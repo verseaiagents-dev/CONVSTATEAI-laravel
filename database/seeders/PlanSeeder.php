@@ -31,7 +31,7 @@ class PlanSeeder extends Seeder
                     'analytics' => 'basic'
                 ],
                 'is_active' => true,
-                'trial_days' => 0,
+                'trial_days' => 7,
                 'usage_tokens' => 50,
                 'token_reset_period' => 'monthly'
             ],
