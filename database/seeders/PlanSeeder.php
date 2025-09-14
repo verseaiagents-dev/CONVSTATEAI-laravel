@@ -14,7 +14,27 @@ class PlanSeeder extends Seeder
     public function run(): void
     {
         $plans = [
-            
+            [
+                'name' => 'Free',
+                'price' => 0,
+                'yearly_price' => 0,
+                'billing_cycle' => 'monthly',
+                'features' => [
+                    'max_projects' => 1,
+                    'max_knowledge_bases' => 2,
+                    'max_chat_sessions' => 50,
+                    'max_products' => 100,
+                    'ai_responses_per_month' => 50,
+                    'widget_customization' => false,
+                    'api_access' => false,
+                    'priority_support' => false,
+                    'analytics' => 'basic'
+                ],
+                'is_active' => true,
+                'trial_days' => 0,
+                'usage_tokens' => 50,
+                'token_reset_period' => 'monthly'
+            ],
             [
                 'name' => 'Starter',
                 'price' => 1000,
