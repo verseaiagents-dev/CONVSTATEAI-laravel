@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "question": "ConvStateAI nedir ve nasıl çalışır?",
+    "answer": "ConvStateAI, e-ticaret siteniz için geliştirilmiş yapay zeka destekli chat widget sistemidir. Müşterilerinize 7/24 hizmet vererek ürün önerileri sunar, sorularını yanıtlar ve dönüşüm oranlarınızı artırır. AI teknolojisi sayesinde müşteri deneyimini kişiselleştirir ve satış süreçlerinizi optimize eder.",
+    "category": "Genel Bilgi",
+    "tags": ["temel", "nasıl çalışır", "ai", "chat widget"],
+    "related_questions": [2, 3, 4]
+  },
+  {
+    "id": 2,
+    "question": "ConvStateAI'ı web siteme nasıl entegre edebilirim?",
+    "answer": "ConvStateAI entegrasyonu çok basittir. Sadece birkaç satır JavaScript kodu ekleyerek widget'ı sitenize dahil edebilirsiniz. Dashboard'dan aldığınız entegrasyon kodunu web sitenizin </body> etiketinden önce yapıştırmanız yeterlidir. Entegrasyon genellikle 5-10 dakika sürer ve anında aktif hale gelir.",
+    "category": "Kurulum",
+    "tags": ["entegrasyon", "kurulum", "javascript", "kod"],
+    "related_questions": [1, 5, 6]
+  },
+  {
+    "id": 3,
+    "question": "Hangi e-ticaret platformları destekleniyor?",
+    "answer": "ConvStateAI tüm e-ticaret platformları ile uyumludur. Shopify, WooCommerce, Magento, PrestaShop, OpenCart ve özel geliştirilmiş e-ticaret siteleri dahil olmak üzere her türlü platformda çalışır. Platform bağımsız bir çözüm olduğu için mevcut sisteminizi değiştirmenize gerek yoktur.",
+    "category": "Uyumluluk",
+    "tags": ["platform", "shopify", "woocommerce", "magento", "uyumluluk"],
+    "related_questions": [1, 7, 8]
+  },
+  {
+    "id": 4,
+    "question": "ConvStateAI'ın fiyatlandırması nasıl?",
+    "answer": "ConvStateAI'ın esnek fiyatlandırma seçenekleri bulunmaktadır. Starter Plan 99.99 TL/ay ile başlar ve temel özellikleri içerir. Professional Plan 199.99 TL/ay ile gelişmiş özellikler sunar. Enterprise Plan ise 499.99 TL/ay ile kurumsal çözümler sağlar. Tüm planlarda 14 gün ücretsiz deneme imkanı vardır.",
+    "category": "Fiyatlandırma",
+    "tags": ["fiyat", "plan", "ücretsiz deneme", "maliyet"],
+    "related_questions": [9, 10, 11]
+  },
+  {
+    "id": 5,
+    "question": "Widget'ın görünümünü özelleştirebilir miyim?",
+    "answer": "Evet, ConvStateAI widget'ının görünümünü tamamen özelleştirebilirsiniz. Renkler, boyutlar, konum, animasyonlar ve mesaj şablonları dahil olmak üzere tüm görsel öğeleri markanıza uygun şekilde düzenleyebilirsiniz. Ayrıca özel CSS kodları ekleyerek daha detaylı özelleştirmeler yapabilirsiniz.",
+    "category": "Özelleştirme",
+    "tags": ["tasarım", "renk", "özelleştirme", "marka", "css"],
+    "related_questions": [2, 12, 13]
+  },
+  {
+    "id": 6,
+    "question": "AI'ın yanıtlarını nasıl eğitebilirim?",
+    "answer": "ConvStateAI'ın AI modelini eğitmek için Knowledge Base bölümünden ürün bilgilerinizi, SSS'lerinizi ve blog içeriklerinizi yükleyebilirsiniz. AI bu verileri analiz ederek müşterilerinize daha doğru ve kişiselleştirilmiş yanıtlar verir. Ayrıca manuel olarak yanıt şablonları oluşturabilir ve AI'ın öğrenmesini hızlandırabilirsiniz.",
+    "category": "AI Eğitimi",
+    "tags": ["ai", "eğitim", "knowledge base", "veri", "öğrenme"],
+    "related_questions": [14, 15, 16]
+  },
+  {
+    "id": 7,
+    "question": "Mobil cihazlarda nasıl çalışır?",
+    "answer": "ConvStateAI tamamen mobil uyumludur. Widget otomatik olarak mobil cihazlarda optimize edilmiş görünüm alır ve dokunmatik kontrollerle kolay kullanım sağlar. Responsive tasarım sayesinde tüm ekran boyutlarında mükemmel çalışır.",
+    "category": "Mobil Uyumluluk",
+    "tags": ["mobil", "responsive", "dokunmatik", "uyumluluk"],
+    "related_questions": [3, 17, 18]
+  },
+  {
+    "id": 8,
+    "question": "Veri güvenliği nasıl sağlanıyor?",
+    "answer": "ConvStateAI, veri güvenliğini en üst seviyede tutar. Tüm veriler SSL şifreleme ile korunur ve GDPR uyumludur. Müşteri verileri güvenli sunucularda saklanır ve üçüncü taraflarla paylaşılmaz. Ayrıca veri silme ve düzenleme haklarınız bulunmaktadır.",
+    "category": "Güvenlik",
+    "tags": ["güvenlik", "ssl", "gdpr", "veri koruma", "şifreleme"],
+    "related_questions": [19, 20, 21]
+  },
+  {
+    "id": 9,
+    "question": "Hangi ödeme yöntemleri kabul ediliyor?",
+    "answer": "ConvStateAI'da kredi kartı, banka kartı, havale/EFT ve taksitli ödeme seçenekleri mevcuttur. Ayrıca kurumsal müşteriler için fatura ile ödeme imkanı da sunulmaktadır. Tüm ödemeler güvenli ödeme sistemleri üzerinden işlenir.",
+    "category": "Ödeme",
+    "tags": ["ödeme", "kredi kartı", "havale", "taksit", "fatura"],
+    "related_questions": [4, 22, 23]
+  },
+  {
+    "id": 10,
+    "question": "Müşteri desteği nasıl sağlanıyor?",
+    "answer": "ConvStateAI'da çoklu destek kanalları bulunmaktadır. Email desteği, canlı chat, telefon desteği ve video konferans seçenekleri mevcuttur. Ayrıca kapsamlı dokümantasyon ve video eğitim serileri ile self-servis destek imkanı sunulmaktadır.",
+    "category": "Destek",
+    "tags": ["destek", "email", "canlı chat", "telefon", "dokümantasyon"],
+    "related_questions": [24, 25, 26]
+  },
+  {
+    "id": 11,
+    "question": "Performans raporları nasıl alınır?",
+    "answer": "ConvStateAI dashboard'unda detaylı performans raporları bulunmaktadır. Konuşma sayıları, dönüşüm oranları, müşteri memnuniyeti, en çok sorulan sorular ve AI performansı gibi metrikleri takip edebilirsiniz. Raporları PDF, Excel veya CSV formatında indirebilirsiniz.",
+    "category": "Raporlama",
+    "tags": ["rapor", "analitik", "performans", "metrik", "dashboard"],
+    "related_questions": [27, 28, 29]
+  },
+  {
+    "id": 12,
+    "question": "Çoklu dil desteği var mı?",
+    "answer": "Evet, ConvStateAI 50+ dil desteği sunar. Widget'ınızı istediğiniz dilde yapılandırabilir ve müşterilerinize kendi dillerinde hizmet verebilirsiniz. AI otomatik olarak müşterinin dilini algılar ve o dilde yanıt verir.",
+    "category": "Çoklu Dil",
+    "tags": ["dil", "çoklu dil", "uluslararası", "lokalizasyon"],
+    "related_questions": [30, 31, 32]
+  },
+  {
+    "id": 13,
+    "question": "API erişimi mevcut mu?",
+    "answer": "Evet, ConvStateAI kapsamlı API desteği sunar. RESTful API ile tüm özelliklere programatik erişim sağlayabilirsiniz. API dokümantasyonu ve SDK'lar mevcuttur. Ayrıca webhook'lar ile gerçek zamanlı veri entegrasyonu yapabilirsiniz.",
+    "category": "API",
+    "tags": ["api", "restful", "webhook", "entegrasyon", "sdk"],
+    "related_questions": [33, 34, 35]
+  },
+  {
+    "id": 14,
+    "question": "Aboneliği nasıl iptal edebilirim?",
+    "answer": "Aboneliğinizi istediğiniz zaman iptal edebilirsiniz. Dashboard'dan 'Abonelik Ayarları' bölümüne giderek iptal işlemini gerçekleştirebilirsiniz. İptal işlemi sonrası mevcut dönem sonuna kadar hizmet almaya devam edersiniz. Verileriniz 30 gün boyunca saklanır.",
+    "category": "Abonelik",
+    "tags": ["iptal", "abonelik", "iade", "veri saklama"],
+    "related_questions": [36, 37, 38]
+  },
+  {
+    "id": 15,
+    "question": "ConvStateAI'ın avantajları nelerdir?",
+    "answer": "ConvStateAI'ın başlıca avantajları: 7/24 müşteri hizmeti, %40'a varan dönüşüm artışı, kişiselleştirilmiş müşteri deneyimi, detaylı analitik raporlar, kolay entegrasyon, maliyet tasarrufu, AI destekli akıllı yanıtlar ve sürekli öğrenen sistem. Bu özellikler sayesinde e-ticaret sitenizin performansını önemli ölçüde artırabilirsiniz.",
+    "category": "Avantajlar",
+    "tags": ["avantaj", "fayda", "dönüşüm", "müşteri deneyimi", "performans"],
+    "related_questions": [1, 39, 40]
+  }
+]

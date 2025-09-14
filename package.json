@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json.schemastore.org/package.json",
+    "name": "convstateai",
+    "version": "1.0.0",
+    "description": "CONVSTATEAI - AI Destekli Chat Widget Sistemi",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "autoprefixer": "^10.4.21",
+        "axios": "^1.11.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "vite": "^7.0.4"
+    },
+    "dependencies": {
+        "@types/styled-components": "^5.1.34",
+        "styled-components": "^6.1.19"
+    }
+}

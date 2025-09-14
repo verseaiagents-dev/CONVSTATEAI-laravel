@@ -1,0 +1,63 @@
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f9ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main Background Circle -->
+  <circle cx="30" cy="30" r="28" fill="url(#bgGradient)" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- AI Brain Circuit Pattern -->
+  <g fill="url(#iconGradient)" opacity="0.9">
+    <!-- Central Node -->
+    <circle cx="30" cy="30" r="4" filter="url(#glow)"/>
+    
+    <!-- Circuit Lines -->
+    <path d="M30 26 L30 20 M30 40 L30 34 M26 30 L20 30 M40 30 L34 30" 
+          stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Connection Nodes -->
+    <circle cx="30" cy="20" r="2"/>
+    <circle cx="30" cy="40" r="2"/>
+    <circle cx="20" cy="30" r="2"/>
+    <circle cx="40" cy="30" r="2"/>
+    
+    <!-- Diagonal Connections -->
+    <path d="M26 26 L24 24 M34 26 L36 24 M26 34 L24 36 M34 34 L36 36" 
+          stroke="url(#iconGradient)" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- Corner Nodes -->
+    <circle cx="24" cy="24" r="1.5"/>
+    <circle cx="36" cy="24" r="1.5"/>
+    <circle cx="24" cy="36" r="1.5"/>
+    <circle cx="36" cy="36" r="1.5"/>
+  </g>
+  
+  <!-- Conversion Arrow -->
+  <g fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 42 L30 30 L42 18" opacity="0.8"/>
+    <path d="M42 18 L38 18 L38 22" opacity="0.8"/>
+  </g>
+  
+  <!-- AI Indicator Dots -->
+  <g fill="#ffffff" opacity="0.7">
+    <circle cx="15" cy="15" r="1.5"/>
+    <circle cx="45" cy="15" r="1.5"/>
+    <circle cx="15" cy="45" r="1.5"/>
+    <circle cx="45" cy="45" r="1.5"/>
+  </g>
+</svg>

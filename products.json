@@ -1,0 +1,197 @@
+[
+  {
+    "id": 1,
+    "name": "ConvStateAI Starter Plan",
+    "description": "E-ticaret siteniz için temel AI chat widget çözümü. Müşteri deneyimini artırın ve dönüşüm oranlarınızı yükseltin.",
+    "price": 99.99,
+    "currency": "TRY",
+    "category": "AI Chat Widget",
+    "features": [
+      "Temel AI chat widget",
+      "5 farklı widget teması",
+      "Temel müşteri analizi",
+      "Email desteği",
+      "Aylık 1000 konuşma limiti"
+    ],
+    "target_audience": "Küçük ve orta ölçekli e-ticaret siteleri",
+    "benefits": [
+      "Müşteri memnuniyetinde %40 artış",
+      "Dönüşüm oranında %25 iyileşme",
+      "7/24 müşteri desteği",
+      "Kolay entegrasyon"
+    ],
+    "technical_specs": {
+      "setup_time": "15 dakika",
+      "integration": "JavaScript SDK",
+      "browser_support": "Tüm modern tarayıcılar",
+      "mobile_responsive": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "14 gün ücretsiz deneme"
+  },
+  {
+    "id": 2,
+    "name": "ConvStateAI Professional",
+    "description": "Gelişmiş AI özellikleri ve detaylı analitik raporlarla e-ticaret sitenizi bir üst seviyeye taşıyın.",
+    "price": 199.99,
+    "currency": "TRY",
+    "category": "AI Chat Widget",
+    "features": [
+      "Gelişmiş AI chat widget",
+      "15+ widget teması",
+      "Detaylı müşteri analizi",
+      "Özel entegrasyonlar",
+      "Aylık 5000 konuşma limiti",
+      "Öncelikli destek",
+      "A/B test özellikleri"
+    ],
+    "target_audience": "Büyük e-ticaret siteleri ve kurumsal müşteriler",
+    "benefits": [
+      "Müşteri memnuniyetinde %60 artış",
+      "Dönüşüm oranında %40 iyileşme",
+      "Detaylı performans raporları",
+      "Özelleştirilebilir AI yanıtları"
+    ],
+    "technical_specs": {
+      "setup_time": "30 dakika",
+      "integration": "JavaScript SDK + API",
+      "browser_support": "Tüm modern tarayıcılar",
+      "mobile_responsive": true,
+      "api_access": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "14 gün ücretsiz deneme"
+  },
+  {
+    "id": 3,
+    "name": "ConvStateAI Enterprise",
+    "description": "Kurumsal seviye AI chat çözümü ile sınırsız özelleştirme ve 7/24 öncelikli destek.",
+    "price": 499.99,
+    "currency": "TRY",
+    "category": "AI Chat Widget",
+    "features": [
+      "Kurumsal AI chat widget",
+      "Sınırsız widget teması",
+      "Gelişmiş müşteri analizi",
+      "Özel entegrasyonlar",
+      "Sınırsız konuşma",
+      "7/24 öncelikli destek",
+      "A/B test özellikleri",
+      "Özel AI model eğitimi",
+      "White-label çözüm"
+    ],
+    "target_audience": "Büyük kurumsal müşteriler ve çoklu site sahipleri",
+    "benefits": [
+      "Müşteri memnuniyetinde %80 artış",
+      "Dönüşüm oranında %60 iyileşme",
+      "Özel AI model eğitimi",
+      "Dedicated account manager"
+    ],
+    "technical_specs": {
+      "setup_time": "1-2 gün",
+      "integration": "JavaScript SDK + API + Custom",
+      "browser_support": "Tüm modern tarayıcılar",
+      "mobile_responsive": true,
+      "api_access": true,
+      "custom_ai_training": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "30 gün ücretsiz deneme"
+  },
+  {
+    "id": 4,
+    "name": "ConvStateAI Analytics Pro",
+    "description": "Detaylı müşteri analizi ve dönüşüm raporları ile e-ticaret performansınızı optimize edin.",
+    "price": 149.99,
+    "currency": "TRY",
+    "category": "Analytics",
+    "features": [
+      "Detaylı konuşma analizi",
+      "Müşteri davranış raporları",
+      "Dönüşüm funnel analizi",
+      "Gerçek zamanlı dashboard",
+      "Özel rapor oluşturma",
+      "Email raporları",
+      "API erişimi"
+    ],
+    "target_audience": "Veri odaklı e-ticaret yöneticileri",
+    "benefits": [
+      "Müşteri davranışlarını anlama",
+      "Dönüşüm noktalarını tespit etme",
+      "ROI hesaplama",
+      "Stratejik karar verme"
+    ],
+    "technical_specs": {
+      "setup_time": "10 dakika",
+      "integration": "Dashboard + API",
+      "data_retention": "12 ay",
+      "export_formats": ["PDF", "Excel", "CSV"]
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "7 gün ücretsiz deneme"
+  },
+  {
+    "id": 5,
+    "name": "ConvStateAI Custom Integration",
+    "description": "Mevcut sistemlerinize özel entegrasyon hizmeti. CRM, ERP ve diğer araçlarla sorunsuz bağlantı.",
+    "price": 299.99,
+    "currency": "TRY",
+    "category": "Integration Services",
+    "features": [
+      "Özel API entegrasyonu",
+      "CRM bağlantısı",
+      "ERP entegrasyonu",
+      "Özel webhook'lar",
+      "Veri senkronizasyonu",
+      "Teknik destek",
+      "Dokümantasyon"
+    ],
+    "target_audience": "Karmaşık sistem mimarisi olan işletmeler",
+    "benefits": [
+      "Mevcut sistemlerle uyum",
+      "Veri tutarlılığı",
+      "İş süreçlerinde optimizasyon",
+      "Teknik uzmanlık"
+    ],
+    "technical_specs": {
+      "setup_time": "1-3 gün",
+      "integration": "Custom API",
+      "supported_systems": ["Salesforce", "HubSpot", "SAP", "Magento", "Shopify"],
+      "maintenance": "6 ay ücretsiz"
+    },
+    "pricing_model": "Tek seferlik + aylık bakım",
+    "trial_period": "Ücretsiz danışmanlık"
+  },
+  {
+    "id": 6,
+    "name": "ConvStateAI Training & Support",
+    "description": "Ekip eğitimi ve sürekli destek hizmetleri ile ConvStateAI'ı maksimum verimlilikle kullanın.",
+    "price": 199.99,
+    "currency": "TRY",
+    "category": "Training & Support",
+    "features": [
+      "Ekip eğitimi (2 saat)",
+      "Özel dokümantasyon",
+      "Video eğitim serisi",
+      "Aylık check-in toplantıları",
+      "Öncelikli destek",
+      "Best practices rehberi",
+      "Sürekli güncellemeler"
+    ],
+    "target_audience": "ConvStateAI kullanıcıları ve ekipleri",
+    "benefits": [
+      "Hızlı öğrenme",
+      "Maksimum verimlilik",
+      "Sürekli gelişim",
+      "Uzman desteği"
+    ],
+    "technical_specs": {
+      "training_duration": "2 saat",
+      "delivery_method": "Online + On-site",
+      "materials": "Video + Dokümantasyon",
+      "support_level": "Öncelikli"
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "Ücretsiz ilk eğitim"
+  }
+]

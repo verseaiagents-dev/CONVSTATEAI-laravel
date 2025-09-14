@@ -1,0 +1,308 @@
+{
+  "hash": "eb97937d9d1cfb1e5545",
+  "version": "5.101.3",
+  "time": 199,
+  "builtAt": 1757759636546,
+  "publicPath": "auto",
+  "outputPath": "/Users/kadirburakdurmazlar/cursor apps/TESTAI/public/widget",
+  "assetsByChunkName": {
+    "main": [
+      "convstateai.min.js"
+    ]
+  },
+  "assets": [
+    {
+      "type": "asset",
+      "name": "convstateai.min.js",
+      "size": 661,
+      "emitted": false,
+      "comparedForEmit": true,
+      "cached": false,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "convstateai.min.js.map"
+        },
+        "size": 661
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 0,
+      "related": [
+        {
+          "type": "sourceMap",
+          "name": "convstateai.min.js.map",
+          "size": 706,
+          "emitted": false,
+          "comparedForEmit": true,
+          "cached": false,
+          "info": {
+            "development": true,
+            "size": 706
+          },
+          "chunkNames": [],
+          "chunkIdHints": [],
+          "auxiliaryChunkNames": [
+            "main"
+          ],
+          "auxiliaryChunkIdHints": [],
+          "related": [],
+          "chunks": [],
+          "auxiliaryChunks": [
+            "main"
+          ],
+          "isOverSizeLimit": false
+        }
+      ],
+      "chunks": [
+        "main"
+      ],
+      "auxiliaryChunks": [],
+      "isOverSizeLimit": false
+    }
+  ],
+  "chunks": [
+    {
+      "rendered": true,
+      "initial": true,
+      "entry": true,
+      "recorded": false,
+      "size": 14,
+      "sizes": {
+        "javascript": 14
+      },
+      "names": [
+        "main"
+      ],
+      "idHints": [],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "convstateai.min.js"
+      ],
+      "auxiliaryFiles": [
+        "convstateai.min.js.map"
+      ],
+      "hash": "b8711b9def928f524025",
+      "childrenByOrder": {},
+      "id": "main",
+      "siblings": [],
+      "parents": [],
+      "children": [],
+      "modules": [
+        {
+          "type": "module",
+          "moduleType": "javascript/auto",
+          "layer": null,
+          "size": 14,
+          "sizes": {
+            "javascript": 14
+          },
+          "built": true,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "/Users/kadirburakdurmazlar/cursor apps/TESTAI/widget/node_modules/ts-loader/index.js??ruleSet[1].rules[0].use!/Users/kadirburakdurmazlar/cursor apps/TESTAI/widget/src/index.tsx",
+          "name": "./src/index.tsx",
+          "nameForCondition": "/Users/kadirburakdurmazlar/cursor apps/TESTAI/widget/src/index.tsx",
+          "index": 0,
+          "preOrderIndex": 0,
+          "index2": 0,
+          "postOrderIndex": 0,
+          "cacheable": true,
+          "optional": false,
+          "orphan": false,
+          "dependent": false,
+          "issuer": null,
+          "issuerName": null,
+          "issuerPath": null,
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": "./src/index.tsx",
+          "issuerId": null,
+          "chunks": [
+            "main"
+          ],
+          "assets": [],
+          "reasons": [
+            {
+              "moduleIdentifier": null,
+              "module": null,
+              "moduleName": null,
+              "resolvedModuleIdentifier": null,
+              "resolvedModule": null,
+              "type": "entry",
+              "active": true,
+              "explanation": "",
+              "userRequest": "./src/index.tsx",
+              "loc": "main",
+              "moduleId": null,
+              "resolvedModuleId": null
+            },
+            {
+              "moduleIdentifier": null,
+              "module": null,
+              "moduleName": null,
+              "resolvedModuleIdentifier": null,
+              "resolvedModule": null,
+              "type": null,
+              "active": true,
+              "explanation": "used as library export",
+              "userRequest": null,
+              "moduleId": null,
+              "resolvedModuleId": null
+            }
+          ],
+          "usedExports": null,
+          "providedExports": null,
+          "optimizationBailout": [],
+          "depth": 0
+        }
+      ],
+      "origins": [
+        {
+          "module": "",
+          "moduleIdentifier": "",
+          "moduleName": "",
+          "loc": "main",
+          "request": "./src/index.tsx"
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "type": "module",
+      "moduleType": "javascript/auto",
+      "layer": null,
+      "size": 14,
+      "sizes": {
+        "javascript": 14
+      },
+      "built": true,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "/Users/kadirburakdurmazlar/cursor apps/TESTAI/widget/node_modules/ts-loader/index.js??ruleSet[1].rules[0].use!/Users/kadirburakdurmazlar/cursor apps/TESTAI/widget/src/index.tsx",
+      "name": "./src/index.tsx",
+      "nameForCondition": "/Users/kadirburakdurmazlar/cursor apps/TESTAI/widget/src/index.tsx",
+      "index": 0,
+      "preOrderIndex": 0,
+      "index2": 0,
+      "postOrderIndex": 0,
+      "cacheable": true,
+      "optional": false,
+      "orphan": false,
+      "issuer": null,
+      "issuerName": null,
+      "issuerPath": null,
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": "./src/index.tsx",
+      "issuerId": null,
+      "chunks": [
+        "main"
+      ],
+      "assets": [],
+      "reasons": [
+        {
+          "moduleIdentifier": null,
+          "module": null,
+          "moduleName": null,
+          "resolvedModuleIdentifier": null,
+          "resolvedModule": null,
+          "type": "entry",
+          "active": true,
+          "explanation": "",
+          "userRequest": "./src/index.tsx",
+          "loc": "main",
+          "moduleId": null,
+          "resolvedModuleId": null
+        },
+        {
+          "moduleIdentifier": null,
+          "module": null,
+          "moduleName": null,
+          "resolvedModuleIdentifier": null,
+          "resolvedModule": null,
+          "type": null,
+          "active": true,
+          "explanation": "used as library export",
+          "userRequest": null,
+          "moduleId": null,
+          "resolvedModuleId": null
+        }
+      ],
+      "usedExports": null,
+      "providedExports": null,
+      "optimizationBailout": [],
+      "depth": 0
+    }
+  ],
+  "entrypoints": {
+    "main": {
+      "name": "main",
+      "chunks": [
+        "main"
+      ],
+      "assets": [
+        {
+          "name": "convstateai.min.js",
+          "size": 661
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": 661,
+      "auxiliaryAssets": [
+        {
+          "name": "convstateai.min.js.map",
+          "size": 706
+        }
+      ],
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 706,
+      "children": {},
+      "childAssets": {},
+      "isOverSizeLimit": false
+    }
+  },
+  "namedChunkGroups": {
+    "main": {
+      "name": "main",
+      "chunks": [
+        "main"
+      ],
+      "assets": [
+        {
+          "name": "convstateai.min.js",
+          "size": 661
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": 661,
+      "auxiliaryAssets": [
+        {
+          "name": "convstateai.min.js.map",
+          "size": 706
+        }
+      ],
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 706,
+      "children": {},
+      "childAssets": {},
+      "isOverSizeLimit": false
+    }
+  },
+  "errors": [],
+  "errorsCount": 0,
+  "warnings": [],
+  "warningsCount": 0,
+  "children": []
+}
