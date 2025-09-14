@@ -21,7 +21,7 @@ Route::get('/subscription/plans', [App\Http\Controllers\SubscriptionController::
 
 // Widget Customization Assets - Public Access
 Route::get('/widgetcust/imgs/{filename}', function ($filename) {
-    $filePath = base_path('widgetcust/imgs/' . $filename);
+    $filePath = public_path('widgetcust/imgs/' . $filename);
     
     if (!file_exists($filePath)) {
         return response('File not found', 404);
