@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('ai_name', 100)->default('Convstate AI');
-            $table->text('welcome_message')->default('Merhaba ben Kadir, senin dijital asistanınım. Sana nasıl yardımcı olabilirim?');
+            $table->string('welcome_message', 500)->default('Merhaba ben Kadir, senin dijital asistanınım. Sana nasıl yardımcı olabilirim?');
             $table->string('primary_color', 7)->default('#007bff'); // Hex color code
             $table->string('secondary_color', 7)->default('#6c757d');
             $table->string('font_family', 50)->default('Arial, sans-serif');
