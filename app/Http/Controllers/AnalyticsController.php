@@ -32,45 +32,89 @@ class AnalyticsController extends Controller
             'product_recommendations'
         ];
 
-        // Query builder'ı başlat
-        $query = ProductInteraction::whereIn('intent', $funnelIntents);
+        // Chat sessions'dan intent verilerini çek
+        $sessionsQuery = EnhancedChatSession::query();
         
         // Project bazlı filtreleme
         if ($projectId) {
-            $query->whereHas('chatSession', function($q) use ($projectId) {
-                $q->where('project_id', $projectId);
-            });
+            $sessionsQuery->where('project_id', $projectId);
         }
+        
+        $sessions = $sessionsQuery->get();
 
-        // Genel kullanım istatistikleri
+        // Genel kullanım istatistikleri - chat history'den intent'leri say
         $funnelUsage = [];
         foreach ($funnelIntents as $intent) {
-            $funnelUsage[$intent] = $query->where('intent', $intent)->count();
+            $funnelUsage[$intent] = 0;
+        }
+
+        foreach ($sessions as $session) {
+            // Chat history'den intent'leri çıkar
+            $chatHistory = $session->getChatHistory();
+            foreach ($chatHistory as $message) {
+                if (isset($message['intent']) && in_array($message['intent'], $funnelIntents)) {
+                    $funnelUsage[$message['intent']]++;
+                }
+            }
+            
+            // Intent history'den de intent'leri çıkar
+            $intentHistory = $session->getIntentHistory();
+            foreach ($intentHistory as $intentData) {
+                $intent = is_array($intentData) ? ($intentData['intent'] ?? null) : $intentData;
+                if ($intent && in_array($intent, $funnelIntents)) {
+                    $funnelUsage[$intent]++;
+                }
+            }
         }
 
         // Bugünkü kullanım
         $funnelUsageToday = [];
         foreach ($funnelIntents as $intent) {
-            $funnelUsageToday[$intent] = $query->where('intent', $intent)
-                ->whereDate('created_at', today())
-                ->count();
+            $funnelUsageToday[$intent] = 0;
+        }
+        
+        $todaySessions = $sessionsQuery->whereDate('created_at', today())->get();
+        foreach ($todaySessions as $session) {
+            $chatHistory = $session->getChatHistory();
+            foreach ($chatHistory as $message) {
+                if (isset($message['intent']) && in_array($message['intent'], $funnelIntents)) {
+                    $funnelUsageToday[$message['intent']]++;
+                }
+            }
         }
 
         // Bu haftaki kullanım
         $funnelUsageWeek = [];
         foreach ($funnelIntents as $intent) {
-            $funnelUsageWeek[$intent] = $query->where('intent', $intent)
-                ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
-                ->count();
+            $funnelUsageWeek[$intent] = 0;
+        }
+        
+        $weekSessions = $sessionsQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->get();
+        foreach ($weekSessions as $session) {
+            $chatHistory = $session->getChatHistory();
+            foreach ($chatHistory as $message) {
+                if (isset($message['intent']) && in_array($message['intent'], $funnelIntents)) {
+                    $funnelUsageWeek[$message['intent']]++;
+                }
+            }
         }
 
         // Bu ayki kullanım
         $funnelUsageMonth = [];
         foreach ($funnelIntents as $intent) {
-            $funnelUsageMonth[$intent] = $query->where('intent', $intent)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
+            $funnelUsageMonth[$intent] = 0;
+        }
+        
+        $monthSessions = $sessionsQuery->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->get();
+        foreach ($monthSessions as $session) {
+            $chatHistory = $session->getChatHistory();
+            foreach ($chatHistory as $message) {
+                if (isset($message['intent']) && in_array($message['intent'], $funnelIntents)) {
+                    $funnelUsageMonth[$message['intent']]++;
+                }
+            }
         }
 
         // En popüler funnel intent'ler
@@ -82,33 +126,44 @@ class AnalyticsController extends Controller
         // Conversion rate hesapla
         $funnelConversions = [];
         foreach ($funnelIntents as $intent) {
-            $sessionsWithIntent = $query->where('intent', $intent)
-                ->distinct('session_id')
-                ->pluck('session_id');
-            
+            $sessionsWithIntent = 0;
             $conversions = 0;
-            foreach ($sessionsWithIntent as $sessionId) {
-                $hasConversion = ProductInteraction::where('session_id', $sessionId)
-                    ->whereIn('action', ['buy', 'add_to_cart'])
-                    ->exists();
-                if ($hasConversion) {
-                    $conversions++;
+            
+            foreach ($sessions as $session) {
+                $hasIntent = false;
+                $chatHistory = $session->getChatHistory();
+                foreach ($chatHistory as $message) {
+                    if (isset($message['intent']) && $message['intent'] === $intent) {
+                        $hasIntent = true;
+                        break;
+                    }
+                }
+                
+                if ($hasIntent) {
+                    $sessionsWithIntent++;
+                    
+                    // Bu session'da conversion var mı kontrol et
+                    $hasConversion = $session->productInteractions()
+                        ->whereIn('action', ['buy', 'add_to_cart'])
+                        ->exists();
+                    if ($hasConversion) {
+                        $conversions++;
+                    }
                 }
             }
             
-            $totalSessions = $sessionsWithIntent->count();
-            $funnelConversions[$intent] = $totalSessions > 0 
-                ? round(($conversions / $totalSessions) * 100, 2) 
+            $funnelConversions[$intent] = $sessionsWithIntent > 0 
+                ? round(($conversions / $sessionsWithIntent) * 100, 2) 
                 : 0;
         }
 
-        // Yeni funnel stage dağılımı
+        // Gerçek kullanıcı etkileşimlerine göre funnel stage dağılımı
         $funnelStages = [
-            'awareness' => $funnelUsage['capabilities_inquiry'] + $funnelUsage['project_info'],
-            'interest' => $funnelUsage['product_recommendations'] + $funnelUsage['pricing_guidance'],
-            'consideration' => $funnelUsage['conversion_guidance'],
-            'intent' => $funnelUsage['demo_request'],
-            'action' => $funnelUsage['contact_request']
+            'awareness' => $this->calculateStageCount($sessions, ['capabilities_inquiry', 'project_info']),
+            'interest' => $this->calculateStageCount($sessions, ['product_recommendations', 'pricing_guidance']),
+            'consideration' => $this->calculateStageCount($sessions, ['conversion_guidance']),
+            'intent' => $this->calculateStageCount($sessions, ['demo_request']),
+            'action' => $this->calculateStageCount($sessions, ['contact_request'])
         ];
 
         return [
@@ -661,51 +716,66 @@ class AnalyticsController extends Controller
     }
 
     /**
-     * Widget tracking verilerini hesapla
+     * Widget tracking verilerini hesapla - gerçek database verileriyle
      */
     private function calculateWidgetTrackingStats($projectId = null)
     {
-        $query = WidgetTracking::query();
+        // ProductInteraction tablosundan gerçek verileri çek
+        $interactionsQuery = ProductInteraction::query();
         
         if ($projectId) {
-            $query->where('project_id', $projectId);
+            $interactionsQuery->whereHas('chatSession', function($q) use ($projectId) {
+                $q->where('project_id', $projectId);
+            });
         }
 
-        // Genel istatistikler
-        $totalClicks = $query->where('event_type', 'product_link_click')->count();
-        $totalInteractions = $query->count();
+        // Genel istatistikler - gerçek ürün tıklamaları
+        $totalClicks = $interactionsQuery->whereIn('action', ['view', 'click', 'add_to_cart', 'buy'])->count();
+        $totalInteractions = $interactionsQuery->count();
         
         // Bugünkü tıklamalar
-        $todayClicks = $query->where('event_type', 'product_link_click')
+        $todayClicks = $interactionsQuery->whereIn('action', ['view', 'click', 'add_to_cart', 'buy'])
             ->whereDate('created_at', today())
             ->count();
             
-        // Intent bazlı tıklamalar
-        $intentClicks = $query->where('event_type', 'product_link_click')
+        // Intent bazlı tıklamalar - gerçek intent verileri
+        $intentClicks = $interactionsQuery->whereIn('action', ['view', 'click', 'add_to_cart', 'buy'])
+            ->whereNotNull('intent')
             ->select('intent', DB::raw('count(*) as count'))
             ->groupBy('intent')
             ->pluck('count', 'intent')
             ->toArray();
             
-        // En çok tıklanan ürünler
-        $topProducts = $query->where('event_type', 'product_link_click')
-            ->whereNotNull('product_name')
-            ->select('product_name', DB::raw('count(*) as count'))
-            ->groupBy('product_name')
-            ->orderBy(DB::raw('count(*)'), 'desc')
-            ->limit(5)
-            ->pluck('count', 'product_name')
+        // En çok tıklanan ürünler - gerçek ürün verileri
+        $topProducts = $interactionsQuery->whereIn('action', ['view', 'click', 'add_to_cart', 'buy'])
+            ->whereNotNull('product_id')
+            ->with('product')
+            ->get()
+            ->groupBy('product_id')
+            ->map(function($interactions) {
+                $product = $interactions->first()->product;
+                return [
+                    'name' => $product ? ($product->name ?? $product->title ?? 'Bilinmeyen Ürün') : 'Bilinmeyen Ürün',
+                    'count' => $interactions->count()
+                ];
+            })
+            ->sortByDesc('count')
+            ->take(5)
+            ->pluck('count', 'name')
             ->toArray();
             
-        // Son 7 günlük tıklama trendi
+        // Son 7 günlük tıklama trendi - gerçek veriler
         $weeklyTrend = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
-            $clicks = $query->where('event_type', 'product_link_click')
+            $clicks = $interactionsQuery->whereIn('action', ['view', 'click', 'add_to_cart', 'buy'])
                 ->whereDate('created_at', $date)
                 ->count();
             $weeklyTrend[$date] = $clicks;
         }
+
+        // Funnel stage dağılımı için gerçek veriler
+        $funnelStageData = $this->calculateRealFunnelStages($interactionsQuery);
 
         return [
             'total_clicks' => $totalClicks,
@@ -713,7 +783,8 @@ class AnalyticsController extends Controller
             'today_clicks' => $todayClicks,
             'intent_clicks' => $intentClicks,
             'top_products' => $topProducts,
-            'weekly_trend' => $weeklyTrend
+            'weekly_trend' => $weeklyTrend,
+            'funnel_stages' => $funnelStageData
         ];
     }
 
@@ -750,6 +821,87 @@ class AnalyticsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Gerçek funnel stage verilerini hesapla - ProductInteraction tablosundan
+     */
+    private function calculateRealFunnelStages($interactionsQuery)
+    {
+        // Gerçek kullanıcı etkileşimlerine göre funnel stage'leri hesapla
+        $stages = [
+            'awareness' => 0,    // Ürün görüntüleme
+            'interest' => 0,     // Ürün detayına tıklama
+            'consideration' => 0, // Karşılaştırma
+            'intent' => 0,       // Sepete ekleme
+            'action' => 0        // Satın alma
+        ];
+
+        // Awareness: Ürün görüntüleme (view action)
+        $stages['awareness'] = $interactionsQuery->where('action', 'view')->count();
+
+        // Interest: Ürün detayına tıklama (click action)
+        $stages['interest'] = $interactionsQuery->where('action', 'click')->count();
+
+        // Consideration: Karşılaştırma (compare action)
+        $stages['consideration'] = $interactionsQuery->where('action', 'compare')->count();
+
+        // Intent: Sepete ekleme (add_to_cart action)
+        $stages['intent'] = $interactionsQuery->where('action', 'add_to_cart')->count();
+
+        // Action: Satın alma (buy action)
+        $stages['action'] = $interactionsQuery->where('action', 'buy')->count();
+
+        return $stages;
+    }
+
+    /**
+     * Funnel stage count hesapla - gerçek kullanıcı etkileşimlerine göre
+     */
+    private function calculateStageCount($sessions, $intents): int
+    {
+        $count = 0;
+        
+        foreach ($sessions as $session) {
+            $hasAnyIntent = false;
+            
+            // Chat history'den intent'leri kontrol et
+            $chatHistory = $session->getChatHistory();
+            foreach ($chatHistory as $message) {
+                if (isset($message['intent']) && in_array($message['intent'], $intents)) {
+                    $hasAnyIntent = true;
+                    break;
+                }
+            }
+            
+            // Intent history'den de kontrol et
+            if (!$hasAnyIntent) {
+                $intentHistory = $session->getIntentHistory();
+                foreach ($intentHistory as $intentData) {
+                    $intent = is_array($intentData) ? ($intentData['intent'] ?? null) : $intentData;
+                    if ($intent && in_array($intent, $intents)) {
+                        $hasAnyIntent = true;
+                        break;
+                    }
+                }
+            }
+            
+            // Product interactions'dan da kontrol et
+            if (!$hasAnyIntent) {
+                $hasInteraction = $session->productInteractions()
+                    ->whereIn('intent', $intents)
+                    ->exists();
+                if ($hasInteraction) {
+                    $hasAnyIntent = true;
+                }
+            }
+            
+            if ($hasAnyIntent) {
+                $count++;
+            }
+        }
+        
+        return $count;
     }
 
     /**

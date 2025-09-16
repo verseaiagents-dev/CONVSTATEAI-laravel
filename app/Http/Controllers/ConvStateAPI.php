@@ -82,7 +82,7 @@ class ConvStateAPI extends Controller
                 ]);
                 return response()->json([
                     'success' => false,
-                    'message' => 'Project ID is required',
+                    'message' => 'Proje ID gerekli',
                     'error' => 'MISSING_PROJECT_ID'
                 ], 400);
             }
@@ -92,62 +92,51 @@ class ConvStateAPI extends Controller
             if ($project && $project->created_by) {
                 $user = \App\Models\User::find($project->created_by);
                 if ($user) {
-                    $usageToken = \App\Models\UsageToken::getActiveForUser($user->id);
-                    
-                    if (!$usageToken) {
+                    // Yeni User tablosundaki token sistemi
+                    if (!$user->current_plan_id) {
                         return response()->json([
                             'success' => false,
-                            'type' => 'error',
-                            'message' => 'Kullanım token\'ınız bulunmuyor. Lütfen bir plan satın alın.',
-                            'error' => 'NO_USAGE_TOKENS',
-                            'redirect' => route('dashboard.subscription.index'),
+                            'error' => 'NO_ACTIVE_PLAN',
+                            'message' => 'Aktif planınız bulunmuyor. Lütfen bir plan satın alın.',
                             'data' => [
-                                'error' => 'NO_USAGE_TOKENS',
-                                'redirect' => route('dashboard.subscription.index')
+                                'error' => 'NO_ACTIVE_PLAN',
+                                'redirect' => route('dashboard.subscription.index'),
+                                'action' => 'purchase_plan'
                             ]
-                        ], 403);
+                        ], 403, [], JSON_UNESCAPED_UNICODE);
                     }
 
-                    if ($usageToken->isExpired()) {
+                    if ($user->isTokenExpired()) {
                         return response()->json([
                             'success' => false,
-                            'type' => 'error',
-                            'message' => 'Kullanım token\'larınızın süresi dolmuş. Lütfen planınızı yenileyin.',
                             'error' => 'USAGE_TOKENS_EXPIRED',
-                            'redirect' => route('dashboard.subscription.index'),
-                            'tokens_remaining' => $usageToken->tokens_remaining,
-                            'tokens_used' => $usageToken->tokens_used,
-                            'reset_date' => $usageToken->reset_date,
+                            'message' => 'Kullanım token\'larınızın süresi dolmuş. Lütfen planınızı yenileyin.',
                             'data' => [
                                 'error' => 'USAGE_TOKENS_EXPIRED',
                                 'redirect' => route('dashboard.subscription.index'),
-                                'tokens_remaining' => $usageToken->tokens_remaining,
-                                'tokens_used' => $usageToken->tokens_used,
-                                'reset_date' => $usageToken->reset_date
+                                'tokens_remaining' => $user->tokens_remaining,
+                                'tokens_used' => $user->tokens_used,
+                                'reset_date' => $user->token_reset_date,
+                                'action' => 'renew_plan'
                             ]
-                        ], 403);
+                        ], 403, [], JSON_UNESCAPED_UNICODE);
                     }
 
-                    if (!$usageToken->canUseToken()) {
+                    if (!$user->canUseToken()) {
                         return response()->json([
                             'success' => false,
-                            'type' => 'error',
-                            'message' => 'Yetersiz kullanım token\'ı. Lütfen daha fazla token satın alın.',
                             'error' => 'INSUFFICIENT_TOKENS',
-                            'redirect' => route('dashboard.subscription.index'),
-                            'tokens_remaining' => $usageToken->tokens_remaining,
-                            'tokens_used' => $usageToken->tokens_used,
-                            'tokens_total' => $usageToken->tokens_total,
-                            'usage_percentage' => $usageToken->usage_percentage,
+                            'message' => 'Yetersiz kullanım token\'ı. Lütfen daha fazla token satın alın.',
                             'data' => [
                                 'error' => 'INSUFFICIENT_TOKENS',
                                 'redirect' => route('dashboard.subscription.index'),
-                                'tokens_remaining' => $usageToken->tokens_remaining,
-                                'tokens_used' => $usageToken->tokens_used,
-                                'tokens_total' => $usageToken->tokens_total,
-                                'usage_percentage' => $usageToken->usage_percentage
+                                'tokens_remaining' => $user->tokens_remaining,
+                                'tokens_used' => $user->tokens_used,
+                                'tokens_total' => $user->tokens_total,
+                                'usage_percentage' => $user->token_usage_percentage,
+                                'action' => 'upgrade_plan'
                             ]
-                        ], 403);
+                        ], 403, [], JSON_UNESCAPED_UNICODE);
                     }
                 }
             }
@@ -185,7 +174,20 @@ class ConvStateAPI extends Controller
                     $response['ai_system_status'] = 'intent_detection_fallback';
                     $response['knowledge_base_results'] = $this->simulateKnowledgeBaseSearch($userMessage);
                     
-                    return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
+                    return response()->json([
+                        'success' => true,
+                        'type' => $response['type'] ?? 'general',
+                        'message' => $response['message'] ?? 'Üzgünüm, şu anda yanıt veremiyorum.',
+                        'data' => [
+                            'products' => $response['products'] ?? [],
+                            'intent' => $response['intent'] ?? 'general',
+                            'confidence' => $response['confidence'] ?? 0.8,
+                            'session_id' => $response['session_id'],
+                            'ai_system_status' => $response['ai_system_status'],
+                            'knowledge_base_results' => $response['knowledge_base_results']
+                        ],
+                        'session_id' => $response['session_id']
+                    ], 200, [], JSON_UNESCAPED_UNICODE);
                 } else {
                     // Enhanced fallback response - AI sistemi simülasyonu
                     $response = $this->generateEnhancedFallbackResponse($userMessage);
@@ -195,7 +197,20 @@ class ConvStateAPI extends Controller
                     $response['ai_system_status'] = 'fallback_mode';
                     $response['knowledge_base_results'] = $this->simulateKnowledgeBaseSearch($userMessage);
                     
-                    return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
+                    return response()->json([
+                        'success' => true,
+                        'type' => $response['type'] ?? 'general',
+                        'message' => $response['message'] ?? 'Üzgünüm, şu anda yanıt veremiyorum.',
+                        'data' => [
+                            'products' => $response['products'] ?? [],
+                            'intent' => $response['intent'] ?? 'general',
+                            'confidence' => $response['confidence'] ?? 0.7,
+                            'session_id' => $response['session_id'],
+                            'ai_system_status' => $response['ai_system_status'],
+                            'knowledge_base_results' => $response['knowledge_base_results']
+                        ],
+                        'session_id' => $response['session_id']
+                    ], 200, [], JSON_UNESCAPED_UNICODE);
                 }
             }
             
@@ -300,21 +315,6 @@ class ConvStateAPI extends Controller
             // 5. AI interaction'ı logla
             $this->logAIInteraction($userMessage, $intent, $response, $sessionId);
             
-            // 6. Usage token kullanımını kaydet (başarılı response sonrası)
-            if (isset($project) && $project && $project->created_by) {
-                $user = \App\Models\User::find($project->created_by);
-                if ($user) {
-                    $usageToken = \App\Models\UsageToken::getActiveForUser($user->id);
-                    if ($usageToken && $usageToken->canUseToken()) {
-                        $usageToken->useToken();
-                        Log::info('Usage token consumed', [
-                            'user_id' => $user->id,
-                            'tokens_remaining' => $usageToken->tokens_remaining,
-                            'tokens_used' => $usageToken->tokens_used
-                        ]);
-                    }
-                }
-            }
             
             // 7. Session'a mesaj ekle (context için)
             try {
@@ -334,8 +334,10 @@ class ConvStateAPI extends Controller
                     $session->addChatMessage('assistant', $response['message'] ?? '', $intent, $response);
                     
                     // User preferences'i güncelle (ürün bilgisi varsa)
-                    if (isset($response['products']) && !empty($response['products'])) {
-                        $preferences = $session->user_preferences ?? [];
+                    if (isset($response['products']) && !empty($response['products']) && is_array($response['products'])) {
+                        // user_preferences'i güvenli bir şekilde array olarak al
+                        $preferences = $this->getUserPreferencesAsArray($session->user_preferences);
+                        
                         $preferences['last_products'] = array_slice($response['products'], 0, 3);
                         
                         if (isset($response['data']['category'])) {
@@ -359,12 +361,58 @@ class ConvStateAPI extends Controller
                 Log::error('Session message add error: ' . $e->getMessage());
             }
             
+            // Token kullanımını kaydet (başarılı response sonrası)
+            // Token kullanımı - sadece başarılı response sonrası
+            $tokenUsed = false;
+            $user = null;
+            if ($project && $project->created_by) {
+                $user = \App\Models\User::find($project->created_by);
+                Log::info('Token usage check', [
+                    'project_id' => $project->id,
+                    'project_created_by' => $project->created_by,
+                    'user_found' => $user ? 'Yes' : 'No',
+                    'user_id' => $user ? $user->id : null,
+                    'can_use_token' => $user ? $user->canUseToken() : false,
+                    'tokens_remaining' => $user ? $user->tokens_remaining : null
+                ]);
+                
+                if ($user && $user->canUseToken()) {
+                    $user->useToken(1); // Her chat mesajı için 1 token kullan
+                    $tokenUsed = true;
+                    Log::info('Token used for chat', [
+                        'user_id' => $user->id,
+                        'tokens_remaining' => $user->fresh()->tokens_remaining,
+                        'tokens_used' => $user->fresh()->tokens_used
+                    ]);
+                }
+            } else {
+                Log::info('No project or created_by for token usage', [
+                    'project' => $project ? 'Found' : 'Not found',
+                    'created_by' => $project ? $project->created_by : null
+                ]);
+            }
+            
             return $this->jsonResponse($response);
             
         } catch (\Exception $e) {
             Log::error('Chat error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
+            
+            // Token rollback - hata durumunda token'ı geri al
+            if (isset($tokenUsed) && $tokenUsed && isset($user) && $user) {
+                try {
+                    $user->increment('tokens_remaining', 1);
+                    $user->decrement('tokens_used', 1);
+                    Log::info('Token rolled back due to error', [
+                        'user_id' => $user->id,
+                        'tokens_remaining' => $user->fresh()->tokens_remaining,
+                        'tokens_used' => $user->fresh()->tokens_used
+                    ]);
+                } catch (\Exception $rollbackError) {
+                    Log::error('Token rollback failed: ' . $rollbackError->getMessage());
+                }
+            }
             
             // Fallback response on error
             $fallbackResponse = $this->generateFallbackResponse($userMessage ?? '');
@@ -1372,8 +1420,8 @@ class ConvStateAPI extends Controller
     private function generateProductRecommendationResponse(string $userMessage, array $searchResults): array
     {
         try {
-            // Rastgele ürün önerisi kontrolü
-            $isRandomRequest = preg_match('/(rastgele|random|herhangi bir|ne olursa olsun|fark etmez)/i', $userMessage);
+            // Rastgele ürün önerisi kontrolü - "ne önerirsin" pattern'ini de dahil et
+            $isRandomRequest = preg_match('/(rastgele|random|herhangi bir|ne olursa olsun|fark etmez|ne önerirsin|ne tavsiye edersin|bana ne önerirsin)/i', $userMessage);
             
             if ($isRandomRequest) {
                 // Rastgele ürün önerisi için özel handling
@@ -1392,6 +1440,23 @@ class ConvStateAPI extends Controller
                             'is_personalized' => 0,
                             'is_random' => true,
                             'reason' => 'Rastgele seçilmiş ürünler',
+                            'category_matched' => false
+                        ]
+                    ];
+                } else {
+                    // Knowledge base'de ürün yoksa
+                    return [
+                        'type' => 'product_recommendation',
+                        'message' => 'Üzgünüm, şu anda önerebileceğim ürün bulunmuyor. Lütfen daha sonra tekrar deneyin.',
+                        'products' => [],
+                        'data' => [
+                            'products' => [],
+                            'search_query' => $userMessage,
+                            'total_found' => 0,
+                            'search_confidence' => 'low',
+                            'is_personalized' => 0,
+                            'is_random' => true,
+                            'reason' => 'Ürün bulunamadı',
                             'category_matched' => false
                         ]
                     ];
@@ -1439,18 +1504,35 @@ class ConvStateAPI extends Controller
             
             // Fallback response - knowledge base'den rastgele ürünler getir
             $fallbackProducts = $this->getRandomProductsFromKnowledgeBase(6);
-            return [
-                'type' => 'product_recommendation',
-                'message' => 'Size özel ürün önerileri hazırlıyorum:',
-                'products' => $fallbackProducts,
-                'data' => [
+            
+            if (!empty($fallbackProducts)) {
+                return [
+                    'type' => 'product_recommendation',
+                    'message' => 'Size özel ürün önerileri hazırlıyorum:',
                     'products' => $fallbackProducts,
-                    'search_query' => $userMessage,
-                    'total_found' => count($fallbackProducts),
-                    'search_confidence' => 'low',
-                    'is_personalized' => 1
-                ]
-            ];
+                    'data' => [
+                        'products' => $fallbackProducts,
+                        'search_query' => $userMessage,
+                        'total_found' => count($fallbackProducts),
+                        'search_confidence' => 'low',
+                        'is_personalized' => 1
+                    ]
+                ];
+            } else {
+                // Knowledge base'de ürün yoksa
+                return [
+                    'type' => 'product_recommendation',
+                    'message' => 'Üzgünüm, şu anda önerebileceğim ürün bulunmuyor. Lütfen daha sonra tekrar deneyin.',
+                    'products' => [],
+                    'data' => [
+                        'products' => [],
+                        'search_query' => $userMessage,
+                        'total_found' => 0,
+                        'search_confidence' => 'low',
+                        'is_personalized' => 0
+                    ]
+                ];
+            }
         }
     }
     
@@ -1468,6 +1550,12 @@ class ConvStateAPI extends Controller
                 ->limit($limit)
                 ->get();
             
+            // Eğer knowledge base'de ürün yoksa boş array döndür
+            if ($chunks->isEmpty()) {
+                Log::info('No products found in knowledge base');
+                return [];
+            }
+            
             $products = [];
             foreach ($chunks as $chunk) {
                 // Chunk content'ini JSON olarak parse et
@@ -1475,6 +1563,11 @@ class ConvStateAPI extends Controller
                 
                 if (!$productData) {
                     continue; // JSON parse edilemezse skip et
+                }
+                
+                // Eğer ürün verisi eksikse veya geçersizse skip et
+                if (empty($productData['name']) && empty($productData['title'])) {
+                    continue;
                 }
                 
                 // Metadata'nın zaten array olup olmadığını kontrol et
@@ -1486,7 +1579,7 @@ class ConvStateAPI extends Controller
                 
                 $products[] = [
                     'id' => $productData['id'] ?? $chunk->id,
-                    'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
+                    'name' => $productData['name'] ?? $productData['title'] ?? 'Ürün',
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
                     'brand' => $productData['brand'] ?? 'Bilinmeyen',
@@ -1507,6 +1600,7 @@ class ConvStateAPI extends Controller
         }
     }
     
+    
     /**
      * Rastgele ürünler ekler
      */
@@ -1522,7 +1616,10 @@ class ConvStateAPI extends Controller
             foreach (array_slice($allChunks, 0, 6) as $chunk) {
                 $product = $this->extractProductFromChunk($chunk);
                 if ($product && count($products) < 6) {
-                    $products[] = $product;
+                    // Sadece geçerli ürün verisi varsa ekle
+                    if (!empty($product['name']) && $product['name'] !== 'Ürün') {
+                        $products[] = $product;
+                    }
                 }
             }
         }
@@ -1811,12 +1908,18 @@ class ConvStateAPI extends Controller
                     // Eğer array ise ilk elemanı al, değilse direkt kullan
                     $productData = is_numeric(array_keys($jsonData)[0]) ? $jsonData[0] : $jsonData;
                     
+                    // Eğer ürün adı yoksa null döndür
+                    $productName = $productData['title'] ?? $productData['name'] ?? null;
+                    if (empty($productName)) {
+                        return null;
+                    }
+                    
                     return [
                         'id' => $productData['id'] ?? $chunk['id'] ?? uniqid(),
-                        'name' => $productData['title'] ?? $productData['name'] ?? 'Ürün',
+                        'name' => $productName,
                         'brand' => $productData['brand'] ?? 'Marka',
                         'price' => $productData['price'] ?? 0,
-                        'image' => $productData['image'] ?? '/imgs/default-product.jpeg',
+                        'image' => $productData['image'] ?? '/widgetcust/imgs/default-product.svg',
                         'category' => $productData['category'] ?? 'Genel',
                         'rating' => is_array($productData['rating']) ? ($productData['rating']['rate'] ?? 4.0) : ($productData['rating'] ?? 4.0),
                         'relevance_score' => $chunk['relevance_score'] ?? $chunk['fuzzy_score'] ?? 0
@@ -1826,12 +1929,17 @@ class ConvStateAPI extends Controller
             
             // Metadata'dan ürün bilgilerini al
             if (!empty($metadata)) {
+                $productName = $metadata['product_title'] ?? null;
+                if (empty($productName)) {
+                    return null;
+                }
+                
                 return [
                     'id' => $metadata['product_id'] ?? $chunk['id'] ?? uniqid(),
-                    'name' => $metadata['product_title'] ?? 'Ürün',
+                    'name' => $productName,
                     'brand' => 'Marka',
                     'price' => $metadata['product_price'] ?? 0,
-                    'image' => '/imgs/default-product.jpeg',
+                    'image' => '/widgetcust/imgs/default-product.svg',
                     'category' => $metadata['product_category'] ?? 'Genel',
                     'rating' => $metadata['product_rating']['rate'] ?? 4.0,
                     'relevance_score' => $chunk['relevance_score'] ?? $chunk['fuzzy_score'] ?? 0
@@ -2311,6 +2419,48 @@ class ConvStateAPI extends Controller
     }
 
     /**
+     * Check Daily View Limit API - Widget yüklenmeden önce limit kontrolü
+     */
+    public function checkDailyViewLimit(Request $request)
+    {
+        try {
+            $sessionId = $request->input('session_id', 'unknown');
+            
+            // Find or create session
+            $session = EnhancedChatSession::firstOrCreate([
+                'session_id' => $sessionId
+            ], [
+                'status' => 'active',
+                'daily_view_count' => 0,
+                'daily_view_limit' => 20
+            ]);
+
+            // Daily limits'i kontrol et ve gerekirse sıfırla
+            $session->refreshDailyLimits();
+            
+            return response()->json([
+                'success' => true,
+                'can_view' => $session->canViewMore(),
+                'daily_view_count' => $session->daily_view_count,
+                'daily_view_limit' => $session->daily_view_limit,
+                'session_id' => $sessionId
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Daily view limit check failed', [
+                'error' => $e->getMessage(),
+                'session_id' => $request->input('session_id')
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'can_view' => false,
+                'error' => 'Limit kontrolü başarısız'
+            ], 500);
+        }
+    }
+
+    /**
      * Product Interaction API - Ürün etkileşimlerini track eder
      */
     public function handleProductInteraction(Request $request)
@@ -2320,7 +2470,7 @@ class ConvStateAPI extends Controller
             $validated = $request->validate([
                 'session_id' => 'required|string',
                 'product_id' => 'required|integer', // products tablosu henüz yok, validation'ı kaldır
-                'action' => 'required|string|in:view,compare,add_to_cart,buy',
+                'action' => 'required|string|in:view,compare,add_to_cart,buy,price_comparison',
                 'timestamp' => 'required|date',
                 'source' => 'required|string|in:chat_widget,product_page,checkout',
                 'metadata' => 'sometimes|array'
@@ -2349,9 +2499,13 @@ class ConvStateAPI extends Controller
                 ]);
 
                 return response()->json([
+                    'success' => false,
                     'error' => 'Daily view limit reached',
+                    'message' => 'Günlük görüntüleme limitinize ulaştınız. Yarın tekrar deneyebilirsiniz.',
+                    'session_id' => $validated['session_id'],
                     'daily_view_count' => $session->daily_view_count,
-                    'daily_view_limit' => $session->daily_view_limit
+                    'daily_view_limit' => $session->daily_view_limit,
+                    'show_notification' => true
                 ], 429);
             }
 
@@ -2390,12 +2544,23 @@ class ConvStateAPI extends Controller
                 ]
             );
 
+            // Prepare response message based on action
+            $responseMessage = 'Product interaction tracked successfully';
+            $isDevelopment = false;
+            
+            if ($validated['action'] === 'compare') {
+                $responseMessage = 'Ürün karşılaştırma özelliği aktif! Benzer ürünleri karşılaştırmak için fiyat karşılaştırması yapılıyor...';
+                $isDevelopment = false; // Artık development değil, aktif özellik
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Product interaction tracked successfully',
+                'message' => $responseMessage,
                 'session_id' => $validated['session_id'],
                 'daily_view_count' => $session->fresh()->daily_view_count,
-                'daily_view_limit' => $session->daily_view_limit
+                'daily_view_limit' => $session->daily_view_limit,
+                'action' => $validated['action'],
+                'isDevelopment' => $isDevelopment
             ]);
 
         } catch (\Exception $e) {
@@ -2415,6 +2580,481 @@ class ConvStateAPI extends Controller
                 'error' => 'Failed to track product interaction',
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Product Details API - AI ile ürün detayları üretir
+     */
+    public function getProductDetails(Request $request)
+    {
+        try {
+            // Validate request
+            $validated = $request->validate([
+                'session_id' => 'required|string',
+                'product_id' => 'required|integer',
+                'product_name' => 'required|string',
+                'product_description' => 'sometimes|string',
+                'product_price' => 'sometimes|numeric',
+                'product_category' => 'sometimes|string',
+                'action' => 'required|string|in:get_details,view,compare'
+            ]);
+
+            // Find session
+            $session = EnhancedChatSession::where('session_id', $validated['session_id'])->first();
+            if (!$session) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session not found'
+                ], 404);
+            }
+
+            // Check daily limits
+            if (!$session->canViewMore()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Daily view limit reached',
+                    'daily_view_count' => $session->daily_view_count,
+                    'daily_view_limit' => $session->daily_view_limit
+                ], 429);
+            }
+
+            // Generate AI-powered product details
+            $aiDetails = $this->generateAIProductDetails($validated);
+
+            // Update session view count
+            $session->incrementViewCount();
+            $session->updateLastActivity();
+
+            // Log the interaction
+            \App\Services\AuditLogService::logProductInteraction(
+                $validated['session_id'],
+                $validated['product_id'],
+                'get_details',
+                ['ai_generated' => true]
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $aiDetails,
+                'session_id' => $validated['session_id'],
+                'daily_view_count' => $session->fresh()->daily_view_count,
+                'daily_view_limit' => $session->daily_view_limit
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Product details generation failed', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate product details',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * AI ile ürün detayları üretir
+     */
+    private function generateAIProductDetails($productData)
+    {
+        try {
+            $productName = $productData['product_name'];
+            $productDescription = $productData['product_description'] ?? '';
+            $productPrice = $productData['product_price'] ?? 0;
+            $productCategory = $productData['product_category'] ?? 'Genel';
+
+            // AI prompt oluştur
+            $prompt = $this->buildProductDetailsPrompt($productName, $productDescription, $productPrice, $productCategory);
+            
+            // OpenAI API'yi çağır
+            $aiResponse = $this->aiService->generateResponse($prompt, []);
+            
+            // Response'u parse et
+            return $this->parseAIProductResponse($aiResponse, $productData);
+
+        } catch (\Exception $e) {
+            \Log::error('AI product details generation failed', [
+                'error' => $e->getMessage(),
+                'product_data' => $productData
+            ]);
+
+            // Fallback response
+            return $this->getFallbackProductDetails($productData);
+        }
+    }
+
+    /**
+     * Ürün detayları için AI prompt oluşturur
+     */
+    private function buildProductDetailsPrompt($name, $description, $price, $category)
+    {
+        return "Sen bir e-ticaret uzmanısın. Aşağıdaki ürün için detaylı, satış odaklı ve kullanıcı dostu bir analiz hazırla:
+
+ÜRÜN BİLGİLERİ:
+- İsim: {$name}
+- Açıklama: {$description}
+- Fiyat: ₺{$price}
+- Kategori: {$category}
+
+Lütfen aşağıdaki formatta JSON response döndür:
+
+{
+  \"ai_description\": \"Ürün hakkında 2-3 paragraf detaylı, satış odaklı açıklama. Ürünün faydalarını, kalitesini ve neden tercih edilmesi gerektiğini vurgula.\",
+  \"features\": [
+    \"Özellik 1: Detaylı açıklama\",
+    \"Özellik 2: Detaylı açıklama\",
+    \"Özellik 3: Detaylı açıklama\"
+  ],
+  \"usage_scenarios\": [
+    \"Kullanım alanı 1: Ne zaman kullanılır\",
+    \"Kullanım alanı 2: Ne zaman kullanılır\",
+    \"Kullanım alanı 3: Ne zaman kullanılır\"
+  ],
+  \"specifications\": {
+    \"Boyut\": \"Detaylı boyut bilgisi\",
+    \"Materyal\": \"Kullanılan malzeme\",
+    \"Renk\": \"Mevcut renk seçenekleri\",
+    \"Garanti\": \"Garanti süresi ve koşulları\"
+  },
+  \"recommendations\": [
+    \"Kullanım önerisi 1\",
+    \"Kullanım önerisi 2\",
+    \"Bakım önerisi\"
+  ],
+  \"additional_info\": \"Ek bilgiler, dikkat edilmesi gerekenler, özel durumlar vb.\"
+}
+
+Türkçe yanıt ver ve satış odaklı, ikna edici bir dil kullan.";
+    }
+
+    /**
+     * AI response'unu parse eder
+     */
+    private function parseAIProductResponse($aiResponse, $productData)
+    {
+        try {
+            // JSON'u extract et
+            $jsonStart = strpos($aiResponse, '{');
+            $jsonEnd = strrpos($aiResponse, '}') + 1;
+            
+            if ($jsonStart !== false && $jsonEnd !== false) {
+                $jsonString = substr($aiResponse, $jsonStart, $jsonEnd - $jsonStart);
+                $parsed = json_decode($jsonString, true);
+                
+                if ($parsed && is_array($parsed)) {
+                    return $parsed;
+                }
+            }
+            
+            // JSON parse edilemezse fallback kullan
+            return $this->getFallbackProductDetails($productData);
+            
+        } catch (\Exception $e) {
+            \Log::error('AI response parsing failed', [
+                'error' => $e->getMessage(),
+                'ai_response' => $aiResponse
+            ]);
+            
+            return $this->getFallbackProductDetails($productData);
+        }
+    }
+
+    /**
+     * Fallback ürün detayları
+     */
+    private function getFallbackProductDetails($productData)
+    {
+        return [
+            'ai_description' => "Bu ürün, kaliteli malzemelerden üretilmiş ve günlük kullanım için idealdir. Müşteri memnuniyeti odaklı tasarımı ile öne çıkan bu ürün, ihtiyaçlarınızı karşılayacak özelliklere sahiptir.",
+            'features' => [
+                "Yüksek kaliteli malzeme kullanımı",
+                "Kullanıcı dostu tasarım",
+                "Dayanıklı yapı",
+                "Kolay kullanım"
+            ],
+            'usage_scenarios' => [
+                "Günlük kullanım için ideal",
+                "Ev ve ofis ortamlarında kullanılabilir",
+                "Hediye olarak verilebilir"
+            ],
+            'specifications' => [
+                "Kategori" => $productData['product_category'] ?? 'Genel',
+                "Fiyat" => "₺" . ($productData['product_price'] ?? 'Belirtilmemiş'),
+                "Durum" => "Yeni"
+            ],
+            'recommendations' => [
+                "Ürünü kullanmadan önce kullanım kılavuzunu okuyun",
+                "Düzenli bakım yaparak ömrünü uzatın",
+                "Sorularınız için müşteri hizmetlerimizle iletişime geçin"
+            ],
+            'additional_info' => "Bu ürün hakkında daha fazla bilgi almak için müşteri hizmetlerimizle iletişime geçebilirsiniz."
+        ];
+    }
+
+    /**
+     * Fiyat karşılaştırması API
+     */
+    public function getPriceComparison(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'session_id' => 'required|string',
+                'product_id' => 'required|integer',
+                'product_name' => 'required|string',
+                'product_price' => 'required|numeric',
+                'product_category' => 'required|string',
+                'comparison_type' => 'sometimes|string|in:similar_products,price_range,competitors'
+            ]);
+
+            // Session kontrolü
+            $session = EnhancedChatSession::where('session_id', $validated['session_id'])->first();
+            if (!$session) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session not found'
+                ], 404);
+            }
+
+            // Daily limits kontrolü
+            if (!$session->canViewMore()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Daily view limit reached',
+                    'daily_view_count' => $session->daily_view_count,
+                    'daily_view_limit' => $session->daily_view_limit
+                ], 429);
+            }
+
+            // Session view count'u artır
+            $session->increment('daily_view_count');
+
+            // Ana ürün bilgileri
+            $mainProduct = [
+                'id' => $validated['product_id'],
+                'name' => $validated['product_name'],
+                'price' => $validated['product_price'],
+                'category' => $validated['product_category'],
+                'is_main' => true
+            ];
+
+            // Benzer ürünleri bul (KnowledgeBase'den)
+            $similarProducts = $this->findSimilarProducts($validated);
+            
+            // Fiyat analizi
+            $priceAnalysis = $this->analyzePrice($validated['product_price'], $similarProducts);
+            
+            // AI-powered karşılaştırma önerileri
+            $aiComparison = $this->generateAIComparison($mainProduct, $similarProducts);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'main_product' => $mainProduct,
+                    'similar_products' => $similarProducts,
+                    'price_analysis' => $priceAnalysis,
+                    'ai_comparison' => $aiComparison,
+                    'comparison_summary' => $this->generateComparisonSummary($mainProduct, $similarProducts, $priceAnalysis)
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Price comparison error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Fiyat karşılaştırması yapılırken bir hata oluştu',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Benzer ürünleri bul
+     */
+    private function findSimilarProducts($productData)
+    {
+        try {
+            // KnowledgeBase'den benzer ürünleri ara
+            $chunks = KnowledgeChunk::where('content_type', 'product')
+                ->where('id', '!=', $productData['product_id'])
+                ->where('content', 'like', '%' . $productData['product_category'] . '%')
+                ->limit(5)
+                ->get();
+
+            $products = [];
+            foreach ($chunks as $chunk) {
+                $metadata = is_string($chunk->metadata) ? json_decode($chunk->metadata, true) : $chunk->metadata;
+                
+                if ($metadata && isset($metadata['name']) && isset($metadata['price'])) {
+                    $products[] = [
+                        'id' => $chunk->id,
+                        'name' => $metadata['name'],
+                        'price' => (float)$metadata['price'],
+                        'category' => $metadata['category'] ?? $productData['product_category'],
+                        'rating' => $metadata['rating'] ?? 4.0,
+                        'image' => $metadata['image'] ?? '/imgs/default-product.svg',
+                        'is_main' => false
+                    ];
+                }
+            }
+
+            // Eğer KnowledgeBase'de ürün yoksa boş döndür
+            if (empty($products)) {
+                return [];
+            }
+
+            return $products;
+        } catch (\Exception $e) {
+            \Log::error('Find similar products error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Fiyat analizi yap
+     */
+    private function analyzePrice($mainPrice, $similarProducts)
+    {
+        if (empty($similarProducts)) {
+            return [
+                'price_position' => 'unknown',
+                'average_price' => $mainPrice,
+                'price_difference' => 0,
+                'price_rating' => 'N/A'
+            ];
+        }
+
+        $prices = array_column($similarProducts, 'price');
+        $averagePrice = array_sum($prices) / count($prices);
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        
+        $priceDifference = $mainPrice - $averagePrice;
+        $percentageDifference = ($priceDifference / $averagePrice) * 100;
+
+        // Fiyat pozisyonunu belirle
+        if ($mainPrice < $minPrice) {
+            $pricePosition = 'lowest';
+        } elseif ($mainPrice > $maxPrice) {
+            $pricePosition = 'highest';
+        } elseif ($mainPrice < $averagePrice) {
+            $pricePosition = 'below_average';
+        } else {
+            $pricePosition = 'above_average';
+        }
+
+        // Fiyat değerlendirmesi
+        if ($percentageDifference < -20) {
+            $priceRating = 'excellent';
+        } elseif ($percentageDifference < -10) {
+            $priceRating = 'good';
+        } elseif ($percentageDifference < 10) {
+            $priceRating = 'fair';
+        } else {
+            $priceRating = 'expensive';
+        }
+
+        return [
+            'price_position' => $pricePosition,
+            'average_price' => round($averagePrice, 2),
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice,
+            'price_difference' => round($priceDifference, 2),
+            'percentage_difference' => round($percentageDifference, 1),
+            'price_rating' => $priceRating
+        ];
+    }
+
+    /**
+     * AI-powered karşılaştırma önerileri
+     */
+    private function generateAIComparison($mainProduct, $similarProducts)
+    {
+        try {
+            $prompt = "Ana ürün: {$mainProduct['name']} - {$mainProduct['price']} TL\n\n";
+            $prompt .= "Benzer ürünler:\n";
+            
+            foreach ($similarProducts as $product) {
+                $prompt .= "- {$product['name']} - {$product['price']} TL\n";
+            }
+            
+            $prompt .= "\nBu ürünlerin fiyat karşılaştırmasını yap ve hangi ürünün daha iyi değer sunduğunu analiz et. Kısa ve öz bir şekilde önerilerini sun.";
+
+            $aiResponse = $this->aiService->generateResponse($prompt, []);
+            
+            return [
+                'analysis' => $aiResponse,
+                'recommendation' => $this->generateRecommendation($mainProduct, $similarProducts)
+            ];
+        } catch (\Exception $e) {
+            \Log::error('AI comparison error: ' . $e->getMessage());
+            return [
+                'analysis' => 'Bu ürün için detaylı analiz yapılamadı.',
+                'recommendation' => 'Ürünü inceleyip satın almayı değerlendirebilirsiniz.'
+            ];
+        }
+    }
+
+    /**
+     * Karşılaştırma özeti oluştur
+     */
+    private function generateComparisonSummary($mainProduct, $similarProducts, $priceAnalysis)
+    {
+        $totalProducts = count($similarProducts) + 1;
+        $pricePositionText = [
+            'lowest' => 'En düşük fiyat',
+            'highest' => 'En yüksek fiyat',
+            'below_average' => 'Ortalama altı',
+            'above_average' => 'Ortalama üstü',
+            'unknown' => 'Bilinmiyor'
+        ];
+
+        return [
+            'total_products_compared' => $totalProducts,
+            'price_position' => $pricePositionText[$priceAnalysis['price_position']],
+            'price_rating' => $priceAnalysis['price_rating'],
+            'best_value_product' => $this->findBestValueProduct($mainProduct, $similarProducts)
+        ];
+    }
+
+    /**
+     * En iyi değer sunan ürünü bul
+     */
+    private function findBestValueProduct($mainProduct, $similarProducts)
+    {
+        $allProducts = array_merge([$mainProduct], $similarProducts);
+        
+        // Fiyat/rating oranına göre sırala (basit algoritma)
+        usort($allProducts, function($a, $b) {
+            $aRatio = $a['price'] / ($a['rating'] ?? 4.0);
+            $bRatio = $b['price'] / ($b['rating'] ?? 4.0);
+            return $aRatio <=> $bRatio;
+        });
+
+        return $allProducts[0];
+    }
+
+    /**
+     * Öneri oluştur
+     */
+    private function generateRecommendation($mainProduct, $similarProducts)
+    {
+        if (empty($similarProducts)) {
+            return "Bu ürünü inceleyip satın almayı değerlendirebilirsiniz.";
+        }
+
+        $cheapest = min($similarProducts, function($a, $b) {
+            return $a['price'] <=> $b['price'];
+        });
+
+        if ($mainProduct['price'] <= $cheapest['price']) {
+            return "Bu ürün fiyat açısından rekabetçi görünüyor. Hemen satın alabilirsiniz.";
+        } else {
+            return "Benzer özelliklerde daha uygun fiyatlı alternatifler mevcut. Karşılaştırma yaparak karar verebilirsiniz.";
         }
     }
 
@@ -2474,7 +3114,8 @@ class ConvStateAPI extends Controller
             $interactionPatterns = $this->analyzeInteractionPatterns($interactions);
 
             // User preferences'ı analiz et
-            $userPreferences = $this->analyzeUserPreferences($chatSession->user_preferences ?? []);
+            $preferences = $this->getUserPreferencesAsArray($chatSession->user_preferences);
+            $userPreferences = $this->analyzeUserPreferences($preferences);
 
             // Session statistics'ini hesapla
             $sessionStats = $this->calculateSessionStats($chatSession, $interactions);
@@ -3502,7 +4143,7 @@ class ConvStateAPI extends Controller
             }
             
             // User preferences'den kategori bilgisi al
-            $userPreferences = $session->user_preferences ?? [];
+            $userPreferences = $this->getUserPreferencesAsArray($session->user_preferences);
             $currentCategory = $userPreferences['current_category'] ?? null;
             
             return [
@@ -3674,5 +4315,26 @@ class ConvStateAPI extends Controller
             // Fallback to general recommendation
             return $this->generateProductRecommendationResponse($userMessage, $searchResults);
         }
+    }
+
+    /**
+     * User preferences'i güvenli bir şekilde array olarak döndürür
+     * TestAPI.php'den referans alınarak oluşturuldu
+     */
+    private function getUserPreferencesAsArray($userPreferences): array
+    {
+        if (empty($userPreferences)) {
+            return [];
+        }
+        
+        if (is_string($userPreferences)) {
+            return json_decode($userPreferences, true) ?? [];
+        }
+        
+        if (is_array($userPreferences)) {
+            return $userPreferences;
+        }
+        
+        return [];
     }
 }

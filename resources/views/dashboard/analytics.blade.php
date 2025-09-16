@@ -568,9 +568,9 @@ function changeProject(projectId) {
 }
 </script>
 
-<!-- Funnel Intent İstatistikleri -->
+{{-- Funnel Intent İstatistikleri - Geçici olarak yorum içinde --}}
 @if(isset($funnelStats))
-<div class="glass-effect rounded-2xl p-8 border border-gray-700">
+{{-- <div class="glass-effect rounded-2xl p-8 border border-gray-700">
     <div class="flex items-center justify-between mb-6">
         <div>
             <div class="flex items-center space-x-3 mb-2">
@@ -675,11 +675,11 @@ function changeProject(projectId) {
                 @foreach($funnelStats['stage_distribution'] as $stage => $count)
                     @php
                         $stageLabels = [
-                            'awareness' => 'Farkındalık',
-                            'interest' => 'İlgi',
-                            'consideration' => 'Değerlendirme',
-                            'intent' => 'Niyet',
-                            'action' => 'Aksiyon'
+                            'awareness' => 'Farkındalık (Ürün Görüntüleme)',
+                            'interest' => 'İlgi (Ürün Detayı)',
+                            'consideration' => 'Değerlendirme (Karşılaştırma)',
+                            'intent' => 'Niyet (Sepete Ekleme)',
+                            'action' => 'Aksiyon (Satın Alma)'
                         ];
                         $stageColors = [
                             'awareness' => 'bg-blue-500',
@@ -705,11 +705,11 @@ function changeProject(projectId) {
                                     <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 w-64">
                                         @php
                                             $stageDescriptions = [
-                                                'awareness' => 'Kullanıcıların ürünleri keşfetmeye başladığı aşama. "Ürün ara", "Ne var?" gibi arama ve keşif soruları.',
-                                                'interest' => 'Kullanıcıların belirli ürünlere ilgi duymaya başladığı aşama. "Fiyat nedir?", "Özellikler neler?" gibi detay soruları.',
-                                                'consideration' => 'Kullanıcıların ürünleri değerlendirdiği aşama. "Sepete ekle", "Karşılaştır" gibi karşılaştırma işlemleri.',
-                                                'intent' => 'Kullanıcıların satın alma niyeti gösterdiği aşama. "Nasıl satın alırım?", "Ödeme nasıl?" gibi satın alma soruları.',
-                                                'action' => 'Kullanıcıların gerçek satın alma işlemini tamamladığı aşama. "Sipariş ver", "Destek al" gibi final işlemler.'
+                                                'awareness' => 'Kullanıcıların ürünleri görüntülediği aşama. Widget\'tan ürün listesini görme ve ürün kartlarına bakma.',
+                                                'interest' => 'Kullanıcıların ürün detaylarına tıkladığı aşama. Ürün sayfasını açma ve detaylı bilgi alma.',
+                                                'consideration' => 'Kullanıcıların ürünleri karşılaştırdığı aşama. "Karşılaştır" butonuna tıklama ve ürünleri yan yana inceleme.',
+                                                'intent' => 'Kullanıcıların ürünleri sepete eklediği aşama. "Sepete Ekle" butonuna tıklama ve satın alma niyeti gösterme.',
+                                                'action' => 'Kullanıcıların gerçek satın alma işlemini tamamladığı aşama. "Satın Al" butonuna tıklama ve ödeme işlemi.'
                                             ];
                                         @endphp
                                         <div class="font-semibold text-purple-glow mb-1">{{ $stageLabels[$stage] ?? ucfirst($stage) }}</div>
@@ -769,12 +769,12 @@ function changeProject(projectId) {
             @endforeach
         </div>
     </div>
-</div>
+</div> --}}
 @endif
 
-<!-- React Widget Takibi -->
+{{-- React Widget Takibi - Geçici olarak yorum içinde --}}
 @if(isset($widgetTrackingStats))
-<div class="glass-effect rounded-2xl p-8 border border-gray-700 mt-8">
+{{-- <div class="glass-effect rounded-2xl p-8 border border-gray-700 mt-8">
     <div class="flex items-center justify-between mb-6">
         <div>
             <div class="flex items-center space-x-3 mb-2">
@@ -929,14 +929,14 @@ function changeProject(projectId) {
                         </tbody>
                     </table>
                 </div>
-            </div>
         </div>
     </div>
-    @endif
+</div> --}}
+@endif
 
-    <!-- Intent Bazlı Tıklamalar -->
+    {{-- Intent Bazlı Tıklamalar --}}
     @if(!empty($widgetTrackingStats['intent_clicks']))
-    <div>
+    {{-- <div>
         <h3 class="text-xl font-semibold text-white mb-4">🎯 Intent Bazlı Tıklamalar</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @foreach($widgetTrackingStats['intent_clicks'] as $intent => $clickCount)
@@ -951,12 +951,10 @@ function changeProject(projectId) {
                 </div>
             @endforeach
         </div>
-    </div>
+    </div> --}}
     @endif
-</div>
-@endif
 
-<script>
+{{-- <script>
 // Ürün detaylarını görüntüleme fonksiyonu
 function viewProductDetails(productName) {
     // Modal veya detay sayfası açma işlemi
@@ -970,5 +968,5 @@ function analyzeProduct(productName) {
     alert('Ürün analizi: ' + productName);
     // Burada analiz sayfasına yönlendirme yapılabilir
 }
-</script>
+</script> --}}
 @endsection

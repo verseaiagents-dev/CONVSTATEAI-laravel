@@ -1,0 +1,266 @@
+[
+  {
+    "id": 1,
+    "name": "Shopify",
+    "type": "E-ticaret Platformu",
+    "category": "Platform Entegrasyonu",
+    "description": "Shopify mağazaları ile sorunsuz entegrasyon",
+    "features": [
+      "Otomatik ürün senkronizasyonu",
+      "Sipariş takibi",
+      "Müşteri verisi entegrasyonu",
+      "Gerçek zamanlı stok güncellemesi",
+      "Shopify webhook desteği"
+    ],
+    "setup_difficulty": "Kolay",
+    "setup_time": "5-10 dakika",
+    "requirements": [
+      "Shopify admin erişimi",
+      "API anahtarı",
+      "Webhook izinleri"
+    ],
+    "supported_features": [
+      "Ürün arama",
+      "Fiyat sorgulama",
+      "Stok kontrolü",
+      "Sipariş durumu",
+      "Müşteri profili"
+    ],
+    "documentation_url": "/docs/integrations/shopify",
+    "api_documentation": "/api/docs/shopify",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["shopify", "e-ticaret", "platform", "entegrasyon"]
+  },
+  {
+    "id": 2,
+    "name": "WooCommerce",
+    "type": "E-ticaret Platformu",
+    "category": "Platform Entegrasyonu",
+    "description": "WordPress WooCommerce siteleri ile entegrasyon",
+    "features": [
+      "WooCommerce API entegrasyonu",
+      "Ürün katalogu senkronizasyonu",
+      "Müşteri verisi entegrasyonu",
+      "Sipariş yönetimi",
+      "Kupon ve indirim desteği"
+    ],
+    "setup_difficulty": "Orta",
+    "setup_time": "15-30 dakika",
+    "requirements": [
+      "WordPress admin erişimi",
+      "WooCommerce API anahtarı",
+      "SSL sertifikası"
+    ],
+    "supported_features": [
+      "Ürün arama ve filtreleme",
+      "Sepet yönetimi",
+      "Sipariş takibi",
+      "Müşteri hesap bilgileri",
+      "Kupon kodu kontrolü"
+    ],
+    "documentation_url": "/docs/integrations/woocommerce",
+    "api_documentation": "/api/docs/woocommerce",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["woocommerce", "wordpress", "e-ticaret", "platform"]
+  },
+  {
+    "id": 3,
+    "name": "Magento",
+    "type": "E-ticaret Platformu",
+    "category": "Platform Entegrasyonu",
+    "description": "Magento 1.x ve 2.x ile entegrasyon",
+    "features": [
+      "Magento REST API entegrasyonu",
+      "Ürün katalogu yönetimi",
+      "Müşteri segmentasyonu",
+      "Sipariş ve fatura yönetimi",
+      "Çoklu mağaza desteği"
+    ],
+    "setup_difficulty": "İleri",
+    "setup_time": "1-2 saat",
+    "requirements": [
+      "Magento admin erişimi",
+      "API kullanıcı hesabı",
+      "Gerekli modül izinleri"
+    ],
+    "supported_features": [
+      "Gelişmiş ürün arama",
+      "Kategori filtreleme",
+      "Müşteri segmentasyonu",
+      "Sipariş geçmişi",
+      "Çoklu dil desteği"
+    ],
+    "documentation_url": "/docs/integrations/magento",
+    "api_documentation": "/api/docs/magento",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["magento", "e-ticaret", "platform", "kurumsal"]
+  },
+  {
+    "id": 4,
+    "name": "Salesforce CRM",
+    "type": "CRM Sistemi",
+    "category": "CRM Entegrasyonu",
+    "description": "Salesforce CRM ile müşteri verisi entegrasyonu",
+    "features": [
+      "Müşteri profili senkronizasyonu",
+      "Lead yönetimi",
+      "Fırsat takibi",
+      "Müşteri etkileşim geçmişi",
+      "Otomatik veri güncelleme"
+    ],
+    "setup_difficulty": "İleri",
+    "setup_time": "2-4 saat",
+    "requirements": [
+      "Salesforce admin erişimi",
+      "API kullanıcı hesabı",
+      "Gerekli izinler"
+    ],
+    "supported_features": [
+      "Müşteri profili görüntüleme",
+      "Lead durumu güncelleme",
+      "Fırsat takibi",
+      "Etkileşim geçmişi",
+      "Raporlama"
+    ],
+    "documentation_url": "/docs/integrations/salesforce",
+    "api_documentation": "/api/docs/salesforce",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["salesforce", "crm", "müşteri yönetimi", "entegrasyon"]
+  },
+  {
+    "id": 5,
+    "name": "HubSpot",
+    "type": "CRM & Pazarlama",
+    "category": "CRM Entegrasyonu",
+    "description": "HubSpot CRM ve pazarlama araçları ile entegrasyon",
+    "features": [
+      "HubSpot CRM entegrasyonu",
+      "Pazarlama otomasyonu",
+      "Lead scoring",
+      "Email kampanya entegrasyonu",
+      "Analitik veri paylaşımı"
+    ],
+    "setup_difficulty": "Orta",
+    "setup_time": "1-2 saat",
+    "requirements": [
+      "HubSpot hesabı",
+      "API anahtarı",
+      "Gerekli izinler"
+    ],
+    "supported_features": [
+      "Müşteri profili yönetimi",
+      "Lead takibi",
+      "Pazarlama kampanyaları",
+      "Email entegrasyonu",
+      "Analitik raporlama"
+    ],
+    "documentation_url": "/docs/integrations/hubspot",
+    "api_documentation": "/api/docs/hubspot",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["hubspot", "crm", "pazarlama", "otomasyon"]
+  },
+  {
+    "id": 6,
+    "name": "Zapier",
+    "type": "Otomasyon Platformu",
+    "category": "Otomasyon Entegrasyonu",
+    "description": "Zapier ile 1000+ uygulama arasında otomasyon",
+    "features": [
+      "1000+ uygulama desteği",
+      "Otomatik iş akışları",
+      "Veri senkronizasyonu",
+      "Webhook entegrasyonu",
+      "Özel trigger'lar"
+    ],
+    "setup_difficulty": "Kolay",
+    "setup_time": "10-15 dakika",
+    "requirements": [
+      "Zapier hesabı",
+      "Uygulama API anahtarları",
+      "Webhook URL'leri"
+    ],
+    "supported_features": [
+      "Otomatik veri aktarımı",
+      "İş akışı otomasyonu",
+      "Bildirim sistemi",
+      "Veri dönüştürme",
+      "Koşullu mantık"
+    ],
+    "documentation_url": "/docs/integrations/zapier",
+    "api_documentation": "/api/docs/zapier",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["zapier", "otomasyon", "webhook", "entegrasyon"]
+  },
+  {
+    "id": 7,
+    "name": "Google Analytics",
+    "type": "Analitik",
+    "category": "Analitik Entegrasyonu",
+    "description": "Google Analytics ile detaylı analitik entegrasyonu",
+    "features": [
+      "GA4 entegrasyonu",
+      "Özel event tracking",
+      "Conversion tracking",
+      "Müşteri journey analizi",
+      "Gerçek zamanlı veri"
+    ],
+    "setup_difficulty": "Orta",
+    "setup_time": "30-45 dakika",
+    "requirements": [
+      "Google Analytics hesabı",
+      "GA4 property",
+      "Measurement ID"
+    ],
+    "supported_features": [
+      "Sayfa görüntüleme takibi",
+      "Event tracking",
+      "Conversion ölçümü",
+      "Müşteri davranış analizi",
+      "Raporlama"
+    ],
+    "documentation_url": "/docs/integrations/google-analytics",
+    "api_documentation": "/api/docs/google-analytics",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["google analytics", "analitik", "tracking", "raporlama"]
+  },
+  {
+    "id": 8,
+    "name": "Mailchimp",
+    "type": "Email Pazarlama",
+    "category": "Pazarlama Entegrasyonu",
+    "description": "Mailchimp ile email pazarlama entegrasyonu",
+    "features": [
+      "Otomatik email kampanyaları",
+      "Müşteri segmentasyonu",
+      "A/B test desteği",
+      "Email template entegrasyonu",
+      "Kampanya analitikleri"
+    ],
+    "setup_difficulty": "Kolay",
+    "setup_time": "15-20 dakika",
+    "requirements": [
+      "Mailchimp hesabı",
+      "API anahtarı",
+      "Audience erişimi"
+    ],
+    "supported_features": [
+      "Email kampanya oluşturma",
+      "Müşteri listesi yönetimi",
+      "Otomatik email gönderimi",
+      "Kampanya takibi",
+      "A/B test analizi"
+    ],
+    "documentation_url": "/docs/integrations/mailchimp",
+    "api_documentation": "/api/docs/mailchimp",
+    "status": "Aktif",
+    "last_updated": "2024-01-15",
+    "tags": ["mailchimp", "email", "pazarlama", "kampanya"]
+  }
+]

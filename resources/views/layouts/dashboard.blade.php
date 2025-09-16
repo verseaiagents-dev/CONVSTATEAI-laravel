@@ -100,6 +100,13 @@
             }
         }
         
+        /* Show sidebar on desktop by default */
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+        }
+        
         /* Sidebar Scrollbar Styles */
         .sidebar .overflow-y-auto::-webkit-scrollbar {
             width: 6px;
@@ -412,8 +419,9 @@
                                     @if(auth()->user()->hasActiveSubscription())
                                         @php
                                             $subscription = auth()->user()->activeSubscription;
-                                            $plan = $subscription->plan;
+                                            $plan = $subscription ? $subscription->plan : null;
                                         @endphp
+                                        @if($subscription && $plan)
                                         <div class="space-y-2">
                                             <div class="flex justify-between text-sm">
                                                 <span class="text-gray-400">Plan:</span>
@@ -425,9 +433,12 @@
                                             </div>
                                             <div class="flex justify-between text-sm">
                                                 <span class="text-gray-400">Bitiş:</span>
-                                                <span class="text-white">{{ $subscription->end_date->format('d.m.Y') }}</span>
+                                                <span class="text-white">{{ $subscription->end_date ? $subscription->end_date->format('d.m.Y') : 'Bilinmiyor' }}</span>
                                             </div>
                                         </div>
+                                        @else
+                                        <p class="text-gray-300 text-sm">Plan bilgileri yüklenemedi.</p>
+                                        @endif
                                     @else
                                         <p class="text-gray-300 text-sm">Dashboard özelliklerini kullanmak için bir plan seçin.</p>
                                     @endif
@@ -667,7 +678,7 @@
         // Initialize sidebar state on page load
         function initializeSidebar() {
             if (window.innerWidth >= 1024) {
-                // Desktop: Show sidebar
+                // Desktop: Show sidebar by default
                 sidebar.classList.remove('closed');
                 mobileOverlay.classList.add('hidden');
             } else {

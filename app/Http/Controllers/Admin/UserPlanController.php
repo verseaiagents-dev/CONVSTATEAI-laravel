@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Plan;
 use App\Models\Subscription;
-use App\Models\UsageToken;
+// UsageToken modeli kaldırıldı - artık User tablosunda token bilgileri tutuluyor
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -42,34 +42,21 @@ class UserPlanController extends Controller
         try {
             // Cancel any existing active subscription
             $user->subscriptions()->where('status', 'active')->update([
-                'status' => 'cancelled',
-                'cancelled_at' => now()
+                'status' => 'cancelled'
             ]);
 
             // Create new subscription
             $subscription = Subscription::create([
-                'user_id' => $user->id,
+                'tenant_id' => $user->id,
                 'plan_id' => $plan->id,
                 'status' => 'active',
-                'started_at' => $request->start_date ?: now(),
-                'expires_at' => $request->end_date ?: now()->addYear(),
-                'metadata' => [
-                    'assigned_by' => auth()->id(),
-                    'assigned_at' => now(),
-                    'notes' => $request->notes
-                ]
+                'start_date' => $request->start_date ?: now(),
+                'end_date' => $request->end_date ?: now()->addYear(),
+                'trial_ends_at' => null
             ]);
 
-            // Create or update usage token
-            $usageToken = UsageToken::firstOrCreate(
-                ['user_id' => $user->id],
-                ['tokens' => 0, 'used_tokens' => 0]
-            );
-
-            // Add plan tokens to usage token
-            if ($plan->usage_tokens > 0) {
-                $usageToken->addTokens($plan->usage_tokens);
-            }
+            // Assign plan and tokens directly to user
+            $user->assignPlan($plan, $subscription->id);
 
             DB::commit();
 
@@ -145,7 +132,6 @@ class UserPlanController extends Controller
     public function getUserPlanInfo(User $user)
     {
         $subscription = $user->subscriptions()->where('status', 'active')->first();
-        $usageToken = $user->usageToken;
         
         return response()->json([
             'subscription' => $subscription ? [
@@ -156,11 +142,14 @@ class UserPlanController extends Controller
                 'expires_at' => $subscription->expires_at,
                 'metadata' => $subscription->metadata
             ] : null,
-            'usage_token' => $usageToken ? [
-                'tokens' => $usageToken->tokens,
-                'used_tokens' => $usageToken->used_tokens,
-                'remaining_tokens' => $usageToken->tokens - $usageToken->used_tokens
-            ] : null
+            'usage_token' => [
+                'tokens_total' => $user->tokens_total,
+                'tokens_used' => $user->tokens_used,
+                'tokens_remaining' => $user->tokens_remaining,
+                'token_reset_date' => $user->token_reset_date,
+                'usage_percentage' => $user->token_usage_percentage,
+                'days_until_reset' => $user->days_until_token_reset
+            ]
         ]);
     }
 }

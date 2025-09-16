@@ -149,7 +149,7 @@
                                    name="email" 
                                    value="{{ old('email') }}"
                                    class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400" 
-                                   placeholder="ornek@email.com"
+                                   placeholder="benimisletmem@xxxx.com"
                                    required 
                                    autofocus>
                             @error('email')
@@ -190,7 +190,7 @@
                             Giriş Yap
                         </button>
                     </form>
-
+  {{-- 
                     <!-- Divider -->
                     <div class="my-6 flex items-center">
                         <div class="flex-1 border-t border-gray-700"></div>
@@ -199,14 +199,16 @@
                     </div>
 
                     <!-- Register Link -->
-                    <div class="text-center">
+                  <div class="text-center">
                         <p class="text-gray-400">
-                            Hesabınız yok mu? 
+                             
                             <a href="{{ route('register') }}" class="text-purple-glow hover:text-neon-purple font-semibold transition-colors">
                                 Hemen kayıt olun
                             </a>
                         </p>
                     </div>
+
+                    --}}
                 </div>
             </div>
         </div>
@@ -215,7 +217,7 @@
     <!-- Footer -->
     <footer class="relative z-10 py-8 text-center">
         <p class="text-gray-400 text-sm">
-            © 2024 ConvStateAI. Tüm hakları saklıdır.
+            © 2025 ConvStateAI. Tüm hakları saklıdır.
         </p>
     </footer>
 

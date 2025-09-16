@@ -1,0 +1,146 @@
+[
+  {
+    "id": 1,
+    "customer_name": "Ahmet Yılmaz",
+    "company": "TechStore E-ticaret",
+    "position": "Genel Müdür",
+    "industry": "Elektronik",
+    "testimonial": "ConvStateAI'ı 6 aydır kullanıyoruz ve dönüşüm oranlarımızda %45 artış gördük. Müşteri memnuniyeti de önemli ölçüde arttı. AI'ın ürün önerileri gerçekten etkili.",
+    "rating": 5,
+    "date": "2024-01-10",
+    "verified": true,
+    "metrics": {
+      "conversion_increase": "45%",
+      "customer_satisfaction": "92%",
+      "response_time": "1.2 saniye"
+    },
+    "tags": ["dönüşüm", "müşteri memnuniyeti", "ürün önerisi", "elektronik"],
+    "image_url": "/imgs/testimonials/ahmet-yilmaz.jpg"
+  },
+  {
+    "id": 2,
+    "customer_name": "Elif Demir",
+    "company": "FashionHub",
+    "position": "Pazarlama Müdürü",
+    "industry": "Moda",
+    "testimonial": "Müşteri hizmetlerimizde 7/24 destek sağlamak artık çok kolay. ConvStateAI sayesinde müşterilerimizin soruları anında yanıtlanıyor ve satış süreçlerimiz hızlandı.",
+    "rating": 5,
+    "date": "2024-01-15",
+    "verified": true,
+    "metrics": {
+      "response_time": "0.8 saniye",
+      "customer_support_improvement": "60%",
+      "sales_acceleration": "35%"
+    },
+    "tags": ["müşteri hizmetleri", "7/24 destek", "satış", "moda"],
+    "image_url": "/imgs/testimonials/elif-demir.jpg"
+  },
+  {
+    "id": 3,
+    "customer_name": "Mehmet Kaya",
+    "company": "HomeDecor Plus",
+    "position": "E-ticaret Uzmanı",
+    "industry": "Ev & Yaşam",
+    "testimonial": "Analitik raporları sayesinde müşteri davranışlarını çok daha iyi anlıyoruz. Bu verilerle stratejilerimizi optimize ediyoruz ve sonuçlar gerçekten etkileyici.",
+    "rating": 5,
+    "date": "2024-01-20",
+    "verified": true,
+    "metrics": {
+      "data_insights": "85% daha detaylı",
+      "strategy_optimization": "40% iyileşme",
+      "roi_increase": "55%"
+    },
+    "tags": ["analitik", "veri", "strateji", "roi", "ev & yaşam"],
+    "image_url": "/imgs/testimonials/mehmet-kaya.jpg"
+  },
+  {
+    "id": 4,
+    "customer_name": "Dr. Ayşe Özkan",
+    "company": "HealthCare Store",
+    "position": "Kurucu Ortak",
+    "industry": "Sağlık",
+    "testimonial": "Sağlık ürünleri satışında güven çok önemli. ConvStateAI'ın kişiselleştirilmiş yaklaşımı müşterilerimize doğru ürünleri önermemizi sağlıyor. Müşteri güveni arttı.",
+    "rating": 5,
+    "date": "2024-01-25",
+    "verified": true,
+    "metrics": {
+      "customer_trust": "78% artış",
+      "product_recommendation_accuracy": "92%",
+      "customer_retention": "65%"
+    },
+    "tags": ["güven", "kişiselleştirme", "sağlık", "doğru öneri"],
+    "image_url": "/imgs/testimonials/ayse-ozkan.jpg"
+  },
+  {
+    "id": 5,
+    "customer_name": "Can Arslan",
+    "company": "BookWorld Online",
+    "position": "Operasyon Müdürü",
+    "industry": "Kitap & Medya",
+    "testimonial": "Entegrasyon süreci çok kolaydı. Mevcut sistemimizle sorunsuz çalışıyor. Müşterilerimiz kitap önerilerini çok beğeniyor ve satışlarımız arttı.",
+    "rating": 4,
+    "date": "2024-02-01",
+    "verified": true,
+    "metrics": {
+      "integration_time": "2 saat",
+      "sales_increase": "30%",
+      "customer_satisfaction": "88%"
+    },
+    "tags": ["entegrasyon", "kolay kurulum", "kitap", "öneri sistemi"],
+    "image_url": "/imgs/testimonials/can-arslan.jpg"
+  },
+  {
+    "id": 6,
+    "customer_name": "Zeynep Çelik",
+    "company": "BeautyBox",
+    "position": "Pazarlama Direktörü",
+    "industry": "Kozmetik",
+    "testimonial": "Müşterilerimizin cilt tipine ve tercihlerine göre ürün önerileri alması harika. AI'ın analiz yeteneği gerçekten etkileyici. Müşteri memnuniyeti ve satışlarımız arttı.",
+    "rating": 5,
+    "date": "2024-02-05",
+    "verified": true,
+    "metrics": {
+      "personalization_accuracy": "90%",
+      "customer_satisfaction": "94%",
+      "repeat_purchase": "45% artış"
+    },
+    "tags": ["kişiselleştirme", "kozmetik", "analiz", "müşteri memnuniyeti"],
+    "image_url": "/imgs/testimonials/zeynep-celik.jpg"
+  },
+  {
+    "id": 7,
+    "customer_name": "Murat Yıldız",
+    "company": "SportsGear Pro",
+    "position": "E-ticaret Müdürü",
+    "industry": "Spor",
+    "testimonial": "Spor ekipmanları satışında müşteri rehberliği çok önemli. ConvStateAI'ın uzman bilgisi ve önerileri sayesinde müşterilerimiz doğru ürünleri seçiyor ve memnuniyet oranımız yüksek.",
+    "rating": 5,
+    "date": "2024-02-10",
+    "verified": true,
+    "metrics": {
+      "expert_guidance": "95% doğruluk",
+      "customer_satisfaction": "91%",
+      "return_rate": "15% azalma"
+    },
+    "tags": ["uzman rehberlik", "spor", "doğru ürün", "memnuniyet"],
+    "image_url": "/imgs/testimonials/murat-yildiz.jpg"
+  },
+  {
+    "id": 8,
+    "customer_name": "Selin Korkmaz",
+    "company": "GardenCenter",
+    "position": "Kurucu",
+    "industry": "Bahçıvanlık",
+    "testimonial": "Bahçıvanlık konusunda müşterilerimizin çok fazla sorusu oluyor. ConvStateAI'ın detaylı bilgi verme yeteneği sayesinde müşteri hizmetlerimiz çok gelişti ve satışlarımız arttı.",
+    "rating": 4,
+    "date": "2024-02-15",
+    "verified": true,
+    "metrics": {
+      "question_resolution": "92%",
+      "customer_service_improvement": "50%",
+      "sales_growth": "40%"
+    },
+    "tags": ["detaylı bilgi", "bahçıvanlık", "müşteri hizmetleri", "satış artışı"],
+    "image_url": "/imgs/testimonials/selin-korkmaz.jpg"
+  }
+]

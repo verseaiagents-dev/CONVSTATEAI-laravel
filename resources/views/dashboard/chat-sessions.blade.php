@@ -201,57 +201,59 @@
                 @endif
             </div>
 
-            <!-- Knowledge Bases -->
-            @if(count($projectKnowledge['data']['knowledge_bases']) > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($projectKnowledge['data']['knowledge_bases'] as $kb)
-                        <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all duration-300">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-sm font-medium text-white">{{ $kb['name'] }}</h4>
-                                <span class="text-xs text-gray-400">{{ $kb['total_chunks'] }} chunk</span>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="text-xs text-gray-400">
-                                    <strong>Tip:</strong> {{ ucfirst($kb['source_type']) }}
-                                </div>
-                                <div class="text-xs text-gray-400">
-                                    <strong>İşlenen Kayıt:</strong> {{ $kb['processed_records'] }}
-                                </div>
-                                @if($kb['last_processed'])
-                                    <div class="text-xs text-gray-400">
-                                        <strong>Son İşlem:</strong> {{ \Carbon\Carbon::parse($kb['last_processed'])->diffForHumans() }}
-                                    </div>
-                                @endif
-                                @if($kb['description'])
-                                    <div class="text-xs text-gray-300 mt-2">
-                                        {{ Str::limit($kb['description'], 100) }}
-                                    </div>
-                                @endif
-                            </div>
-                            
-                            <!-- Sample Chunks -->
-                            @if(count($kb['chunks']) > 0)
-                                <div class="mt-3 pt-3 border-t border-gray-700">
-                                    <div class="text-xs text-gray-400 mb-2">Örnek İçerikler:</div>
-                                    <div class="space-y-1">
-                                        @foreach(array_slice($kb['chunks'], 0, 2) as $chunk)
-                                            <div class="text-xs text-gray-300 bg-gray-700/50 rounded p-2">
-                                                {{ Str::limit($chunk['content'], 80) }}
-                                            </div>
-                    @endforeach
+            <!-- Project Knowledge Base Info -->
+            <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <span class="text-lg">📚</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Proje Bilgi Tabanı</h3>
+                        <p class="text-sm text-gray-400">Test projesi için knowledge base bilgileri</p>
+                    </div>
                 </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <div class="text-sm text-gray-400 mb-1">Toplam Knowledge Base</div>
+                        <div class="text-2xl font-bold text-white">{{ count($projectKnowledge['data']['knowledge_bases']) }}</div>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <div class="text-sm text-gray-400 mb-1">Toplam Chunk</div>
+                        <div class="text-2xl font-bold text-white">
+                            {{ collect($projectKnowledge['data']['knowledge_bases'])->sum('total_chunks') }}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <div class="text-sm text-gray-400 mb-1">İşlenen Kayıt</div>
+                        <div class="text-2xl font-bold text-white">
+                            {{ collect($projectKnowledge['data']['knowledge_bases'])->sum('processed_records') }}
+                        </div>
+                    </div>
+                </div>
+                
+                @if(count($projectKnowledge['data']['knowledge_bases']) > 0)
+                    <div class="mt-4 p-4 bg-gray-700/30 rounded-lg">
+                        <div class="text-sm text-gray-300 mb-2">
+                            <strong>Proje Durumu:</strong> Knowledge base verileri başarıyla yüklenmiş ve işlenmeye hazır.
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            Tüm knowledge base verileri chat oturumlarında kullanılabilir durumda.
+                        </div>
+                    </div>
+                @else
+                    <div class="mt-4 p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                        <div class="text-sm text-yellow-300 mb-2">
+                            <strong>Uyarı:</strong> Bu proje için henüz knowledge base bulunmuyor.
+                        </div>
+                        <div class="text-xs text-yellow-400">
+                            Knowledge base eklemek için proje ayarlarını kontrol edin.
+                        </div>
+                    </div>
+                @endif
             </div>
-                            @endif
-        </div>
-                    @endforeach
-    </div>
-            @else
-                <div class="text-center py-8">
-                    <div class="text-gray-400 mb-2">📚</div>
-                    <div class="text-gray-400">Bu proje için henüz knowledge base bulunmuyor</div>
-                    <div class="text-sm text-gray-500 mt-1">Knowledge base eklemek için proje ayarlarını kontrol edin</div>
-                </div>
-            @endif
         </div>
     @endif
 
@@ -337,17 +339,9 @@
                                 <div class="text-xs text-gray-400 mt-1">{{ $session->daily_view_count }}/{{ $session->daily_view_limit }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 total-messages-cell">
-                                <div class="flex items-center space-x-2">
-                                    <span class="bg-purple-glow/20 text-purple-glow px-2 py-1 rounded-full text-xs font-semibold">
-                                        {{ count($session->getChatHistory()) }}
-                                    </span>
-                                    @if(count($session->getChatHistory()) > 0)
-                                        <button onclick="showChatHistory('{{ $session->session_id }}')" 
-                                                class="text-blue-400 hover:text-blue-300 text-xs underline">
-                                            Görüntüle
-                                        </button>
-                                    @endif
-                                </div>
+                                <span class="bg-purple-glow/20 text-purple-glow px-2 py-1 rounded-full text-xs font-semibold">
+                                    {{ count($session->getChatHistory()) }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
@@ -356,7 +350,7 @@
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                         </svg>
-                                        Chat
+                                        Sohbet Geçmişi
                                     </button>
                                 <a href="{{ route('dashboard.chat-sessions.show', $session->session_id) }}" 
                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-glow hover:bg-purple-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-glow transition-all duration-200">
@@ -437,7 +431,7 @@
                         </div>
                         <div>
                             <div class="text-xs text-gray-400 mb-1">Mesaj Sayısı</div>
-                            <div class="text-sm text-white">{{ $session->total_messages }}</div>
+                            <div class="text-sm text-white">{{ count($session->getChatHistory()) }}</div>
                         </div>
                         <div>
                             <div class="text-xs text-gray-400 mb-1">Günlük Kullanım</div>
@@ -954,7 +948,7 @@ document.getElementById('knowledgeBaseDetailsModal').addEventListener('click', f
         <!-- Modal Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-700">
             <div>
-                <h3 class="text-xl font-semibold text-white">Chat History</h3>
+                <h3 class="text-xl font-semibold text-white">Sohbet Geçmişi</h3>
                 <p class="text-sm text-gray-400 mt-1">Session chat geçmişi ve mesaj detayları</p>
             </div>
             <button onclick="closeChatHistory()" class="text-gray-400 hover:text-white transition-colors duration-200">
@@ -1061,7 +1055,7 @@ function loadChatHistory(sessionId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                displayChatHistory(data.data);
+                displayChatHistory(data);
             } else {
                 chatMessages.innerHTML = `
                     <div class="text-center text-red-500 py-8">
@@ -1088,17 +1082,22 @@ function loadChatHistory(sessionId) {
 
 function displayChatHistory(data) {
     const chatMessages = document.getElementById('chatMessages');
-    const stats = data.stats;
+    const chatHistory = data.chat_history || [];
+    
+    // Calculate stats from chat history
+    const userMessages = chatHistory.filter(msg => msg.role === 'user').length;
+    const assistantMessages = chatHistory.filter(msg => msg.role === 'assistant').length;
+    const totalMessages = chatHistory.length;
     
     // Update stats
-    document.getElementById('totalMessages').textContent = stats.total_messages || 0;
-    document.getElementById('userMessages').textContent = stats.user_messages || 0;
-    document.getElementById('assistantMessages').textContent = stats.assistant_messages || 0;
-    document.getElementById('intentCount').textContent = stats.intent_count || 0;
+    document.getElementById('totalMessages').textContent = totalMessages;
+    document.getElementById('userMessages').textContent = userMessages;
+    document.getElementById('assistantMessages').textContent = assistantMessages;
+    document.getElementById('intentCount').textContent = chatHistory.filter(msg => msg.intent).length;
     
     // Display messages
-    if (data.chat_history && data.chat_history.length > 0) {
-        chatMessages.innerHTML = data.chat_history.map(message => `
+    if (chatHistory && chatHistory.length > 0) {
+        chatMessages.innerHTML = chatHistory.map(message => `
             <div class="flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}">
                 <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.role === 'user' 
@@ -1107,7 +1106,7 @@ function displayChatHistory(data) {
                 }">
                     <div class="text-sm">${message.content}</div>
                     <div class="text-xs mt-1 opacity-70">
-                        ${new Date(message.timestamp).toLocaleString('tr-TR')}
+                        ${message.timestamp ? new Date(message.timestamp).toLocaleString('tr-TR') : 'Bilinmiyor'}
                         ${message.intent ? ` • ${message.intent}` : ''}
                     </div>
                 </div>
@@ -1308,9 +1307,9 @@ function createSessionRow(session) {
                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                    </svg>
-                    Chat
-                </button>
+                                        </svg>
+                                        Sohbet Geçmişi
+                                    </button>
                 <a href="/dashboard/chat-sessions/${session.session_id}" 
                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-glow hover:bg-purple-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-glow transition-all duration-200">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1352,11 +1351,11 @@ function showChatHistory(sessionId) {
     `;
     
     // Chat history'yi yükle
-    fetch(`/api/dashboard/chat-sessions/${sessionId}/history`)
+    fetch(`/api/chat-history/${sessionId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success && data.chat_history) {
-                displayChatHistory(data.chat_history);
+                displayChatHistory(data);
             } else {
                 document.getElementById('chatHistoryContent').innerHTML = `
                     <div class="text-center py-8">
@@ -1375,8 +1374,9 @@ function showChatHistory(sessionId) {
         });
 }
 
-function displayChatHistory(chatHistory) {
+function displayChatHistory(data) {
     const content = document.getElementById('chatHistoryContent');
+    const chatHistory = data.chat_history || [];
     
     if (!chatHistory || chatHistory.length === 0) {
         content.innerHTML = `
@@ -1389,7 +1389,7 @@ function displayChatHistory(chatHistory) {
     
     const messagesHtml = chatHistory.map(message => {
         const isUser = message.role === 'user';
-        const timestamp = new Date(message.timestamp).toLocaleString('tr-TR');
+        const timestamp = message.timestamp ? new Date(message.timestamp).toLocaleString('tr-TR') : 'Bilinmiyor';
         
         return `
             <div class="flex ${isUser ? 'justify-end' : 'justify-start'} mb-4">
@@ -1470,7 +1470,7 @@ function hideEmptyState() {
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
             <div class="flex items-center justify-between p-6 border-b border-gray-700">
-                <h3 class="text-xl font-semibold text-white">Chat Geçmişi</h3>
+                <h3 class="text-xl font-semibold text-white">Sohbet Geçmişi</h3>
                 <button onclick="closeChatHistory()" class="text-gray-400 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

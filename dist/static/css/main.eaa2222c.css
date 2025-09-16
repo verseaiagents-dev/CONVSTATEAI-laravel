@@ -758,18 +758,20 @@ html{
   flex-direction:row;
   flex-shrink:0;
   flex-wrap:nowrap;
-  gap:15px;
+  gap:20px;
   justify-content:flex-start;
   min-width:-moz-max-content;
   min-width:max-content;
   min-width:100%;
   min-width:calc(100% + 50px);
-  padding:5px 15px 5px 5px;
+  padding:10px 25px 10px 10px;
   transform:translateZ(0);
   white-space:nowrap;
   width:-moz-max-content;
   width:max-content;
   will-change:transform;
+  margin:0 auto;
+  position:relative;
 }
 
 .product-card{

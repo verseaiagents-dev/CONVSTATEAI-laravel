@@ -18,27 +18,46 @@ class ProjectAuth
     public function handle(Request $request, Closure $next)
     {
         // Project ID'yi al - önce header, sonra JSON body, sonra form data
-        $projectId = $request->header('""X-Project-ID""') 
+        $projectId = $request->header('X-Project-ID') 
             ?? $request->json('project_id') 
             ?? $request->input('project_id');
+            
+        // Type casting - string veya integer olabilir
+        $projectId = (string) $projectId;
+        
+        // Debug log
+        \Log::info('ProjectAuth Debug', [
+            'project_id_header' => $request->header('X-Project-ID'),
+            'project_id_json' => $request->json('project_id'),
+            'project_id_input' => $request->input('project_id'),
+            'final_project_id' => $projectId,
+            'project_id_type' => gettype($projectId)
+        ]);
         
         if (!$projectId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Project ID is required',
+                'message' => 'Proje ID gerekli',
                 'error' => 'MISSING_PROJECT_ID'
             ], 400);
         }
 
-        // Project'i kontrol et
+        // Project'i kontrol et - hem string hem integer olarak dene
         $project = Project::where('id', $projectId)
+            ->orWhere('id', (int) $projectId)
             ->where('status', 'active')
             ->first();
+            
+        \Log::info('Project Query Debug', [
+            'project_id' => $projectId,
+            'project_found' => $project ? 'Yes' : 'No',
+            'project_status' => $project ? $project->status : 'N/A'
+        ]);
             
         if (!$project) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid or inactive project',
+                'message' => 'Geçersiz veya aktif olmayan proje',
                 'error' => 'INVALID_PROJECT'
             ], 404);
         }
@@ -48,7 +67,7 @@ class ProjectAuth
         if ($token && !$this->validateToken($token, $projectId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid authentication token',
+                'message' => 'Geçersiz kimlik doğrulama token\'ı',
                 'error' => 'INVALID_TOKEN'
             ], 401);
         }

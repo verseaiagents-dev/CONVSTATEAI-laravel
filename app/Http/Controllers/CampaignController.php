@@ -28,19 +28,9 @@ class CampaignController extends Controller
         if ($request->expectsJson()) {
             // API request - return JSON
             try {
-                $siteId = $request->get('site_id', 1); // Default site ID
+                $projectId = $request->get('project_id', 1); // Default project ID
                 
-                // Site'in var olup olmadığını kontrol et
-                $site = Site::find($siteId);
-                if (!$site) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Belirtilen site bulunamadı',
-                        'data' => []
-                    ], 404);
-                }
-                
-                $campaigns = Campaign::where('site_id', $siteId)
+                $campaigns = Campaign::where('project_id', $projectId)
                     ->active()
                     ->valid()
                     ->orderBy('start_date', 'desc')
@@ -225,9 +215,9 @@ class CampaignController extends Controller
     public function getByCategory(Request $request, $category): JsonResponse
     {
         try {
-            $siteId = $request->get('site_id', 1);
+            $projectId = $request->get('project_id', 1);
             
-            $campaigns = Campaign::where('site_id', $siteId)
+            $campaigns = Campaign::where('project_id', $projectId)
                 ->where('category', $category)
                 ->active()
                 ->valid()
@@ -288,9 +278,9 @@ class CampaignController extends Controller
     public function getActiveCount(Request $request): JsonResponse
     {
         try {
-            $siteId = $request->get('site_id', 1);
+            $projectId = $request->get('project_id', 1);
             
-            $count = Campaign::where('site_id', $siteId)
+            $count = Campaign::where('project_id', $projectId)
                 ->active()
                 ->valid()
                 ->count();
@@ -434,7 +424,7 @@ class CampaignController extends Controller
                 'minimum_order_amount' => is_numeric($suggestion['minimum_order']) ? (float)$suggestion['minimum_order'] : 0.0,
                 'terms_conditions' => $suggestion['terms'] ?? '',
                 'is_active' => true,
-                'site_id' => $request->site_id,
+                'project_id' => $request->project_id,
                 'ai_generated' => true,
                 'ai_confidence_score' => is_numeric($suggestion['confidence_score']) ? (float)$suggestion['confidence_score'] : 0.0
             ];
@@ -504,7 +494,7 @@ class CampaignController extends Controller
                         'minimum_order_amount' => is_numeric($suggestion['minimum_order']) ? (float)$suggestion['minimum_order'] : 0.0,
                         'terms_conditions' => $suggestion['terms'] ?? '',
                         'is_active' => true,
-                        'site_id' => $request->site_id,
+                        'project_id' => $request->project_id,
                         'ai_generated' => true,
                         'ai_confidence_score' => is_numeric($suggestion['confidence_score']) ? (float)$suggestion['confidence_score'] : 0.0
                     ];

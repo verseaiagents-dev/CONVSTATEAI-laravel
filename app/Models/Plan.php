@@ -40,11 +40,11 @@ class Plan extends Model
     }
 
     /**
-     * UsageToken ile ilişki (plan üzerinden)
+     * Users with this plan (for token management)
      */
-    public function usageTokens(): HasMany
+    public function users(): HasMany
     {
-        return $this->hasMany(UsageToken::class, 'plan_id');
+        return $this->hasMany(User::class, 'current_plan_id');
     }
 
     /**
@@ -111,14 +111,12 @@ class Plan extends Model
      */
     public function calculateUsageTokens(): int
     {
-        // AI responses per month değerini usage token olarak kullan
-        $aiResponses = $this->getFeature('ai_responses_per_month', 0);
-        
-        if ($aiResponses === -1) {
+        // usage_tokens alanını kullan
+        if ($this->usage_tokens === -1) {
             return -1; // Sınırsız
         }
         
-        return $aiResponses;
+        return $this->usage_tokens ?? 0;
     }
 
     /**
@@ -144,26 +142,17 @@ class Plan extends Model
     }
 
     /**
-     * Kullanıcı için usage token oluştur
+     * Kullanıcı için usage token oluştur (yeni User tablosu sistemi)
      */
-    public function createUsageTokenForUser(int $userId, int $subscriptionId = null): UsageToken
+    public function createUsageTokenForUser(int $userId, int $subscriptionId = null): User
     {
         $tokens = $this->calculateUsageTokens();
         
-        // Mevcut aktif token'ı deaktive et
-        UsageToken::where('user_id', $userId)
-                  ->where('is_active', true)
-                  ->update(['is_active' => false]);
-
-        return UsageToken::create([
-            'user_id' => $userId,
-            'subscription_id' => $subscriptionId,
-            'plan_id' => $this->id,
-            'tokens_total' => $tokens,
-            'tokens_remaining' => $tokens,
-            'tokens_used' => 0,
-            'reset_date' => $this->getNextTokenResetDate(),
-            'is_active' => true
-        ]);
+        $user = User::findOrFail($userId);
+        
+        // Kullanıcıya plan atama ve token ekleme
+        $user->assignPlan($this, $subscriptionId);
+        
+        return $user;
     }
 }

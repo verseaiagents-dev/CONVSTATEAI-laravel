@@ -27,7 +27,7 @@ return [
     */
     'enabled' => env('CORS_ENABLED', true),
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'widgetcust/*'],
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
@@ -39,7 +39,9 @@ return [
             'http://localhost:3001',
             'http://127.0.0.1:3001',
             'http://localhost:8000',
-            'http://127.0.0.1:8000'
+            'http://127.0.0.1:8000',
+            'http://localhost:8080',
+            'http://127.0.0.1:8080'
         ] : []),
         
         // Production origins - sadece production ortamında aktif

@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "question": "ConvStateAI nedir ve nasıl çalışır?",
+    "answer": "ConvStateAI, e-ticaret siteniz için geliştirilmiş yapay zeka destekli chat widget sistemidir. Müşterilerinize 7/24 hizmet vererek ürün önerileri sunar, sorularını yanıtlar ve dönüşüm oranlarınızı artırır. AI teknolojisi sayesinde müşteri deneyimini kişiselleştirir ve satış süreçlerinizi optimize eder.",
+    "category": "Genel Bilgi",
+    "subcategory": "Temel Kavramlar",
+    "tags": ["temel", "nasıl çalışır", "ai", "chat widget", "e-ticaret"],
+    "related_questions": [2, 3, 4, 15],
+    "difficulty_level": "Başlangıç",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "question": "ConvStateAI'ı web siteme nasıl entegre edebilirim?",
+    "answer": "ConvStateAI entegrasyonu çok basittir. Sadece birkaç satır JavaScript kodu ekleyerek widget'ı sitenize dahil edebilirsiniz. Dashboard'dan aldığınız entegrasyon kodunu web sitenizin </body> etiketinden önce yapıştırmanız yeterlidir. Entegrasyon genellikle 5-10 dakika sürer ve anında aktif hale gelir.",
+    "category": "Kurulum",
+    "subcategory": "Entegrasyon",
+    "tags": ["entegrasyon", "kurulum", "javascript", "kod", "web sitesi"],
+    "related_questions": [1, 5, 6, 7],
+    "difficulty_level": "Orta",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 3,
+    "question": "Hangi e-ticaret platformları destekleniyor?",
+    "answer": "ConvStateAI tüm e-ticaret platformları ile uyumludur. Shopify, WooCommerce, Magento, PrestaShop, OpenCart ve özel geliştirilmiş e-ticaret siteleri dahil olmak üzere her türlü platformda çalışır. Platform bağımsız bir çözüm olduğu için mevcut sisteminizi değiştirmenize gerek yoktur.",
+    "category": "Uyumluluk",
+    "subcategory": "Platform Desteği",
+    "tags": ["platform", "shopify", "woocommerce", "magento", "uyumluluk", "entegrasyon"],
+    "related_questions": [1, 7, 8, 9],
+    "difficulty_level": "Başlangıç",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 4,
+    "question": "ConvStateAI'ın fiyatlandırması nasıl?",
+    "answer": "ConvStateAI'ın esnek fiyatlandırma seçenekleri bulunmaktadır. Starter Plan 99.99 TL/ay ile başlar ve temel özellikleri içerir. Professional Plan 199.99 TL/ay ile gelişmiş özellikler sunar. Enterprise Plan ise 499.99 TL/ay ile kurumsal çözümler sağlar. Tüm planlarda 14 gün ücretsiz deneme imkanı vardır.",
+    "category": "Fiyatlandırma",
+    "subcategory": "Plan Seçenekleri",
+    "tags": ["fiyat", "plan", "ücretsiz deneme", "maliyet", "abonelik"],
+    "related_questions": [9, 10, 11, 12],
+    "difficulty_level": "Başlangıç",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 5,
+    "question": "Widget'ın görünümünü özelleştirebilir miyim?",
+    "answer": "Evet, ConvStateAI widget'ının görünümünü tamamen özelleştirebilirsiniz. Renkler, boyutlar, konum, animasyonlar ve mesaj şablonları dahil olmak üzere tüm görsel öğeleri markanıza uygun şekilde düzenleyebilirsiniz. Ayrıca özel CSS kodları ekleyerek daha detaylı özelleştirmeler yapabilirsiniz.",
+    "category": "Özelleştirme",
+    "subcategory": "Görsel Tasarım",
+    "tags": ["tasarım", "renk", "özelleştirme", "marka", "css", "widget"],
+    "related_questions": [2, 12, 13, 14],
+    "difficulty_level": "Orta",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 6,
+    "question": "AI'ın yanıtlarını nasıl eğitebilirim?",
+    "answer": "ConvStateAI'ın AI modelini eğitmek için Knowledge Base bölümünden ürün bilgilerinizi, SSS'lerinizi ve blog içeriklerinizi yükleyebilirsiniz. AI bu verileri analiz ederek müşterilerinize daha doğru ve kişiselleştirilmiş yanıtlar verir. Ayrıca manuel olarak yanıt şablonları oluşturabilir ve AI'ın öğrenmesini hızlandırabilirsiniz.",
+    "category": "AI Eğitimi",
+    "subcategory": "Model Eğitimi",
+    "tags": ["ai", "eğitim", "knowledge base", "veri", "öğrenme", "model"],
+    "related_questions": [14, 15, 16, 17],
+    "difficulty_level": "İleri",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 7,
+    "question": "Mobil cihazlarda nasıl çalışır?",
+    "answer": "ConvStateAI tamamen mobil uyumludur. Widget otomatik olarak mobil cihazlarda optimize edilmiş görünüm alır ve dokunmatik kontrollerle kolay kullanım sağlar. Responsive tasarım sayesinde tüm ekran boyutlarında mükemmel çalışır.",
+    "category": "Mobil Uyumluluk",
+    "subcategory": "Responsive Tasarım",
+    "tags": ["mobil", "responsive", "dokunmatik", "uyumluluk", "mobil cihaz"],
+    "related_questions": [3, 17, 18, 19],
+    "difficulty_level": "Başlangıç",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 8,
+    "question": "Veri güvenliği nasıl sağlanıyor?",
+    "answer": "ConvStateAI, veri güvenliğini en üst seviyede tutar. Tüm veriler SSL şifreleme ile korunur ve GDPR uyumludur. Müşteri verileri güvenli sunucularda saklanır ve üçüncü taraflarla paylaşılmaz. Ayrıca veri silme ve düzenleme haklarınız bulunmaktadır.",
+    "category": "Güvenlik",
+    "subcategory": "Veri Koruması",
+    "tags": ["güvenlik", "ssl", "gdpr", "veri koruma", "şifreleme", "gizlilik"],
+    "related_questions": [19, 20, 21, 22],
+    "difficulty_level": "Orta",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 9,
+    "question": "Hangi ödeme yöntemleri kabul ediliyor?",
+    "answer": "ConvStateAI'da kredi kartı, banka kartı, havale/EFT ve taksitli ödeme seçenekleri mevcuttur. Ayrıca kurumsal müşteriler için fatura ile ödeme imkanı da sunulmaktadır. Tüm ödemeler güvenli ödeme sistemleri üzerinden işlenir.",
+    "category": "Ödeme",
+    "subcategory": "Ödeme Yöntemleri",
+    "tags": ["ödeme", "kredi kartı", "havale", "taksit", "fatura", "güvenli ödeme"],
+    "related_questions": [4, 22, 23, 24],
+    "difficulty_level": "Başlangıç",
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 10,
+    "question": "Müşteri desteği nasıl sağlanıyor?",
+    "answer": "ConvStateAI'da çoklu destek kanalları bulunmaktadır. Email desteği, canlı chat, telefon desteği ve video konferans seçenekleri mevcuttur. Ayrıca kapsamlı dokümantasyon ve video eğitim serileri ile self-servis destek imkanı sunulmaktadır.",
+    "category": "Destek",
+    "subcategory": "Destek Kanalları",
+    "tags": ["destek", "email", "canlı chat", "telefon", "dokümantasyon", "yardım"],
+    "related_questions": [24, 25, 26, 27],
+    "difficulty_level": "Başlangıç",
+    "last_updated": "2024-01-15"
+  }
+]

@@ -1,0 +1,234 @@
+[
+  {
+    "id": 1,
+    "name": "AI Destekli Chat Widget",
+    "description": "Yapay zeka teknolojisi ile güçlendirilmiş akıllı chat widget sistemi",
+    "category": "Temel Özellikler",
+    "subcategory": "Chat Sistemi",
+    "features": [
+      "Doğal dil işleme",
+      "Anlık yanıt verme",
+      "Çoklu dil desteği",
+      "Akıllı öğrenme",
+      "Kişiselleştirilmiş deneyim"
+    ],
+    "benefits": [
+      "7/24 müşteri hizmeti",
+      "Anında soru yanıtlama",
+      "Müşteri memnuniyeti artışı",
+      "Operasyonel maliyet azalması"
+    ],
+    "technical_details": {
+      "response_time": "< 2 saniye",
+      "languages_supported": 50,
+      "concurrent_users": "Sınırsız",
+      "uptime": "99.9%"
+    },
+    "tags": ["ai", "chat", "widget", "müşteri hizmetleri", "otomasyon"],
+    "is_active": true,
+    "is_featured": true
+  },
+  {
+    "id": 2,
+    "name": "Ürün Öneri Sistemi",
+    "description": "Müşteri davranışlarını analiz ederek kişiselleştirilmiş ürün önerileri sunan AI sistemi",
+    "category": "AI Özellikleri",
+    "subcategory": "Öneri Motoru",
+    "features": [
+      "Makine öğrenmesi algoritmaları",
+      "Gerçek zamanlı analiz",
+      "Kişiselleştirilmiş öneriler",
+      "Cross-selling ve up-selling",
+      "Trend analizi"
+    ],
+    "benefits": [
+      "Dönüşüm oranında %40 artış",
+      "Ortalama sepet değerinde artış",
+      "Müşteri memnuniyetinde iyileşme",
+      "Satış gelirinde artış"
+    ],
+    "technical_details": {
+      "algorithm_type": "Collaborative Filtering + Content-Based",
+      "update_frequency": "Gerçek zamanlı",
+      "accuracy_rate": "85%+",
+      "processing_speed": "< 100ms"
+    },
+    "tags": ["ürün önerisi", "ai", "kişiselleştirme", "satış", "analiz"],
+    "is_active": true,
+    "is_featured": true
+  },
+  {
+    "id": 3,
+    "name": "Knowledge Base Yönetimi",
+    "description": "Ürün bilgileri, SSS'ler ve dokümantasyonu yöneten merkezi bilgi sistemi",
+    "category": "Veri Yönetimi",
+    "subcategory": "Bilgi Sistemi",
+    "features": [
+      "Merkezi veri yönetimi",
+      "Otomatik içerik işleme",
+      "Arama ve filtreleme",
+      "Versiyon kontrolü",
+      "Çoklu format desteği"
+    ],
+    "benefits": [
+      "Tutarlı bilgi sunumu",
+      "Kolay içerik güncelleme",
+      "AI eğitimi için veri kaynağı",
+      "Müşteri self-servis desteği"
+    ],
+    "technical_details": {
+      "supported_formats": ["PDF", "DOC", "TXT", "HTML", "JSON"],
+      "max_file_size": "50MB",
+      "search_engine": "Elasticsearch",
+      "backup_frequency": "Günlük"
+    },
+    "tags": ["knowledge base", "veri yönetimi", "içerik", "arama", "dokümantasyon"],
+    "is_active": true,
+    "is_featured": false
+  },
+  {
+    "id": 4,
+    "name": "Analitik ve Raporlama",
+    "description": "Detaylı performans analizi ve özelleştirilebilir raporlar sunan sistem",
+    "category": "Analitik",
+    "subcategory": "Raporlama",
+    "features": [
+      "Gerçek zamanlı dashboard",
+      "Özelleştirilebilir raporlar",
+      "Veri görselleştirme",
+      "Export seçenekleri",
+      "Otomatik rapor gönderimi"
+    ],
+    "benefits": [
+      "Veri odaklı karar verme",
+      "Performans takibi",
+      "ROI hesaplama",
+      "Stratejik planlama"
+    ],
+    "technical_details": {
+      "data_retention": "12 ay",
+      "export_formats": ["PDF", "Excel", "CSV", "JSON"],
+      "real_time_updates": true,
+      "custom_metrics": true
+    },
+    "tags": ["analitik", "raporlama", "dashboard", "veri", "performans"],
+    "is_active": true,
+    "is_featured": true
+  },
+  {
+    "id": 5,
+    "name": "Çoklu Platform Entegrasyonu",
+    "description": "Farklı e-ticaret platformları ve üçüncü parti sistemlerle entegrasyon",
+    "category": "Entegrasyon",
+    "subcategory": "Platform Desteği",
+    "features": [
+      "Shopify entegrasyonu",
+      "WooCommerce desteği",
+      "Magento uyumluluğu",
+      "API entegrasyonu",
+      "Webhook desteği"
+    ],
+    "benefits": [
+      "Mevcut sistemlerle uyum",
+      "Hızlı kurulum",
+      "Veri senkronizasyonu",
+      "Esnek entegrasyon"
+    ],
+    "technical_details": {
+      "supported_platforms": ["Shopify", "WooCommerce", "Magento", "PrestaShop", "OpenCart"],
+      "api_version": "RESTful v2",
+      "webhook_support": true,
+      "sync_frequency": "Gerçek zamanlı"
+    },
+    "tags": ["entegrasyon", "platform", "api", "webhook", "uyumluluk"],
+    "is_active": true,
+    "is_featured": false
+  },
+  {
+    "id": 6,
+    "name": "A/B Test Özellikleri",
+    "description": "Farklı widget konfigürasyonlarını test etme ve optimize etme sistemi",
+    "category": "Optimizasyon",
+    "subcategory": "Test Sistemi",
+    "features": [
+      "Widget varyantları",
+      "Mesaj A/B testleri",
+      "Tema testleri",
+      "İstatistiksel analiz",
+      "Otomatik optimizasyon"
+    ],
+    "benefits": [
+      "Dönüşüm optimizasyonu",
+      "Veri odaklı kararlar",
+      "Sürekli iyileştirme",
+      "ROI maksimizasyonu"
+    ],
+    "technical_details": {
+      "test_duration": "Minimum 7 gün",
+      "statistical_significance": "95%",
+      "auto_optimization": true,
+      "traffic_split": "50/50"
+    },
+    "tags": ["a/b test", "optimizasyon", "test", "dönüşüm", "analiz"],
+    "is_active": true,
+    "is_featured": false
+  },
+  {
+    "id": 7,
+    "name": "Güvenlik ve Uyumluluk",
+    "description": "Veri güvenliği ve yasal uyumluluk standartlarını karşılayan güvenlik sistemi",
+    "category": "Güvenlik",
+    "subcategory": "Veri Koruması",
+    "features": [
+      "SSL şifreleme",
+      "GDPR uyumluluğu",
+      "Veri anonimleştirme",
+      "Güvenli veri saklama",
+      "Erişim kontrolü"
+    ],
+    "benefits": [
+      "Müşteri verilerinin korunması",
+      "Yasal uyumluluk",
+      "Güvenilirlik",
+      "Marka itibarı korunması"
+    ],
+    "technical_details": {
+      "encryption": "AES-256",
+      "compliance": ["GDPR", "CCPA", "ISO 27001"],
+      "data_retention": "Yasal gerekliliklere uygun",
+      "audit_logging": true
+    },
+    "tags": ["güvenlik", "gdpr", "şifreleme", "uyumluluk", "veri koruma"],
+    "is_active": true,
+    "is_featured": true
+  },
+  {
+    "id": 8,
+    "name": "Mobil Optimizasyon",
+    "description": "Mobil cihazlarda mükemmel çalışan responsive tasarım ve dokunmatik optimizasyon",
+    "category": "Kullanıcı Deneyimi",
+    "subcategory": "Mobil Uyumluluk",
+    "features": [
+      "Responsive tasarım",
+      "Dokunmatik optimizasyon",
+      "Hızlı yükleme",
+      "Mobil özel özellikler",
+      "Offline çalışma"
+    ],
+    "benefits": [
+      "Mobil kullanıcı deneyimi",
+      "Dönüşüm oranı artışı",
+      "Erişilebilirlik",
+      "Kullanıcı memnuniyeti"
+    ],
+    "technical_details": {
+      "responsive_breakpoints": ["320px", "768px", "1024px", "1200px"],
+      "touch_optimization": true,
+      "loading_speed": "< 3 saniye",
+      "offline_capability": "Temel özellikler"
+    },
+    "tags": ["mobil", "responsive", "dokunmatik", "optimizasyon", "kullanıcı deneyimi"],
+    "is_active": true,
+    "is_featured": true
+  }
+]

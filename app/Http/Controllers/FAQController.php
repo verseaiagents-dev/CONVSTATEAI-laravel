@@ -18,19 +18,9 @@ class FAQController extends Controller
         if ($request->expectsJson()) {
             // API request - return JSON
             try {
-                $siteId = $request->get('site_id', 1); // Default site ID
+                $projectId = $request->get('project_id', 1); // Default project ID
                 
-                // Site'in var olup olmadığını kontrol et
-                $site = Site::find($siteId);
-                if (!$site) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Belirtilen site bulunamadı',
-                        'data' => []
-                    ], 404);
-                }
-                
-                $faqs = FAQ::where('site_id', $siteId)
+                $faqs = FAQ::where('project_id', $projectId)
                     ->active()
                     ->ordered()
                     ->get();
@@ -193,9 +183,9 @@ class FAQController extends Controller
     public function getByCategory(Request $request, $category): JsonResponse
     {
         try {
-            $siteId = $request->get('site_id', 1);
+            $projectId = $request->get('project_id', 1);
             
-            $faqs = FAQ::where('site_id', $siteId)
+            $faqs = FAQ::where('project_id', $projectId)
                 ->where('category', $category)
                 ->active()
                 ->ordered()

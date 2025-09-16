@@ -19,21 +19,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 // Public Plan Selection
 Route::get('/subscription/plans', [App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscription.plans');
 
-// Widget Customization Assets - Public Access
-Route::get('/widgetcust/imgs/{filename}', function ($filename) {
-    $filePath = public_path('widgetcust/imgs/' . $filename);
-    
-    if (!file_exists($filePath)) {
-        return response('File not found', 404);
-    }
-    
-    $mimeType = mime_content_type($filePath);
-    $fileContent = file_get_contents($filePath);
-    
-    return response($fileContent)
-        ->header('Content-Type', $mimeType)
-        ->header('Cache-Control', 'public, max-age=31536000');
-})->where('filename', '[^/]+');
+// Widget Customization Assets - Public Access (moved to API routes for CORS support)
 
 // Legal Pages
 Route::get('/privacy-policy', function () {
@@ -157,7 +143,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
     // User Management Routes (Legacy - AdminController)
     Route::get('/admin/users/{id}', [AdminController::class, 'getUser'])->name('admin.users.get');
-    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update.legacy');
     Route::post('/admin/users/{id}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
     
@@ -190,6 +176,26 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
         'update' => 'admin.subscriptions.update',
         'destroy' => 'admin.subscriptions.destroy',
     ]);
+    
+    // Plan Request Routes
+    Route::post('/admin/subscriptions/requests/{planRequest}/approve', [\App\Http\Controllers\Admin\SubscriptionController::class, 'approveRequest'])->name('admin.subscriptions.requests.approve');
+    Route::post('/admin/subscriptions/requests/{planRequest}/reject', [\App\Http\Controllers\Admin\SubscriptionController::class, 'rejectRequest'])->name('admin.subscriptions.requests.reject');
+    
+    // User Plan History Route
+    Route::get('/admin/subscriptions/user/{user}/history', [\App\Http\Controllers\Admin\SubscriptionController::class, 'getUserPlanHistory'])->name('admin.subscriptions.user.history');
+    
+    // VIP Token Management Route
+    Route::post('/admin/subscriptions/vip-token', [\App\Http\Controllers\Admin\SubscriptionController::class, 'manageVipToken'])->name('admin.subscriptions.vip-token');
+    
+    // User Management with Subscriptions and Requests
+    Route::get('/admin/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users/subscriptions', [\App\Http\Controllers\Admin\UserController::class, 'storeSubscription'])->name('admin.users.subscriptions.store');
+    Route::put('/admin/users/subscriptions/{subscription}', [\App\Http\Controllers\Admin\UserController::class, 'updateSubscription'])->name('admin.users.subscriptions.update');
+    Route::delete('/admin/users/subscriptions/{subscription}', [\App\Http\Controllers\Admin\UserController::class, 'destroySubscription'])->name('admin.users.subscriptions.destroy');
+    Route::post('/admin/users/requests/{planRequest}/approve', [\App\Http\Controllers\Admin\UserController::class, 'approveRequest'])->name('admin.users.requests.approve');
+    Route::post('/admin/users/requests/{planRequest}/reject', [\App\Http\Controllers\Admin\UserController::class, 'rejectRequest'])->name('admin.users.requests.reject');
+    Route::get('/admin/users/{user}/plan-history', [\App\Http\Controllers\Admin\UserController::class, 'getUserPlanHistory'])->name('admin.users.plan-history');
+    Route::get('/admin/users/{user}/plan-request-history', [\App\Http\Controllers\Admin\UserController::class, 'getUserPlanRequestHistory'])->name('admin.users.plan-request-history');
     
     // Mail Templates Management
     Route::resource('admin/mail-templates', \App\Http\Controllers\Admin\MailTemplateController::class)->names([

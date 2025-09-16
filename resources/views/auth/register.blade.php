@@ -161,7 +161,7 @@
                                    name="email" 
                                    value="{{ old('email') }}"
                                    class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400" 
-                                   placeholder="ornek@email.com"
+                                   placeholder="benimisletmem@xxxx.com"
                                    required>
                             @error('email')
                                 <p class="mt-1 text-red-400 text-sm">{{ $message }}</p>
@@ -237,7 +237,7 @@
     <!-- Footer -->
     <footer class="relative z-10 py-8 text-center">
         <p class="text-gray-400 text-sm">
-            © 2024 ConvStateAI. Tüm hakları saklıdır.
+            © 2025 ConvStateAI. Tüm hakları saklıdır.
         </p>
     </footer>
 

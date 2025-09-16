@@ -1,0 +1,194 @@
+[
+  {
+    "id": 1,
+    "title": "ConvStateAI'a Başlarken",
+    "category": "Başlangıç",
+    "subcategory": "Kurulum",
+    "content": "ConvStateAI'ı web sitenize entegre etmek için adım adım rehber. Dashboard'a giriş yapın, entegrasyon kodunuzu alın ve web sitenize ekleyin.",
+    "steps": [
+      "ConvStateAI hesabınızı oluşturun",
+      "Dashboard'a giriş yapın",
+      "Entegrasyon kodunuzu kopyalayın",
+      "Web sitenizin </body> etiketinden önce kodu yapıştırın",
+      "Widget'ın çalıştığını test edin"
+    ],
+    "estimated_time": "5-10 dakika",
+    "difficulty": "Başlangıç",
+    "tags": ["kurulum", "entegrasyon", "başlangıç", "rehber"],
+    "related_articles": [2, 3, 4],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "title": "Widget Özelleştirme Rehberi",
+    "category": "Özelleştirme",
+    "subcategory": "Görsel Tasarım",
+    "content": "ConvStateAI widget'ının görünümünü markanıza uygun şekilde özelleştirin. Renkler, boyutlar, konum ve mesaj şablonlarını düzenleyin.",
+    "steps": [
+      "Dashboard'da 'Widget Ayarları' bölümüne gidin",
+      "Tema seçin ve renkleri ayarlayın",
+      "Widget boyutunu ve konumunu belirleyin",
+      "Mesaj şablonlarını özelleştirin",
+      "Değişiklikleri kaydedin ve test edin"
+    ],
+    "estimated_time": "15-30 dakika",
+    "difficulty": "Orta",
+    "tags": ["özelleştirme", "tasarım", "widget", "marka"],
+    "related_articles": [1, 5, 6],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 3,
+    "title": "Knowledge Base Kurulumu",
+    "category": "Veri Yönetimi",
+    "subcategory": "Knowledge Base",
+    "content": "AI'ınızı eğitmek için ürün bilgilerinizi, SSS'lerinizi ve dokümantasyonunuzu Knowledge Base'e yükleyin.",
+    "steps": [
+      "Knowledge Base bölümüne gidin",
+      "Yeni kaynak ekleyin",
+      "Dosya türünü seçin (PDF, DOC, TXT)",
+      "Dosyayı yükleyin",
+      "İçeriği işlemesini bekleyin",
+      "Test edin"
+    ],
+    "estimated_time": "10-20 dakika",
+    "difficulty": "Orta",
+    "tags": ["knowledge base", "veri", "eğitim", "ai"],
+    "related_articles": [1, 7, 8],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 4,
+    "title": "API Entegrasyonu",
+    "category": "Gelişmiş",
+    "subcategory": "API",
+    "content": "ConvStateAI API'sini kullanarak özel entegrasyonlar oluşturun ve mevcut sistemlerinizle bağlantı kurun.",
+    "steps": [
+      "API anahtarınızı alın",
+      "API dokümantasyonunu inceleyin",
+      "Test ortamında API'yi test edin",
+      "Üretim ortamında entegrasyonu yapın",
+      "Webhook'ları yapılandırın"
+    ],
+    "estimated_time": "1-2 saat",
+    "difficulty": "İleri",
+    "tags": ["api", "entegrasyon", "gelişmiş", "webhook"],
+    "related_articles": [9, 10, 11],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 5,
+    "title": "Analitik Raporları Anlama",
+    "category": "Analitik",
+    "subcategory": "Raporlama",
+    "content": "ConvStateAI dashboard'undaki analitik raporları nasıl okuyacağınızı ve yorumlayacağınızı öğrenin.",
+    "steps": [
+      "Dashboard'da 'Analitik' bölümüne gidin",
+      "Rapor türlerini inceleyin",
+      "Filtreleri kullanın",
+      "Verileri yorumlayın",
+      "Raporları dışa aktarın"
+    ],
+    "estimated_time": "20-30 dakika",
+    "difficulty": "Orta",
+    "tags": ["analitik", "raporlama", "dashboard", "veri"],
+    "related_articles": [12, 13, 14],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 6,
+    "title": "A/B Test Nasıl Yapılır",
+    "category": "Optimizasyon",
+    "subcategory": "A/B Test",
+    "content": "Farklı widget konfigürasyonlarını test ederek dönüşüm oranlarınızı optimize edin.",
+    "steps": [
+      "A/B Test bölümüne gidin",
+      "Test varyantını oluşturun",
+      "Test parametrelerini ayarlayın",
+      "Testi başlatın",
+      "Sonuçları analiz edin",
+      "Kazanan varyantı uygulayın"
+    ],
+    "estimated_time": "30-45 dakika",
+    "difficulty": "İleri",
+    "tags": ["a/b test", "optimizasyon", "dönüşüm", "test"],
+    "related_articles": [5, 15, 16],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 7,
+    "title": "Müşteri Segmentasyonu",
+    "category": "Müşteri Yönetimi",
+    "subcategory": "Segmentasyon",
+    "content": "Müşterilerinizi farklı gruplara ayırarak kişiselleştirilmiş deneyimler sunun.",
+    "steps": [
+      "Müşteri verilerini analiz edin",
+      "Segmentasyon kriterlerini belirleyin",
+      "Segmentleri oluşturun",
+      "Kişiselleştirilmiş mesajlar hazırlayın",
+      "Segmentlere özel widget konfigürasyonları yapın"
+    ],
+    "estimated_time": "45-60 dakika",
+    "difficulty": "İleri",
+    "tags": ["segmentasyon", "müşteri", "kişiselleştirme", "analiz"],
+    "related_articles": [3, 17, 18],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 8,
+    "title": "Güvenlik Ayarları",
+    "category": "Güvenlik",
+    "subcategory": "Güvenlik Yapılandırması",
+    "content": "ConvStateAI'ınızın güvenlik ayarlarını yapılandırarak verilerinizi koruyun.",
+    "steps": [
+      "Güvenlik bölümüne gidin",
+      "SSL sertifikasını kontrol edin",
+      "API erişim izinlerini ayarlayın",
+      "Veri saklama politikalarını yapılandırın",
+      "Güvenlik raporlarını inceleyin"
+    ],
+    "estimated_time": "20-30 dakika",
+    "difficulty": "Orta",
+    "tags": ["güvenlik", "ssl", "veri koruma", "ayarlar"],
+    "related_articles": [19, 20, 21],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 9,
+    "title": "Webhook Yapılandırması",
+    "category": "Gelişmiş",
+    "subcategory": "Webhook",
+    "content": "Webhook'ları yapılandırarak ConvStateAI ile diğer sistemleriniz arasında otomatik veri akışı sağlayın.",
+    "steps": [
+      "Webhook bölümüne gidin",
+      "Yeni webhook oluşturun",
+      "URL ve event türlerini belirleyin",
+      "Test webhook'unu gönderin",
+      "Webhook'u aktifleştirin"
+    ],
+    "estimated_time": "15-25 dakika",
+    "difficulty": "İleri",
+    "tags": ["webhook", "entegrasyon", "otomasyon", "api"],
+    "related_articles": [4, 22, 23],
+    "last_updated": "2024-01-15"
+  },
+  {
+    "id": 10,
+    "title": "Sorun Giderme Rehberi",
+    "category": "Destek",
+    "subcategory": "Sorun Giderme",
+    "content": "Yaygın sorunları tespit edin ve çözüm yollarını öğrenin.",
+    "steps": [
+      "Sorunun belirtilerini not edin",
+      "Log dosyalarını kontrol edin",
+      "Yaygın sorunlar listesini inceleyin",
+      "Çözüm adımlarını uygulayın",
+      "Gerekirse destek ekibiyle iletişime geçin"
+    ],
+    "estimated_time": "10-30 dakika",
+    "difficulty": "Orta",
+    "tags": ["sorun giderme", "destek", "hata", "çözüm"],
+    "related_articles": [24, 25, 26],
+    "last_updated": "2024-01-15"
+  }
+]

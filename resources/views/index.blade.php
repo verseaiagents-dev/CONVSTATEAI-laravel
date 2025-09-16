@@ -48,6 +48,100 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
+        /* Landing Page Chat Bubble Styles */
+        .landing-notification-widget {
+            position: absolute;
+            bottom: 20px;
+            right: 80px; /* Logo için daha fazla alan bırak */
+            z-index: 1000;
+            animation: slideInFromRight 0.5s ease-out;
+        }
+        
+        .landing-notification-widget-slide-in {
+            animation: slideInFromRight 0.5s ease-out;
+        }
+        
+        .landing-notification-speech-bubble {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-width: 280px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .landing-notification-content {
+            padding: 12px 16px;
+            position: relative;
+        }
+        
+        .landing-notification-header {
+            margin-bottom: 4px;
+        }
+        
+        .landing-notification-sender {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8B5CF6;
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .landing-notification-message {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.4;
+        }
+        
+        .landing-notification-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #9CA3AF;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .landing-notification-close-btn:hover {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+        
+        /* Speech bubble tail */
+        .landing-notification-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+        
+        @keyframes slideInFromRight {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body class="bg-black text-white">
@@ -134,10 +228,16 @@
                                 </div>
                                 
                                 <!-- Chat Bubble -->
-                                <div class="absolute bottom-20 right-4 bg-white text-gray-800 p-3 rounded-lg shadow-lg max-w-xs">
-                                    <div class="text-xs font-semibold mb-1 gradient-text ">ConvState AI</div>
-                                    <div class="text-sm ">Sizin için en uygun ürünleri öneririm 🛍️</div>
-                                    <div class="absolute bottom-0 right-0 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white transform translate-y-full"></div>
+                                <div class="landing-notification-widget landing-notification-widget-slide-in">
+                                    <div class="landing-notification-speech-bubble">
+                                        <div class="landing-notification-content">
+                                            <div class="landing-notification-header">
+                                                <span class="landing-notification-sender">ConvState AI</span>
+                                            </div>
+                                            <div class="landing-notification-message">Sizin için ürün seçebilirim 🛍️</div>
+                                        </div>
+                                        <button class="landing-notification-close-btn" title="Kapat">×</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -289,20 +389,7 @@
                                     </svg>
                                 </div>
                                 
-                                <!-- Chat Messages -->
-                                <div class="absolute bottom-24 right-4 space-y-2 max-w-xs">
-                                    <div class="bg-white text-gray-800 p-3 rounded-lg shadow-lg">
-                                        <div class="text-xs font-semibold mb-1 ">ConvState AI</div>
-                                        <div class="text-sm">Merhaba! Size nasıl yardımcı olabilirim? 🛍️</div>
-                                    </div>
-                                    <div class="bg-gray-100 text-gray-800 p-3 rounded-lg ml-8">
-                                        <div class="text-sm">Telefon modelleri hakkında bilgi alabilir miyim?</div>
-                                    </div>
-                                    <div class="bg-white text-gray-800 p-3 rounded-lg shadow-lg">
-                                        <div class="text-xs font-semibold mb-1">ConvState AI</div>
-                                        <div class="text-sm">Tabii! Size en uygun telefon modellerini önerebilirim. Hangi bütçe aralığında düşünüyorsunuz? 📱</div>
-                                    </div>
-                                </div>
+                                <!-- Chat Messages - Removed for cleaner demo -->
                             </div>
                         </div>
                     </div>
@@ -621,13 +708,45 @@
             });
         }
 
+        // Landing page chat bubble close functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeButtons = document.querySelectorAll('.landing-notification-close-btn');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const widget = this.closest('.landing-notification-widget');
+                    if (widget) {
+                        widget.style.animation = 'slideOutToRight 0.3s ease-in forwards';
+                        setTimeout(() => {
+                            widget.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Add slide out animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOutToRight {
+                0% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
     </script>
 
     <!-- ConvStateAI Widget -->
     <script src="{{ url('/embed/convstateai.min.js') }}"></script>
     <script>
         window.convstateaiConfig = {
-            projectId: "1",
+            projectId: "2",
             customizationToken: "dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246"
         };
     </script>
