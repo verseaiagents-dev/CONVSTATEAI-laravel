@@ -9,10 +9,10 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Schedule tanımları
-Schedule::command('knowledge-base:retry-stuck --minutes=10')
-    ->everyTenMinutes()
-    ->withoutOverlapping()
-    ->runInBackground();
+// Schedule::command('knowledge-base:retry-stuck --minutes=10')
+//     ->everyTenMinutes()
+//     ->withoutOverlapping()
+//     ->runInBackground();
 
 // Her gün saat 02:00'da log dosyalarını temizle
 Schedule::call(function () {

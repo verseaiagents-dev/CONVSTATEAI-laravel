@@ -428,6 +428,10 @@
                                                 <span class="text-white font-medium">{{ $plan->name }}</span>
                                             </div>
                                             <div class="flex justify-between text-sm">
+                                                <span class="text-gray-400">Token:</span>
+                                                <span class="text-white font-medium">{{ auth()->user()->tokens_remaining ?? 0 }} / {{ auth()->user()->tokens_total ?? 0 }}</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm">
                                                 <span class="text-gray-400">Kalan Süre:</span>
                                                 <span class="text-white">{{ $subscription->days_remaining }} gün</span>
                                             </div>

@@ -181,7 +181,7 @@
                 <!-- Left Content -->
                 <div class="text-center lg:text-left">
             <h2 class="text-5xl sm:text-5xl md:text-7xl font-bold mb-6">
-                        <span class="gradient-text">Conv State AI</span><div class="h-3 sm:h-5"></div>  
+                        <span class="gradient-text">ConvState AI</span><div class="h-3 sm:h-5"></div>  
                         ile Müşteri Sayını
                         Çoğalt
             </h2>
@@ -267,7 +267,7 @@
                     Neden <span class="gradient-text">ConvStateAI</span>?
                 </h2>
                 <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    E-ticaret sitenize güçlü Conv State AI'ı entegre edin, müşteri deneyimini dönüştürün
+                    E-ticaret sitenize güçlü ConvState AI'ı entegre edin, müşteri deneyimini dönüştürün
                 </p>
             </div>
             
@@ -492,7 +492,7 @@
                         </div>
                     </div>
                     <p class="text-gray-300 mb-4">
-                        "ConvStateAI sayesinde müşteri hizmetlerimiz %300 arttı. Conv State AI'ı ile 7/24 müşteri desteği sağlıyoruz."
+                        "ConvStateAI sayesinde müşteri hizmetlerimiz %300 arttı. ConvState AI'ı ile 7/24 müşteri desteği sağlıyoruz."
                     </p>
                     <div class="flex text-yellow-400">
                         ⭐⭐⭐⭐⭐

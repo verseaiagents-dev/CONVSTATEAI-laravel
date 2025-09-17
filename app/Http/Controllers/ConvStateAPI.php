@@ -2667,13 +2667,16 @@ class ConvStateAPI extends Controller
             $productPrice = $productData['product_price'] ?? 0;
             $productCategory = $productData['product_category'] ?? 'Genel';
 
-            // AI prompt oluştur
-            $prompt = $this->buildProductDetailsPrompt($productName, $productDescription, $productPrice, $productCategory);
+            // Hybrid sistem - Template veya AI kullan
+            $response = $this->buildProductDetailsPrompt($productName, $productDescription, $productPrice, $productCategory);
             
-            // OpenAI API'yi çağır
-            $aiResponse = $this->aiService->generateResponse($prompt, []);
+            // Eğer response array ise (template'den geldi), direkt döndür
+            if (is_array($response)) {
+                return $response;
+            }
             
-            // Response'u parse et
+            // Eğer string ise (AI prompt), AI'ya gönder
+            $aiResponse = $this->aiService->generateResponse($response, []);
             return $this->parseAIProductResponse($aiResponse, $productData);
 
         } catch (\Exception $e) {
@@ -2688,47 +2691,210 @@ class ConvStateAPI extends Controller
     }
 
     /**
-     * Ürün detayları için AI prompt oluşturur
+     * Hybrid ürün detayları sistemi - Template + Minimal AI
      */
     private function buildProductDetailsPrompt($name, $description, $price, $category)
     {
-        return "Sen bir e-ticaret uzmanısın. Aşağıdaki ürün için detaylı, satış odaklı ve kullanıcı dostu bir analiz hazırla:
+        // Kategori tespiti
+        $detectedCategory = $this->detectProductCategory([
+            'product_name' => $name,
+            'product_category' => $category,
+            'product_description' => $description
+        ]);
+        
+        // Cache kontrolü
+        $cacheKey = "product_details_{$name}_{$detectedCategory}";
+        $cached = \Cache::get($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+        
+        // Template-based response (AI'sız)
+        if ($this->canUseTemplate($detectedCategory)) {
+            $response = $this->getTemplateResponse($detectedCategory, [
+                'name' => $name,
+                'description' => $description,
+                'price' => $price,
+                'category' => $category
+            ]);
+            
+            // Cache'le
+            \Cache::put($cacheKey, $response, 3600); // 1 saat
+            return $response;
+        }
+        
+        // Minimal AI prompt (sadece gerekli durumlarda)
+        return $this->buildMinimalAIPrompt($name, $description, $price, $detectedCategory);
+    }
 
-ÜRÜN BİLGİLERİ:
-- İsim: {$name}
-- Açıklama: {$description}
-- Fiyat: ₺{$price}
-- Kategori: {$category}
-
-Lütfen aşağıdaki formatta JSON response döndür:
-
-{
-  \"ai_description\": \"Ürün hakkında 2-3 paragraf detaylı, satış odaklı açıklama. Ürünün faydalarını, kalitesini ve neden tercih edilmesi gerektiğini vurgula.\",
-  \"features\": [
-    \"Özellik 1: Detaylı açıklama\",
-    \"Özellik 2: Detaylı açıklama\",
-    \"Özellik 3: Detaylı açıklama\"
-  ],
-  \"usage_scenarios\": [
-    \"Kullanım alanı 1: Ne zaman kullanılır\",
-    \"Kullanım alanı 2: Ne zaman kullanılır\",
-    \"Kullanım alanı 3: Ne zaman kullanılır\"
-  ],
-  \"specifications\": {
-    \"Boyut\": \"Detaylı boyut bilgisi\",
-    \"Materyal\": \"Kullanılan malzeme\",
-    \"Renk\": \"Mevcut renk seçenekleri\",
-    \"Garanti\": \"Garanti süresi ve koşulları\"
-  },
-  \"recommendations\": [
-    \"Kullanım önerisi 1\",
-    \"Kullanım önerisi 2\",
-    \"Bakım önerisi\"
-  ],
-  \"additional_info\": \"Ek bilgiler, dikkat edilmesi gerekenler, özel durumlar vb.\"
-}
-
-Türkçe yanıt ver ve satış odaklı, ikna edici bir dil kullan.";
+    /**
+     * Kategori tespiti - mevcut sistemi geliştir
+     */
+    private function detectProductCategory($productData)
+    {
+        $name = strtolower($productData['product_name']);
+        $category = strtolower($productData['product_category'] ?? '');
+        $description = strtolower($productData['product_description'] ?? '');
+        $text = $name . ' ' . $category . ' ' . $description;
+        
+        // Yazılım kategorisi ekle
+        $softwareKeywords = [
+            'yazılım', 'software', 'app', 'uygulama', 'program', 'tool', 'platform',
+            'sistem', 'mobil', 'web', 'desktop', 'api', 'sdk', 'framework', 'plugin',
+            'extension', 'addon', 'module', 'library', 'package', 'bundle'
+        ];
+        
+        foreach ($softwareKeywords as $keyword) {
+            if (str_contains($text, $keyword)) {
+                return 'yazilim';
+            }
+        }
+        
+        // Mevcut kategori tespiti sistemini kullan
+        return $this->extractCategoryFromMessage($name);
+    }
+    
+    /**
+     * Template kullanılabilir mi kontrol et
+     */
+    private function canUseTemplate($category)
+    {
+        $templateCategories = ['yazilim', 'donanim', 'giyim', 'kitap', 'ev_esyalari', 'aksesuar'];
+        return in_array($category, $templateCategories);
+    }
+    
+    /**
+     * Template-based response (AI'sız)
+     */
+    private function getTemplateResponse($category, $productData)
+    {
+        $templates = [
+            'yazilim' => [
+                'ai_description' => "Bu yazılım ürünü, {$productData['name']} ihtiyaçlarınızı karşılayacak modern özelliklere sahiptir. Kullanıcı dostu arayüzü ve güçlü performansı ile öne çıkar.",
+                'features' => [
+                    "Kullanıcı dostu arayüz ve kolay navigasyon",
+                    "Güvenli veri işleme ve koruma sistemi",
+                    "Hızlı performans ve optimize edilmiş kod yapısı",
+                    "Güncel teknolojiler ve modern standartlar"
+                ],
+                'usage_scenarios' => [
+                    "Günlük iş süreçlerinizi kolaylaştırmak için",
+                    "Profesyonel projelerinizde verimlilik artırmak için",
+                    "Kişisel kullanım ve eğlence amaçlı"
+                ],
+                'specifications' => [
+                    "Platform" => "Windows, Mac, Linux uyumlu",
+                    "Sistem Gereksinimleri" => "Minimum 4GB RAM, 2GB disk alanı",
+                    "Lisans" => "Tek kullanıcı lisansı",
+                    "Destek" => "7/24 teknik destek ve güncellemeler"
+                ],
+                'recommendations' => [
+                    "Kurulum öncesi sistem gereksinimlerini kontrol edin",
+                    "Düzenli güncellemeleri yaparak en iyi performansı alın",
+                    "Sorularınız için dokümantasyonu inceleyin"
+                ],
+                'additional_info' => "Bu yazılım hakkında daha fazla bilgi için müşteri hizmetlerimizle iletişime geçebilirsiniz."
+            ],
+            'donanim' => [
+                'ai_description' => "Bu donanım ürünü, {$productData['name']} kaliteli malzemelerden üretilmiş ve uzun ömürlü kullanım için tasarlanmıştır. Dayanıklı yapısı ve güvenilir performansı ile öne çıkar.",
+                'features' => [
+                    "Yüksek kaliteli malzeme ve işçilik",
+                    "Dayanıklı ve uzun ömürlü yapı",
+                    "Kullanıcı dostu tasarım ve ergonomi",
+                    "Güvenilir performans ve stabilite"
+                ],
+                'usage_scenarios' => [
+                    "Günlük kullanım ve iş amaçlı",
+                    "Profesyonel projelerinizde",
+                    "Ev ve ofis ortamlarında"
+                ],
+                'specifications' => [
+                    "Boyut" => "Detaylı boyut bilgisi",
+                    "Materyal" => "Kaliteli malzeme kullanımı",
+                    "Renk" => "Mevcut renk seçenekleri",
+                    "Garanti" => "2 yıl resmi garanti"
+                ],
+                'recommendations' => [
+                    "Kullanım kılavuzunu dikkatli okuyun",
+                    "Düzenli bakım yaparak ömrünü uzatın",
+                    "Garanti süresini takip edin"
+                ],
+                'additional_info' => "Bu ürün hakkında teknik destek için müşteri hizmetlerimizle iletişime geçebilirsiniz."
+            ],
+            'giyim' => [
+                'ai_description' => "Şık ve konforlu {$productData['name']} tasarımı ile öne çıkar. Kaliteli kumaş ve modern kesim ile hem şıklık hem de rahatlık sunar.",
+                'features' => [
+                    "Kaliteli kumaş ve malzeme",
+                    "Rahat kesim ve ergonomik tasarım",
+                    "Dayanıklı dikiş ve işçilik",
+                    "Modern ve şık görünüm"
+                ],
+                'usage_scenarios' => [
+                    "Günlük kullanım için ideal",
+                    "Özel günlerde şık görünüm",
+                    "İş ve sosyal ortamlarda"
+                ],
+                'specifications' => [
+                    "Beden" => "S, M, L, XL, XXL seçenekleri",
+                    "Kumaş" => "Kaliteli pamuk karışımı",
+                    "Renk" => "Çoklu renk seçenekleri",
+                    "Bakım" => "30°C'de yıkayın, ütülemeyin"
+                ],
+                'recommendations' => [
+                    "Beden seçiminde ölçü tablosunu kontrol edin",
+                    "İlk yıkamada renk ayrımı yapın",
+                    "Uygun saklama koşullarında muhafaza edin"
+                ],
+                'additional_info' => "Beden ve renk seçenekleri hakkında bilgi almak için müşteri hizmetlerimizle iletişime geçebilirsiniz."
+            ]
+        ];
+        
+        return $templates[$category] ?? $this->getGenericTemplate($productData);
+    }
+    
+    /**
+     * Genel template (fallback)
+     */
+    private function getGenericTemplate($productData)
+    {
+        $price = $productData['price'] ?? 0;
+        $isPremium = $price > 1000;
+        
+        return [
+            'ai_description' => $isPremium 
+                ? "Bu ürün, kaliteli malzemelerden üretilmiş ve dijital platformlarda kullanım için idealdir. Müşteri memnuniyeti odaklı tasarımı ile öne çıkan bu ürün, ihtiyaçlarınızı karşılayacak özelliklere sahiptir."
+                : "Uygun fiyatlı seçenek olan bu ürün, ihtiyaçlarınızı karşılayacak özelliklere sahiptir. Kaliteli malzeme kullanımı ve kullanıcı dostu tasarımı ile öne çıkar.",
+            'features' => [
+                "Kullanıcı dostu tasarım",
+                "Güçlü",
+                "Kolay kullanım"
+            ],
+            'usage_scenarios' => [
+                "Dijital platformlarda kullanım için ideal",
+                "Hediye olarak verilebilir"
+            ],
+            'specifications' => [
+                "Kategori" => $productData['category'] ?? 'Genel',
+                "Fiyat" => "₺" . ($productData['price'] ?? 'Belirtilmemiş'),
+                "Durum" => "Yeni"
+            ],
+            'recommendations' => [
+                "Ürünü kullanmadan önce kullanım kılavuzunu okuyun",
+            
+            ],
+            'additional_info' => "Bu ürün hakkında daha fazla bilgi almak için müşteri hizmetlerimizle iletişime geçebilirsiniz."
+        ];
+    }
+    
+    /**
+     * Minimal AI prompt (sadece gerekli durumlarda)
+     */
+    private function buildMinimalAIPrompt($name, $description, $price, $category)
+    {
+        return "Ürün: {$name} (₺{$price})
+Kategori: {$category}
+Kısa analiz yap: 2-3 cümle açıklama, 3 özellik, 2 kullanım alanı.
+JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"usage_scenarios\":[...]}";
     }
 
     /**

@@ -698,86 +698,6 @@
                         </div>
                     </div>
 
-                    <!-- Bildirim Widget'ı -->
-                    <div class="glass-effect rounded-2xl p-6 space-y-6">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div
-                                class="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 17h5l-5 5v-5zM4 19h6v2H4a2 2 0 01-2-2V5a2 2 0 012-2h6v2H4v14zM12 3h8a2 2 0 012 2v8M12 3L8 7l4 4">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-white">Bildirim Widget'ı</h3>
-                                <p class="text-gray-400 text-sm">Kullanıcılara özel bildirimler gönderin</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Bildirim Aktif/Pasif -->
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="notification_active" name="notification_active"
-                                    class="w-5 h-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500 focus:ring-2">
-                                <label for="notification_active" class="text-sm font-medium text-gray-300">
-                                    Bildirim Widget'ı Aktif
-                                </label>
-                            </div>
-
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Mesaj Metni -->
-                            <div>
-                                <label for="notification_message_text"
-                                    class="block text-sm font-medium text-gray-300 mb-2">
-                                    Bildirim Mesajı
-                                </label>
-                                <input type="text" id="notification_message_text" name="notification_message_text"
-                                    placeholder="Sizin için kampanyamız var!"
-                                    class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                            </div>
-
-                            <!-- Görünürlük Süresi -->
-                            <div>
-                                <label for="notification_display_duration"
-                                    class="block text-sm font-medium text-gray-300 mb-2">
-                                    Görünürlük Süresi (saniye)
-                                </label>
-                                <input type="number" id="notification_display_duration"
-                                    name="notification_display_duration" min="1" max="30" value="5"
-                                    class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Animasyon Türü -->
-                            <div>
-                                <label for="notification_animation_type"
-                                    class="block text-sm font-medium text-gray-300 mb-2">
-                                    Animasyon Türü
-                                </label>
-                                <select id="notification_animation_type" name="notification_animation_type"
-                                    class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                    <option value="fade-in">Fade In</option>
-                                    <option value="slide-in">Slide In</option>
-                                    <option value="bounce">Bounce</option>
-                                </select>
-                            </div>
-
-                        </div>
-
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" id="notification_show_close_button"
-                                name="notification_show_close_button" checked
-                                class="w-5 h-5 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500 focus:ring-2">
-                            <label for="notification_show_close_button" class="text-sm font-medium text-gray-300">
-                                Kapatma Butonu Göster
-                            </label>
-                        </div>
-                    </div>
 
                     <!-- Gelişmiş Ayarlar -->
                     <div class="glass-effect rounded-2xl p-6 space-y-6">
@@ -1183,27 +1103,6 @@
                 }
             }
 
-            // Notification Widget verilerini populate et
-            if (data.notificationWidget) {
-                const notification = data.notificationWidget;
-
-                if (notification.is_active !== undefined) {
-                    document.getElementById('notification_active').checked = notification.is_active;
-                }
-                if (notification.message_text) {
-                    document.getElementById('notification_message_text').value = notification.message_text;
-                }
-                if (notification.display_duration) {
-                    document.getElementById('notification_display_duration').value = Math.round(notification
-                        .display_duration / 1000);
-                }
-                if (notification.animation_type) {
-                    document.getElementById('notification_animation_type').value = notification.animation_type;
-                }
-                if (notification.show_close_button !== undefined) {
-                    document.getElementById('notification_show_close_button').checked = notification.show_close_button;
-                }
-            }
 
             // Widget Actions verilerini populate et
             if (data.widgetActions) {

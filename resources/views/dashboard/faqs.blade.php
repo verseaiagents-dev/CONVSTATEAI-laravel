@@ -123,16 +123,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama</label>
-                        <textarea id="description" name="description" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="SSS için kısa açıklama"></textarea>
-                    </div>
-                    
-                    <div>
-                        <label for="project_id" class="block text-sm font-medium text-gray-300 mb-2">Proje ID</label>
-                        <input type="number" id="project_id" name="project_id" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Opsiyonel">
-                    </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama</label>
+                    <textarea id="description" name="description" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="SSS için kısa açıklama"></textarea>
                 </div>
 
                 <div>
@@ -145,34 +138,11 @@
                     <textarea id="answer" name="answer" rows="4" required class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-2">Sıralama</label>
-                        <input type="number" id="sort_order" name="sort_order" min="0" value="0" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                    </div>
-                    
-                    <div>
-                        <label for="tags" class="block text-sm font-medium text-gray-300 mb-2">Etiketler</label>
-                        <input type="text" id="tags" name="tags" placeholder="etiket1, etiket2, etiket3" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="meta_title" class="block text-sm font-medium text-gray-300 mb-2">Meta Başlık</label>
-                        <input type="text" id="meta_title" name="meta_title" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                    </div>
-                    
-                    <div>
-                        <label for="seo_url" class="block text-sm font-medium text-gray-300 mb-2">SEO URL</label>
-                        <input type="text" id="seo_url" name="seo_url" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                    </div>
-                </div>
-                
                 <div>
-                    <label for="meta_description" class="block text-sm font-medium text-gray-300 mb-2">Meta Açıklama</label>
-                    <textarea id="meta_description" name="meta_description" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"></textarea>
+                    <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-2">Sıralama</label>
+                    <input type="number" id="sort_order" name="sort_order" min="0" value="0" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
                 </div>
+                
 
                 <div class="flex items-center space-x-3">
                     <input type="checkbox" id="is_active" name="is_active" checked class="form-checkbox">
@@ -223,6 +193,15 @@ let currentFaqId = null;
 
 // Load FAQs on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // URL'den project_id parametresini kontrol et
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project_id');
+    
+    if (!projectId) {
+        showError('Proje ID parametresi gerekli. Lütfen knowledge base sayfasından SSS yönetimine girin.');
+        return;
+    }
+    
     loadFAQs();
     
     // Setup search functionality
@@ -240,7 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadFAQs() {
     try {
         showLoading();
-        const response = await fetch('/api/faqs?site_id=1', {
+        // URL'den project_id parametresini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project_id') || '1';
+        
+        const response = await fetch(`/api/faqs?project_id=${projectId}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -272,7 +255,11 @@ async function loadFAQs() {
 async function searchFAQs(query) {
     try {
         showLoading();
-        const response = await fetch(`/api/faqs/search?q=${encodeURIComponent(query)}&site_id=1`, {
+        // URL'den project_id parametresini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project_id') || '1';
+        
+        const response = await fetch(`/api/faqs/search?q=${encodeURIComponent(query)}&project_id=${projectId}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -369,9 +356,7 @@ function editFAQ(id) {
     document.getElementById('description').value = faq.description || '';
     document.getElementById('short_answer').value = faq.short_answer || '';
     document.getElementById('answer').value = faq.answer || '';
-    document.getElementById('project_id').value = faq.project_id || '';
     document.getElementById('sort_order').value = faq.sort_order || 0;
-    document.getElementById('tags').value = Array.isArray(faq.tags) ? faq.tags.join(', ') : (faq.tags || '');
     document.getElementById('is_active').checked = faq.is_active;
     
     document.getElementById('faqModal').classList.remove('hidden');
@@ -392,10 +377,13 @@ document.getElementById('faqForm').addEventListener('submit', async function(e) 
     // Convert checkbox value
     data.is_active = formData.get('is_active') === 'on';
     
-    // Convert tags to array
-    if (data.tags) {
-        data.tags = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-    }
+    // URL'den project_id parametresini al
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project_id') || '1';
+    data.project_id = parseInt(projectId);
+    
+    // site_id'yi 1 olarak ayarla (varsayılan)
+    data.site_id = 1;
     
     try {
         const url = currentFaqId ? `/api/dashboard/faqs/${currentFaqId}` : '/api/dashboard/faqs';

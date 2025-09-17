@@ -39,8 +39,13 @@ class FAQController extends Controller
         }
 
         // Web request - return admin view
-        $faqs = FAQ::with('site')->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc')->get();
-        return view('dashboard.faqs', compact('faqs'));
+        $projectId = $request->get('project_id', 1);
+        $faqs = FAQ::where('project_id', $projectId)
+            ->with('site')
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('dashboard.faqs', compact('faqs', 'projectId'));
     }
 
     /**
@@ -59,10 +64,8 @@ class FAQController extends Controller
                 'category' => 'nullable|string|max:100',
                 'is_active' => 'boolean',
                 'site_id' => 'required|exists:sites,id',
-                'project_id' => 'nullable|integer',
-                'sort_order' => 'nullable|integer|min:0',
-                'tags' => 'nullable|array',
-                'tags.*' => 'string|max:50'
+                'project_id' => 'required|integer|exists:projects,id',
+                'sort_order' => 'nullable|integer|min:0'
             ]);
 
             if ($validator->fails()) {
@@ -112,6 +115,7 @@ class FAQController extends Controller
         }
     }
 
+   
     /**
      * Update the specified FAQ
      */
@@ -127,10 +131,8 @@ class FAQController extends Controller
                 'short_answer' => 'sometimes|required|string|max:255',
                 'category' => 'nullable|string|max:100',
                 'is_active' => 'sometimes|boolean',
-                'project_id' => 'nullable|integer',
-                'sort_order' => 'nullable|integer|min:0',
-                'tags' => 'nullable|array',
-                'tags.*' => 'string|max:50'
+                'project_id' => 'sometimes|required|integer|exists:projects,id',
+                'sort_order' => 'nullable|integer|min:0'
             ]);
 
             if ($validator->fails()) {
@@ -254,7 +256,7 @@ class FAQController extends Controller
     public function search(Request $request): JsonResponse
     {
         try {
-            $siteId = $request->get('site_id', 1);
+            $projectId = $request->get('project_id', 1);
             $query = $request->get('q', '');
             
             if (empty($query)) {
@@ -264,7 +266,7 @@ class FAQController extends Controller
                 ], 400);
             }
 
-            $faqs = FAQ::where('site_id', $siteId)
+            $faqs = FAQ::where('project_id', $projectId)
                 ->where('is_active', true)
                 ->where(function($q) use ($query) {
                     $q->where('title', 'like', "%{$query}%")

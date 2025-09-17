@@ -158,49 +158,70 @@ class KnowledgeBaseController extends Controller
                 'is_processing' => false,
             ]);
 
-            DB::commit();
-
-            // Dispatch background job for file processing with error handling
+            // Process file directly instead of using background job
             try {
-                ProcessKnowledgeBaseFile::dispatch($knowledgeBase, $path, $extension)
-                    ->onQueue('knowledge-base-processing')
-                    ->delay(now()->addSeconds(5)); // 5 saniye gecikme
+                $knowledgeBase->update([
+                    'processing_status' => 'processing',
+                    'is_processing' => true
+                ]);
+
+                // Process file and create chunks
+                $chunks = $this->processFileAndCreateChunks($file, $extension, $knowledgeBase);
                 
-                \Log::info('Knowledge base file job dispatched successfully', [
+                // Update knowledge base with results
+                $knowledgeBase->update([
+                    'processing_status' => 'completed',
+                    'is_processing' => false,
+                    'chunk_count' => count($chunks),
+                    'total_records' => $this->getTotalRecords($file, $extension),
+                    'processed_records' => count($chunks),
+                    'progress_percentage' => 100,
+                    'is_completed' => true,
+                    'completed_at' => now()
+                ]);
+
+                DB::commit();
+
+                \Log::info('Knowledge base file processed successfully', [
                     'knowledge_base_id' => $knowledgeBase->id,
                     'file_path' => $path,
-                    'file_type' => $extension
+                    'file_type' => $extension,
+                    'chunks_created' => count($chunks)
                 ]);
-            } catch (\Exception $jobException) {
-                \Log::error('Failed to dispatch knowledge base file job', [
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Dosya başarıyla yüklendi ve işlendi.',
                     'knowledge_base_id' => $knowledgeBase->id,
-                    'error' => $jobException->getMessage(),
-                    'trace' => $jobException->getTraceAsString()
+                    'file_name' => $fileName,
+                    'file_size' => $this->contentChunker->countTokens(file_get_contents($file->getPathname())),
+                    'extension' => $extension,
+                    'chunk_count' => count($chunks),
+                    'processing_status' => 'completed',
+                    'is_processing' => false
+                ]);
+
+            } catch (\Exception $processingException) {
+                DB::rollBack();
+                
+                \Log::error('Failed to process knowledge base file', [
+                    'knowledge_base_id' => $knowledgeBase->id,
+                    'error' => $processingException->getMessage(),
+                    'trace' => $processingException->getTraceAsString()
                 ]);
                 
-                // Mark as failed if job dispatch fails
+                // Mark as failed if processing fails
                 $knowledgeBase->update([
                     'processing_status' => 'failed',
                     'is_processing' => false,
-                    'error_message' => 'Job dispatch failed: ' . $jobException->getMessage()
+                    'error_message' => 'Processing failed: ' . $processingException->getMessage()
                 ]);
                 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dosya yüklendi ancak işleme kuyruğa alınamadı: ' . $jobException->getMessage()
+                    'message' => 'Dosya yüklendi ancak işlenemedi: ' . $processingException->getMessage()
                 ], 500);
             }
-        
-            return response()->json([
-                'success' => true,
-                'message' => 'Dosya başarıyla yüklendi. İşleme kuyruğa alındı.',
-                'knowledge_base_id' => $knowledgeBase->id,
-                'file_name' => $fileName,
-                'file_size' => $this->contentChunker->countTokens(file_get_contents($file->getPathname())),
-                'extension' => $extension,
-                'processing_status' => 'pending',
-                'is_processing' => false
-            ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -291,50 +312,93 @@ class KnowledgeBaseController extends Controller
                 'is_processing' => false,
             ]);
             
-            DB::commit();
-
-            // Dispatch background job for URL processing with error handling
+            // Process URL content directly instead of using background job
             try {
-                ProcessKnowledgeBaseUrl::dispatch($knowledgeBase, $url)
-                    ->onQueue('knowledge-base-processing')
-                    ->delay(now()->addSeconds(5)); // 5 saniye gecikme
-                
-                \Log::info('Knowledge base URL job dispatched successfully', [
-                    'knowledge_base_id' => $knowledgeBase->id,
-                    'url' => $url
+                $knowledgeBase->update([
+                    'processing_status' => 'processing',
+                    'is_processing' => true
                 ]);
-            } catch (\Exception $jobException) {
-                \Log::error('Failed to dispatch knowledge base URL job', [
+
+                // Process content and create chunks
+                $chunks = $this->contentChunker->chunkContent($content, [
+                    'max_chunk_size' => 800,
+                    'overlap_size' => 150,
+                    'preserve_words' => true
+                ]);
+                
+                // Create chunks in database
+                $chunkModels = [];
+                foreach ($chunks as $index => $chunkData) {
+                    $chunkModels[] = KnowledgeChunk::create([
+                        'knowledge_base_id' => $knowledgeBase->id,
+                        'chunk_index' => $index + 1,
+                        'content' => $chunkData['content'],
+                        'content_hash' => $chunkData['content_hash'],
+                        'content_type' => $this->determineContentType($chunkData['content'], $extension),
+                        'chunk_size' => $chunkData['chunk_size'],
+                        'word_count' => $chunkData['word_count'],
+                        'has_images' => false,
+                        'processed_images' => 0,
+                        'image_vision' => null,
+                        'metadata' => $chunkData['metadata'] ?? null,
+                    ]);
+                }
+                
+                // Update knowledge base with results
+                $knowledgeBase->update([
+                    'processing_status' => 'completed',
+                    'is_processing' => false,
+                    'chunk_count' => count($chunkModels),
+                    'total_records' => 1,
+                    'processed_records' => count($chunkModels),
+                    'progress_percentage' => 100,
+                    'is_completed' => true,
+                    'completed_at' => now()
+                ]);
+
+                DB::commit();
+
+                \Log::info('Knowledge base URL processed successfully', [
                     'knowledge_base_id' => $knowledgeBase->id,
                     'url' => $url,
-                    'error' => $jobException->getMessage(),
-                    'trace' => $jobException->getTraceAsString()
+                    'chunks_created' => count($chunkModels)
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'URL başarıyla alındı ve işlendi.',
+                    'knowledge_base_id' => $knowledgeBase->id,
+                    'file_name' => basename($url),
+                    'file_size' => $this->contentChunker->countTokens($content),
+                    'extension' => $extension,
+                    'url' => $url,
+                    'chunk_count' => count($chunkModels),
+                    'processing_status' => 'completed',
+                    'is_processing' => false
+                ]);
+
+            } catch (\Exception $processingException) {
+                DB::rollBack();
+                
+                \Log::error('Failed to process knowledge base URL', [
+                    'knowledge_base_id' => $knowledgeBase->id,
+                    'url' => $url,
+                    'error' => $processingException->getMessage(),
+                    'trace' => $processingException->getTraceAsString()
                 ]);
                 
-                // Mark as failed if job dispatch fails
+                // Mark as failed if processing fails
                 $knowledgeBase->update([
                     'processing_status' => 'failed',
                     'is_processing' => false,
-                    'error_message' => 'Job dispatch failed: ' . $jobException->getMessage()
+                    'error_message' => 'Processing failed: ' . $processingException->getMessage()
                 ]);
                 
                 return response()->json([
                     'success' => false,
-                    'message' => 'URL alındı ancak işleme kuyruğa alınamadı: ' . $jobException->getMessage()
+                    'message' => 'URL alındı ancak işlenemedi: ' . $processingException->getMessage()
                 ], 500);
             }
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'URL başarıyla alındı. İşleme kuyruğa alındı.',
-                'knowledge_base_id' => $knowledgeBase->id,
-                'file_name' => basename($url),
-                'file_size' => $this->contentChunker->countTokens($content),
-                'extension' => $extension,
-                'url' => $url,
-                'processing_status' => 'pending',
-                'is_processing' => false
-            ]);
             
         } catch (\Exception $e) {
             DB::rollBack();

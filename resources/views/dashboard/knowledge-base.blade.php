@@ -183,7 +183,7 @@
                         AI destekli bilgi tabanı sistemi ile dosyalarınızı yükleyin ve akıllı arama yapın
                     </p>
                 </div>
-                
+                {{--
                 <!-- Yönetim Butonları -->
                 <div class="flex items-center space-x-3">
                     <a href="{{ route('dashboard.campaigns.index') }}" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
@@ -200,6 +200,9 @@
                         <span>SSS Yönetimi</span>
                     </a>
                 </div>
+
+
+                 --}}
             </div>
         </div>
     </div>
@@ -302,14 +305,7 @@
                     </div>
                 </div>
                 
-                <!-- Proje Seçimi -->
-                <div class="mt-6 text-center">
-                    <label for="global-project" class="block text-sm font-medium text-gray-300 mb-2">Proje Seçin (Opsiyonel)</label>
-                    <select id="global-project" class="w-full max-w-xs px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20 text-center mx-auto">
-                        <option value="">Proje Seçin (Opsiyonel)</option>
-                    </select>
-                    <p class="text-xs text-gray-400 mt-2">Seçilen proje hem dosya yükleme hem de URL ile içerik çekme için kullanılacaktır</p>
-                </div>
+              
             </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -424,6 +420,33 @@
             
             <div id="results-content" class="space-y-6">
                 <!-- Results will be populated here -->
+            </div>
+        </div>
+
+        <!-- File Name Modal -->
+        <div id="fileNameModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center">
+            <div class="relative p-6 border border-gray-700 w-96 shadow-2xl rounded-xl glass-effect">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-white">Dosya Adı Girin</h3>
+                    <button onclick="closeFileNameModal(); resetFileSelection();" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Bilgi Tabanı Adı</label>
+                        <input type="text" id="modal-kb-name" placeholder="Bilgi tabanı adını girin" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20">
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-700">
+                    <button onclick="confirmFileUpload()" class="w-full px-4 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
+                        Dosyayı Yükle
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -854,14 +877,7 @@ function populateKnowledgeBasesList() {
                     </div>
                     
                     ${kb.processing_status === 'completed' ? `
-                        <div class="mt-4 flex space-x-3">
-                            <button onclick="event.stopPropagation(); searchKnowledgeBase(${kb.id})" class="px-4 py-2 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white text-sm font-medium hover:from-purple-dark hover:to-neon-purple transition-all duration-300">
-                                Arama Yap
-                            </button>
-                            <button onclick="event.stopPropagation(); viewChunks(${kb.id})" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white text-sm font-medium transition-colors duration-300">
-                                Chunk'ları Gör
-                            </button>
-                        </div>
+                      
                     ` : ''}
                     
                     ${kb.processing_status === 'pending' || kb.processing_status === 'processing' ? `
@@ -1506,12 +1522,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // File name modal event listeners
+    const fileNameModal = document.getElementById('fileNameModal');
+    if (fileNameModal) {
+        // Close modal when clicking on backdrop
+        fileNameModal.addEventListener('click', (e) => {
+            if (e.target === fileNameModal) {
+                closeFileNameModal();
+                // Reset file selection when modal is closed by backdrop click
+                resetFileSelection();
+            }
+        });
+        
+        // Handle Enter key in modal input
+        const modalInput = document.getElementById('modal-kb-name');
+        if (modalInput) {
+            modalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmFileUpload();
+                }
+            });
+        }
+    }
+    
     // Close modal with ESC key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             const chunksModal = document.getElementById('chunks-modal');
+            const fileNameModal = document.getElementById('fileNameModal');
+            
             if (chunksModal && !chunksModal.classList.contains('hidden')) {
                 chunksModal.classList.add('hidden');
+            }
+            if (fileNameModal && !fileNameModal.classList.contains('hidden')) {
+                closeFileNameModal();
+                resetFileSelection();
             }
         }
     });
@@ -1563,10 +1608,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Global variable to store selected file
+let selectedFile = null;
+
 function handleFileUpload(file) {
+    console.log('handleFileUpload called with file:', file);
+    
     // Validate file type
     const allowedTypes = ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    console.log('File extension:', fileExtension);
+    console.log('File size:', file.size);
+    console.log('File type:', file.type);
     
     if (!allowedTypes.includes(fileExtension)) {
         alert('Desteklenmeyen dosya formatı. Lütfen CSV, TXT, XML, JSON veya Excel dosyası seçin.');
@@ -1579,33 +1633,114 @@ function handleFileUpload(file) {
         return;
     }
 
-    // Get bilgi tabanı name
-    const kbName = prompt('Bilgi Tabanı için bir isim girin:');
+    // Store file globally and show modal
+    selectedFile = file;
+    console.log('File stored, showing modal');
+    showFileNameModal();
+}
+
+// Modal functions
+function showFileNameModal() {
+    const modal = document.getElementById('fileNameModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        // Focus on input
+        setTimeout(() => {
+            const input = document.getElementById('modal-kb-name');
+            if (input) {
+                input.focus();
+            }
+        }, 100);
+    }
+}
+
+function closeFileNameModal() {
+    const modal = document.getElementById('fileNameModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        // Clear input but keep file
+        const input = document.getElementById('modal-kb-name');
+        if (input) {
+            input.value = '';
+        }
+        // Don't reset selectedFile here - let it be reset only when needed
+    }
+}
+
+function resetFileSelection() {
+    selectedFile = null;
+    // Also reset file input
+    const fileInput = document.getElementById('file-input');
+    if (fileInput) {
+        fileInput.value = '';
+    }
+}
+
+function confirmFileUpload() {
+    const kbNameInput = document.getElementById('modal-kb-name');
+    const kbName = kbNameInput ? kbNameInput.value.trim() : '';
+    
+    console.log('confirmFileUpload called');
+    console.log('selectedFile:', selectedFile);
+    console.log('kbName:', kbName);
+    
     if (!kbName) {
+        alert('Lütfen bilgi tabanı adı girin');
         return;
     }
+    
+    if (!selectedFile) {
+        alert('Dosya seçilmedi. Lütfen tekrar dosya seçin.');
+        closeFileNameModal();
+        return;
+    }
+    
+    // Store file reference before closing modal
+    const fileToUpload = selectedFile;
+    
+    // Close modal
+    closeFileNameModal();
+    
+    // Start upload process
+    uploadFileWithName(fileToUpload, kbName);
+}
 
+function uploadFileWithName(file, kbName) {
+    // Debug: Log file information
+    console.log('File details:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified
+    });
+    
     // Show progress
     const uploadProgress = document.getElementById('upload-progress');
     if (uploadProgress) {
         uploadProgress.classList.remove('hidden');
     }
     
-    // Simulate progress
+    // Show real progress
     let progress = 0;
     const progressBar = document.getElementById('progress-bar');
     const progressInterval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress > 90) progress = 90;
+        progress += Math.random() * 20;
+        if (progress > 95) progress = 95;
         if (progressBar) {
             progressBar.style.width = progress + '%';
         }
-    }, 200);
+    }, 100);
 
     // Create FormData
     const formData = new FormData();
     formData.append('file', file);
     formData.append('name', kbName);
+    
+    // Add project_id if available
+    const projectId = '{{ $projectId }}';
+    if (projectId) {
+        formData.append('project_id', projectId);
+    }
     
     // CSRF token'ı güvenli şekilde al
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -1615,14 +1750,29 @@ function handleFileUpload(file) {
         alert('Güvenlik token\'ı bulunamadı. Sayfayı yenileyin.');
         return;
     }
+    
+    // Debug: Log FormData contents
+    console.log('FormData contents:');
+    for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
 
     // Upload file
-    fetch('/api/knowledge-base/upload', {
+    fetch('/dashboard/knowledge-base/upload', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         clearInterval(progressInterval);
         if (progressBar) {
             progressBar.style.width = '100%';
@@ -1634,18 +1784,28 @@ function handleFileUpload(file) {
             }
             if (data.success) {
                 showResults(data);
+                // Reset file selection
+                resetFileSelection();
                 // Reload page to show new knowledge base
                 setTimeout(() => location.reload(), 2000);
             } else {
-                alert('Hata: ' + data.message);
+                console.error('Upload error:', data);
+                let errorMessage = 'Hata: ' + data.message;
+                if (data.errors) {
+                    errorMessage += '\nDetaylar: ' + JSON.stringify(data.errors, null, 2);
+                }
+                alert(errorMessage);
             }
         }, 500);
     })
     .catch(error => {
+        console.error('Upload error:', error);
         clearInterval(progressInterval);
         if (uploadProgress) {
             uploadProgress.classList.add('hidden');
         }
+        // Reset file selection on error
+        resetFileSelection();
         alert('Dosya yüklenirken hata oluştu: ' + error.message);
     });
 }
@@ -1712,16 +1872,16 @@ function handleUrlFetch() {
         urlFetchProgress.classList.remove('hidden');
     }
     
-    // Simulate progress
+    // Show real progress
     let progress = 0;
     const urlProgressBar = document.getElementById('url-progress-bar');
     const progressInterval = setInterval(() => {
-        progress += Math.random() * 20;
-        if (progress > 85) progress = 85;
+        progress += Math.random() * 25;
+        if (progress > 95) progress = 95;
         if (urlProgressBar) {
             urlProgressBar.style.width = progress + '%';
         }
-    }, 300);
+    }, 150);
 
     // Create form data
     const formData = new FormData();
@@ -1738,8 +1898,12 @@ function handleUrlFetch() {
     }
 
     // Fetch from URL
-    fetch('/api/knowledge-base/fetch-url', {
+    fetch('/dashboard/knowledge-base/fetch-url', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
         body: formData
     })
     .then(response => response.json())

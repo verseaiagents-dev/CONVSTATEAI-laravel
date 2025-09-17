@@ -203,49 +203,52 @@ class WidgetDesignController extends Controller
                     ->update(['is_active' => false]);
             }
             
-            // Notification Widget ayarlarını güncelle/oluştur
-            if ($request->has('notification_active') || $request->notification_message_text) {
-                $projectId = $request->project_id;
-                if ($projectId) {
-                    // Get or create site for this project
-                    $site = Site::firstOrCreate(
-                        ['project_id' => $projectId],
-                        [
-                            'name' => 'Default Site',
-                            'domain' => 'example.com',
-                            'is_active' => true
-                        ]
-                    );
+            // Notification Widget ayarlarını default değerlerle oluştur/güncelle
+            $projectId = $request->project_id;
+            if ($projectId) {
+                // Get or create site for this project
+                $site = Site::firstOrCreate(
+                    ['project_id' => $projectId],
+                    [
+                        'name' => 'Default Site',
+                        'domain' => 'example.com',
+                        'is_active' => true
+                    ]
+                );
+                
+                // AI Asistan'dan gelen notification_message'ı kullan, yoksa default
+                $notificationMessage = $request->notification_message ?? 'Sizin için kampanyamız var!';
+                
+                NotificationWidgetSetting::updateOrCreate(
+                    ['site_id' => $site->id],
+                    [
+                        'message_text' => $notificationMessage,
+                        'is_active' => true, // Her zaman aktif
+                        'color_theme' => 'purple', // Fixed purple theme
+                        'display_duration' => 5000, // 5 saniye default
+                        'animation_type' => 'fade-in', // Default animation
+                        'show_close_button' => true, // Default olarak kapatma butonu göster
+                        'redirect_url' => null // No redirect URL
+                    ]
+                );
+            } else {
+                // Use the first available site
+                $site = Site::first();
+                if ($site) {
+                    $notificationMessage = $request->notification_message ?? 'Sizin için kampanyamız var!';
                     
                     NotificationWidgetSetting::updateOrCreate(
                         ['site_id' => $site->id],
                         [
-                            'message_text' => $request->notification_message_text ?? 'Sizin için kampanyamız var!',
-                            'is_active' => $request->has('notification_active'),
+                            'message_text' => $notificationMessage,
+                            'is_active' => true, // Her zaman aktif
                             'color_theme' => 'purple', // Fixed purple theme
-                            'display_duration' => ($request->notification_display_duration ?? 5) * 1000, // Convert to milliseconds
-                            'animation_type' => $request->notification_animation_type ?? 'fade-in',
-                            'show_close_button' => $request->has('notification_show_close_button'),
+                            'display_duration' => 5000, // 5 saniye default
+                            'animation_type' => 'fade-in', // Default animation
+                            'show_close_button' => true, // Default olarak kapatma butonu göster
                             'redirect_url' => null // No redirect URL
                         ]
                     );
-                } else {
-                    // Use the first available site
-                    $site = Site::first();
-                    if ($site) {
-                        NotificationWidgetSetting::updateOrCreate(
-                            ['site_id' => $site->id],
-                            [
-                                'message_text' => $request->notification_message_text ?? 'Sizin için kampanyamız var!',
-                                'is_active' => $request->has('notification_active'),
-                                'color_theme' => 'purple', // Fixed purple theme
-                                'display_duration' => ($request->notification_display_duration ?? 5) * 1000, // Convert to milliseconds
-                                'animation_type' => $request->notification_animation_type ?? 'fade-in',
-                                'show_close_button' => $request->has('notification_show_close_button'),
-                                'redirect_url' => null // No redirect URL
-                            ]
-                        );
-                    }
                 }
             }
             
