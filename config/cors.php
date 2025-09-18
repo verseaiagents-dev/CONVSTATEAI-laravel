@@ -49,7 +49,9 @@ return [
             env('FRONTEND_URL', 'https://convstateai.com'),
             env('WIDGET_URL', 'https://convstateai.com'),
             'https://convstateai.com',
-            'https://www.convstateai.com'
+            'https://www.convstateai.com',
+            'https://convstateai.com/',
+            'https://www.convstateai.com/'
         ] : []),
         
         // Custom allowed origins from environment

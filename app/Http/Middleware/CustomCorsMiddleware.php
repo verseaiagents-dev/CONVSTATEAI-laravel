@@ -56,7 +56,11 @@ class CustomCorsMiddleware
             $response->headers->set('Access-Control-Allow-Origin', '*');
         } else {
             // Production'da sadece belirli originlere izin ver
-            $response->headers->set('Access-Control-Allow-Origin', 'null');
+            if (in_array($origin, $allowedOrigins)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+            } else {
+                $response->headers->set('Access-Control-Allow-Origin', 'https://convstateai.com');
+            }
         }
 
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
