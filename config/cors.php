@@ -44,15 +44,9 @@ return [
             'http://127.0.0.1:8080'
         ] : []),
         
-        // Production origins - sadece production ortamında aktif
-        ...(env('APP_ENV') === 'production' ? [
-            env('FRONTEND_URL', 'https://convstateai.com'),
-            env('WIDGET_URL', 'https://convstateai.com'),
-            'https://convstateai.com',
-            'https://www.convstateai.com',
-            'https://convstateai.com/',
-            'https://www.convstateai.com/'
-        ] : []),
+        // Production origins - sadece Project tablosundaki aktif projelerin domain'leri
+        // Bu kısım CustomCorsMiddleware tarafından dinamik olarak yönetilir
+        ...(env('APP_ENV') === 'production' ? [] : []),
         
         // Custom allowed origins from environment
         ...(env('CORS_ALLOWED_ORIGINS') ? explode(',', env('CORS_ALLOWED_ORIGINS')) : [])

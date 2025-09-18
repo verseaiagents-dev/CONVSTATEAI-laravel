@@ -143,11 +143,8 @@ class CustomCorsMiddleware
                 ];
                 
             case 'production':
-                $productionOrigins = $this->getProductionAllowedOrigins();
-                // Production domain'ini ekle
-                $productionOrigins[] = 'https://convstateai.com';
-                $productionOrigins[] = 'https://www.convstateai.com';
-                return array_unique($productionOrigins);
+                // Production'da sadece Project tablosundaki aktif projelerin domain'lerine izin ver
+                return $this->getProductionAllowedOrigins();
                 
             default:
                 return [];
@@ -186,22 +183,12 @@ class CustomCorsMiddleware
                 }
             }
 
-            // Environment'dan gelen ek URL'leri ekle
+            // Environment'dan gelen ek URL'leri ekle (sadece production için)
             $envOrigins = array_filter([
                 env('FRONTEND_URL'),
                 env('WIDGET_URL'),
                 env('CORS_ALLOWED_ORIGINS') ? explode(',', env('CORS_ALLOWED_ORIGINS')) : []
             ]);
-            
-            // Local development için localhost originleri ekle
-            $localhostOrigins = [
-                'http://localhost:3000',
-                'http://127.0.0.1:3000',
-                'http://localhost:8080',
-                'http://127.0.0.1:8080',
-                'http://localhost:8000',
-                'http://127.0.0.1:8000'
-            ];
             
             // array_flatten yerine array_merge kullan
             $flatEnvOrigins = [];
@@ -213,7 +200,8 @@ class CustomCorsMiddleware
                 }
             }
             
-            $origins = array_merge($origins, $flatEnvOrigins, $localhostOrigins);
+            // Sadece Project tablosundaki domain'ler ve environment'dan gelenler
+            $origins = array_merge($origins, $flatEnvOrigins);
             $origins = array_unique(array_filter($origins));
 
             // Cache'e kaydet (5 dakika)
@@ -222,7 +210,7 @@ class CustomCorsMiddleware
             return $origins;
             
         } catch (\Exception $e) {
-            // Database hatası durumunda güvenli varsayılan
+            // Database hatası durumunda sadece environment'dan gelen URL'leri döndür
             \Log::error('CORS: Database error while fetching allowed origins', [
                 'error' => $e->getMessage()
             ]);
@@ -230,12 +218,7 @@ class CustomCorsMiddleware
             return array_filter([
                 env('FRONTEND_URL'),
                 env('WIDGET_URL'),
-                'http://localhost:3000',
-                'http://127.0.0.1:3000',
-                'http://localhost:8080',
-                'http://127.0.0.1:8080',
-                'http://localhost:8000',
-                'http://127.0.0.1:8000'
+                env('CORS_ALLOWED_ORIGINS') ? explode(',', env('CORS_ALLOWED_ORIGINS')) : []
             ]);
         }
     }
