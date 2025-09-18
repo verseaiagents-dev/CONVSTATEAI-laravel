@@ -450,7 +450,7 @@ class AIService
     /**
      * Cache'den embedding alır veya oluşturur
      */
-    public function getOrCreateEmbedding(string $text, string $cacheKey = null): array
+    public function getOrCreateEmbedding(string $text, ?string $cacheKey = null): array
     {
         $cacheKey = $cacheKey ?? 'embedding_' . md5($text);
         

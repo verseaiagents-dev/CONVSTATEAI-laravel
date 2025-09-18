@@ -649,7 +649,7 @@ class ConvStateAPI extends Controller
     /**
      * Knowledge base'den ürün verilerini çeker
      */
-    private function getProductsFromKnowledgeBase($category = null): array
+    private function getProductsFromKnowledgeBase(?string $category = null): array
     {
         try {
             $query = KnowledgeChunk::where('content_type', 'product');

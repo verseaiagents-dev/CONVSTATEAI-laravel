@@ -262,7 +262,7 @@ class ContentChunker
     /**
      * Chunk oluşturur
      */
-    private function createChunk(string $content, int $index, $knowledgeBaseId = null): array
+    private function createChunk(string $content, int $index, ?int $knowledgeBaseId = null): array
     {
         // Resim analizi yap
         $imageAnalysis = $this->analyzeImagesInContent($content);

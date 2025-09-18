@@ -144,7 +144,7 @@ class Plan extends Model
     /**
      * Kullanıcı için usage token oluştur (yeni User tablosu sistemi)
      */
-    public function createUsageTokenForUser(int $userId, int $subscriptionId = null): User
+    public function createUsageTokenForUser(int $userId, ?int $subscriptionId = null): User
     {
         $tokens = $this->calculateUsageTokens();
         

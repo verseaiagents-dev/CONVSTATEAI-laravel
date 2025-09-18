@@ -348,7 +348,7 @@ class User extends Authenticatable
     /**
      * Plan atama ve token ekleme
      */
-    public function assignPlan(Plan $plan, int $subscriptionId = null): void
+    public function assignPlan(Plan $plan, ?int $subscriptionId = null): void
     {
         $tokens = $plan->calculateUsageTokens();
         
