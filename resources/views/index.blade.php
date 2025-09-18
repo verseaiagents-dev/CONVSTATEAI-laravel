@@ -191,9 +191,7 @@
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-8">
                      
-                        <button onclick="scrollToDemo()" class="px-8 py-4 glass-effect rounded-xl text-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                            Demo
-                </button>
+                   
             </div>
              
                 </div>
@@ -559,12 +557,7 @@
                          ConvStateAI'ın gücünü keşfedin ve e-ticaret sitenizi dönüştürün
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-                        <a href="{{ route('register') }}" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300 transform hover:scale-105 animate-glow">
-                          Talep Oluştur
-                        </a>
-                        <button onclick="scrollToDemo()" class="px-8 py-4 glass-effect rounded-xl text-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                            Demo İzle
-                        </button>
+                         @php $phone = '905458527693'; $message = "Merhaba, numaranızı convstateai.comdan aldım. Uygulama hakkında bilgi alabilirmiyim"; $url = "https://wa.me/{$phone}?text=" . urlencode($message); @endphp <a href="{{$url}}" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300 transform hover:scale-105 animate-glow">Demo Talebi Oluştur </a>
                     </div>
                  {{--    <div class="flex flex-wrap items-center justify-center space-x-8 text-sm text-gray-400">
                         <div class="flex items-center">

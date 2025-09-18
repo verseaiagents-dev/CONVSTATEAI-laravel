@@ -108,8 +108,9 @@
                 </a>
                 <div class="flex items-center space-x-4">
                     <a href="/" class="text-gray-300 hover:text-purple-glow transition-colors">Ana Sayfa</a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 text-purple-glow hover:text-white transition-colors">Kayıt Ol</a>
-                </div>
+{{--                    <a href="{{ route('register') }}" class="px-4 py-2 text-purple-glow hover:text-white transition-colors">Kayıt Ol</a>
+--}}
+               </div>
             </div>
         </div>
     </nav>
