@@ -450,7 +450,7 @@ class ConvStateAPI extends Controller
                     'session_id' => $browserUuid,
                     'user_id' => 0, // Guest user
                     'project_id' => $request->input('project_id', 1),
-                    'daily_view_limit' => 20,
+                    'daily_view_limit' => 10,
                     'daily_view_count' => 0,
                     'status' => 'active',
                     'last_activity' => now(),
@@ -2432,7 +2432,7 @@ class ConvStateAPI extends Controller
             ], [
                 'status' => 'active',
                 'daily_view_count' => 0,
-                'daily_view_limit' => 20
+                'daily_view_limit' => 10
             ]);
 
             // Daily limits'i kontrol et ve gerekirse sıfırla
@@ -2482,7 +2482,7 @@ class ConvStateAPI extends Controller
             ], [
                 'status' => 'active',
                 'daily_view_count' => 0,
-                'daily_view_limit' => 20
+                'daily_view_limit' => 10
             ]);
 
             // Daily limits'i kontrol et ve gerekirse sıfırla

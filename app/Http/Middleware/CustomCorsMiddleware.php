@@ -139,7 +139,11 @@ class CustomCorsMiddleware
                 ];
                 
             case 'production':
-                return $this->getProductionAllowedOrigins();
+                $productionOrigins = $this->getProductionAllowedOrigins();
+                // Production domain'ini ekle
+                $productionOrigins[] = 'https://convstateai.com';
+                $productionOrigins[] = 'https://www.convstateai.com';
+                return array_unique($productionOrigins);
                 
             default:
                 return [];
