@@ -86,9 +86,9 @@ class WidgetEmbedController extends Controller
         userId: null
       }
     }).then(() => {
-      console.log('ConvStateAI Widget loaded successfully for project: {$projectId}');
+      // Widget loaded successfully
     }).catch((error) => {
-      console.error('ConvStateAI Widget failed to load:', error);
+      // Widget failed to load
     });
   }
   v.src = '{$apiUrl}/widget/dist/bundle.js';

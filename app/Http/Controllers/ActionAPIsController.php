@@ -334,8 +334,7 @@ class ActionAPIsController extends Controller
             return response()->json([
                 'success' => true,
                 'order' => $orderData,
-                'message' => 'Sipariş durumu başarıyla getirildi',
-                'widget_type' => 'order_tracking_widget'
+                'message' => 'Sipariş durumu başarıyla getirildi'
             ]);
             
         } catch (\Exception $e) {
@@ -390,8 +389,7 @@ class ActionAPIsController extends Controller
             return response()->json([
                 'success' => true,
                 'tracking' => $cargoData,
-                'message' => 'Kargo durumu başarıyla getirildi',
-                'widget_type' => 'cargo_tracking_widget'
+                'message' => 'Kargo durumu başarıyla getirildi'
             ]);
             
         } catch (\Exception $e) {
@@ -465,8 +463,7 @@ class ActionAPIsController extends Controller
             return response()->json([
                 'success' => true,
                 'cart' => $cartData,
-                'message' => 'Ürün sepete başarıyla eklendi',
-                'widget_type' => 'cart_add_widget'
+                'message' => 'Ürün sepete başarıyla eklendi'
             ]);
             
         } catch (\Exception $e) {
@@ -539,8 +536,7 @@ class ActionAPIsController extends Controller
             return response()->json([
                 'success' => true,
                 'product' => $productData,
-                'message' => 'Ürün detayları başarıyla getirildi',
-                'widget_type' => 'product_detail_widget'
+                'message' => 'Ürün detayları başarıyla getirildi'
             ]);
             
         } catch (\Exception $e) {
@@ -577,7 +573,7 @@ class ActionAPIsController extends Controller
                 $query->where('content', 'like', '%' . $productName . '%');
             } else {
                 // Rastgele ürünler getir
-                $query->inRandomOrder()->limit(3);
+                $query->inRandomOrder()->limit(6);
             }
             
             $products = $query->get();
@@ -618,8 +614,7 @@ class ActionAPIsController extends Controller
             return response()->json([
                 'success' => true,
                 'prices' => $priceData,
-                'message' => 'Fiyat bilgileri başarıyla getirildi',
-                'widget_type' => 'price_inquiry_widget'
+                'message' => 'Fiyat bilgileri başarıyla getirildi'
             ]);
             
         } catch (\Exception $e) {

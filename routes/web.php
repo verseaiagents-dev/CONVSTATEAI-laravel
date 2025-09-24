@@ -9,8 +9,10 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Admin\PromptManagementController;
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DemoRequestController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -18,6 +20,9 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 // Public Plan Selection
 Route::get('/subscription/plans', [App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscription.plans');
+
+// Demo Request Routes
+Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo-request.store');
 
 // Widget Customization Assets - Public Access (moved to API routes for CORS support)
 
@@ -35,6 +40,7 @@ Route::get('/terms-of-service', function () {
     return view('terms-of-service');
 })->name('terms-of-service');
 
+
 Route::get('/cookies', function () {
     return view('cookies');
 })->name('cookies');
@@ -46,8 +52,8 @@ Route::get('/current-language', [App\Http\Controllers\LanguageController::class,
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
+Route::get('/register_service', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register_service', [AuthController::class, 'register']);
 Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
@@ -106,6 +112,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/knowledge-base/load-content', [KnowledgeBaseController::class, 'loadContent'])->name('dashboard.knowledge-base.load-content');
     Route::post('/dashboard/knowledge-base/upload', [KnowledgeBaseController::class, 'uploadFile'])->name('dashboard.knowledge-base.upload');
     Route::post('/dashboard/knowledge-base/fetch-url', [KnowledgeBaseController::class, 'fetchFromUrl'])->name('dashboard.knowledge-base.fetch-url');
+    Route::post('/dashboard/knowledge-base/detect-fields-from-file', [KnowledgeBaseController::class, 'detectFieldsFromFile'])->name('dashboard.knowledge-base.detect-fields-from-file');
+    Route::post('/dashboard/knowledge-base/detect-fields-from-url', [KnowledgeBaseController::class, 'detectFieldsFromUrl'])->name('dashboard.knowledge-base.detect-fields-from-url');
     Route::post('/dashboard/knowledge-base/refresh-images', [KnowledgeBaseController::class, 'refreshImageAnalysis'])->name('dashboard.knowledge-base.refresh-images');
     Route::get('/dashboard/knowledge-base/image-status', [KnowledgeBaseController::class, 'getImageAnalysisStatus'])->name('dashboard.knowledge-base.image-status');
     Route::delete('/dashboard/knowledge-base/{id}', [KnowledgeBaseController::class, 'destroy'])->name('dashboard.knowledge-base.destroy');
@@ -121,8 +129,33 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/widget-design/test-endpoint', [App\Http\Controllers\WidgetDesignController::class, 'testEndpoint'])->name('dashboard.widget-design.test-endpoint');
     
     // Widget Customization Routes
-    Route::get('/dashboard/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'getCustomization'])->name('dashboard.widget-customization.get');
+    Route::get('/dashboard/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'index'])->name('dashboard.widget-customization');
+    Route::get('/dashboard/widget-customization-old', [App\Http\Controllers\WidgetCustomizationController::class, 'getCustomization'])->name('dashboard.widget-customization.get');
     Route::post('/dashboard/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'store'])->name('dashboard.widget-customization.store');
+    
+    // Widget Customization Container Routes
+    Route::get('/dashboard/widget-customization/container/{container}', [App\Http\Controllers\WidgetCustomizationController::class, 'getContainer'])->name('dashboard.widget-customization.container');
+    
+    // AI Settings Routes
+    Route::get('/dashboard/widget-customization/get-ai-settings', [App\Http\Controllers\WidgetCustomizationController::class, 'getAISettings'])->name('dashboard.widget-customization.get-ai-settings');
+    Route::post('/dashboard/widget-customization/save-ai-settings', [App\Http\Controllers\WidgetCustomizationController::class, 'saveAISettings'])->name('dashboard.widget-customization.save-ai-settings');
+    
+    // Action Triggers Routes
+    Route::get('/dashboard/widget-customization/get-action-triggers', [App\Http\Controllers\WidgetCustomizationController::class, 'getActionTriggers'])->name('dashboard.widget-customization.get-action-triggers');
+    Route::post('/dashboard/widget-customization/toggle-default-button', [App\Http\Controllers\WidgetCustomizationController::class, 'toggleDefaultButton'])->name('dashboard.widget-customization.toggle-default-button');
+    Route::post('/dashboard/widget-customization/toggle-custom-button', [App\Http\Controllers\WidgetCustomizationController::class, 'toggleCustomButton'])->name('dashboard.widget-customization.toggle-custom-button');
+    Route::post('/dashboard/widget-customization/add-custom-button', [App\Http\Controllers\WidgetCustomizationController::class, 'addCustomButton'])->name('dashboard.widget-customization.add-custom-button');
+    Route::post('/dashboard/widget-customization/save-api-settings', [App\Http\Controllers\WidgetCustomizationController::class, 'saveAPISettings'])->name('dashboard.widget-customization.save-api-settings');
+    
+    // API Endpoints Routes
+    Route::get('/dashboard/widget-customization/get-api-endpoints', [App\Http\Controllers\WidgetCustomizationController::class, 'getAPIEndpoints'])->name('dashboard.widget-customization.get-api-endpoints');
+    Route::post('/dashboard/widget-customization/delete-custom-button', [App\Http\Controllers\WidgetCustomizationController::class, 'deleteCustomButton'])->name('dashboard.widget-customization.delete-custom-button');
+    
+    // Embed Script Routes
+    Route::get('/dashboard/widget-customization/get-embed-script', [App\Http\Controllers\WidgetCustomizationController::class, 'getEmbedScript'])->name('dashboard.widget-customization.get-embed-script');
+    Route::get('/dashboard/widget-customization/test-widget', [App\Http\Controllers\WidgetCustomizationController::class, 'testWidget'])->name('dashboard.widget-customization.test-widget');
+    Route::post('/dashboard/widget-customization/test-endpoint', [App\Http\Controllers\WidgetCustomizationController::class, 'testEndpoint'])->name('dashboard.widget-customization.test-endpoint');
+    Route::post('/dashboard/widget-customization/add-multiple-custom-buttons', [App\Http\Controllers\WidgetCustomizationController::class, 'addMultipleCustomButtons'])->name('dashboard.widget-customization.add-multiple-custom-buttons');
     
     // Personal Token Routes
     Route::get('/dashboard/personal-token', [App\Http\Controllers\PersonalTokenController::class, 'getTokenInfo'])->name('dashboard.personal-token.info');
@@ -141,11 +174,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
     Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
-    // User Management Routes (Legacy - AdminController)
-    Route::get('/admin/users/{id}', [AdminController::class, 'getUser'])->name('admin.users.get');
-    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update.legacy');
-    Route::post('/admin/users/{id}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
-    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    // User Management Routes (Legacy - AdminController) - DISABLED
+    // Route::get('/admin/users/{id}', [AdminController::class, 'getUser'])->name('admin.users.get');
+    // Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update.legacy');
+    // Route::post('/admin/users/{id}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
+    // Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
     
     Route::get('/admin/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
 Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyticsContent'])->name('admin.analytics.load-content');
@@ -165,6 +198,26 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
     Route::get('/admin/payment-settings', function () {
         return view('admin.payment-settings.index');
     })->name('admin.payment-settings.index');
+
+    // Payment Routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/billing-form/{plan}', [App\Http\Controllers\PaymentController::class, 'billingForm'])->name('payment.billing-form');
+        Route::post('/checkout/{plan}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+        Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+        Route::get('/payment/fail', [App\Http\Controllers\PaymentController::class, 'fail'])->name('payment.fail');
+    });
+    
+    // Payment Callback (CSRF koruması olmadan)
+    Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');
+    
+    // Test route for payment integration
+    Route::get('/test-payment/{plan}', function($planId) {
+        $plan = \App\Models\Plan::find($planId);
+        if (!$plan) {
+            return 'Plan bulunamadı';
+        }
+        return view('test-payment', compact('plan'));
+    })->name('test.payment');
     
     // Subscriptions Management
     Route::resource('admin/subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class)->names([
@@ -213,19 +266,6 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
     Route::post('/admin/mail-templates/{id}/duplicate', [\App\Http\Controllers\Admin\MailTemplateController::class, 'duplicate'])->name('admin.mail-templates.duplicate');
     Route::get('/admin/mail-templates/stats', [\App\Http\Controllers\Admin\MailTemplateController::class, 'stats'])->name('admin.mail-templates.stats');
     
-    // API Settings Management
-    Route::resource('admin/api-settings', \App\Http\Controllers\Admin\ApiSettingsController::class)->names([
-        'index' => 'admin.api-settings.index',
-        'create' => 'admin.api-settings.create',
-        'store' => 'admin.api-settings.store',
-        'show' => 'admin.api-settings.show',
-        'edit' => 'admin.api-settings.edit',
-        'update' => 'admin.api-settings.update',
-        'destroy' => 'admin.api-settings.destroy',
-    ]);
-    
-    // API Settings Additional Routes
-    Route::post('/admin/api-settings/{apiSetting}/toggle-active', [\App\Http\Controllers\Admin\ApiSettingsController::class, 'toggleActive'])->name('admin.api-settings.toggle-active');
     
 });
 
@@ -261,6 +301,11 @@ Route::post('/api/cargo/track', [App\Http\Controllers\CargoTrackingController::c
     Route::post('/admin/users/{user}/assign-plan', [\App\Http\Controllers\Admin\UserPlanController::class, 'assignPlan'])->name('admin.users.assign-plan.store');
     Route::post('/admin/users/{user}/remove-plan', [\App\Http\Controllers\Admin\UserPlanController::class, 'removePlan'])->name('admin.users.remove-plan');
     Route::get('/admin/users/{user}/plan-info', [\App\Http\Controllers\Admin\UserPlanController::class, 'getUserPlanInfo'])->name('admin.users.plan-info');
+    
+    // Demo Requests Management
+    Route::get('/admin/demo-requests', [\App\Http\Controllers\Admin\DemoRequestController::class, 'index'])->name('admin.demo-requests.index');
+    Route::get('/admin/demo-requests/{demoRequest}', [\App\Http\Controllers\Admin\DemoRequestController::class, 'show'])->name('admin.demo-requests.show');
+    Route::post('/admin/demo-requests/{demoRequest}/status', [\App\Http\Controllers\Admin\DemoRequestController::class, 'updateStatus'])->name('admin.demo-requests.update-status');
 
     // Usage Token Management Routes
     Route::post('/admin/usage-tokens/update-user-tokens', [\App\Http\Controllers\Admin\UsageTokenController::class, 'updateUserTokens'])->name('admin.usage-tokens.update-user-tokens');
@@ -268,7 +313,28 @@ Route::post('/api/cargo/track', [App\Http\Controllers\CargoTrackingController::c
     Route::get('/admin/usage-tokens/get-user-tokens', [\App\Http\Controllers\Admin\UsageTokenController::class, 'getUserTokens'])->name('admin.usage-tokens.get-user-tokens');
     Route::get('/admin/usage-tokens/get-plan-tokens', [\App\Http\Controllers\Admin\UsageTokenController::class, 'getPlanTokens'])->name('admin.usage-tokens.get-plan-tokens');
 
-// Widget dosyaları artık public dizininden direkt servis ediliyor
+    // Prompt Management Routes
+    Route::resource('admin/prompts', PromptManagementController::class)->names([
+        'index' => 'admin.prompts.index',
+        'create' => 'admin.prompts.create',
+        'store' => 'admin.prompts.store',
+        'show' => 'admin.prompts.show',
+        'edit' => 'admin.prompts.edit',
+        'update' => 'admin.prompts.update',
+        'destroy' => 'admin.prompts.destroy',
+    ]);
+    
+    // Demo Requests Management Routes
+    Route::get('/admin/demo-requests', [DemoRequestController::class, 'index'])->name('admin.demo-requests.index');
+    Route::get('/admin/demo-requests/{demoRequest}', [DemoRequestController::class, 'show'])->name('admin.demo-requests.show');
+    Route::post('/admin/demo-requests/{demoRequest}/update-status', [DemoRequestController::class, 'updateStatus'])->name('admin.demo-requests.update-status');
+    
+    // Prompt Management API Routes
+Route::post('/admin/prompts/{prompt}/test', [PromptManagementController::class, 'test'])->name('admin.prompts.test');
+Route::get('/admin/prompts/{prompt}/analyze', [PromptManagementController::class, 'analyze'])->name('admin.prompts.analyze');
+Route::get('/admin/prompts/statistics', [PromptManagementController::class, 'statistics'])->name('admin.prompts.statistics');
+Route::post('/admin/prompts/{prompt}/toggle', [PromptManagementController::class, 'toggle'])->name('admin.prompts.toggle');
+
 
 
 

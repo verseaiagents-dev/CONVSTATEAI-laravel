@@ -11,7 +11,7 @@ const getEnvVar = (name, defaultValue) => {
 
 window.WIDGET_CONFIG = {
     // API Endpoints - Environment-based
-    API_BASE_URL: getEnvVar('REACT_APP_API_BASE_URL', 'https://convstateai.com'),
+    API_BASE_URL: getEnvVar('REACT_APP_API_BASE_URL', 'http://127.0.0.1:8000'),
     CHAT_ENDPOINT: '/api/chat',
     PRODUCTS_ENDPOINT: '/api/products',
     WIDGET_CUSTOMIZATION_ENDPOINT: '/api/widget-customization',

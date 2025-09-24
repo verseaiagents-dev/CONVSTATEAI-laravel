@@ -214,20 +214,9 @@
                         <li>Türkiye hukuku uygulanır</li>
                     </ul>
 
-                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">12. İletişim</h2>
-                    <p class="text-gray-300 mb-6">
-                        Bu şartlar hakkında sorularınız için:
-                    </p>
-                    <div class="bg-gray-800 rounded-lg p-6">
-                        <p class="text-gray-300 mb-2"><strong>E-posta:</strong> legal@convstateai.com</p>
-                        <p class="text-gray-300 mb-2"><strong>Adres:</strong> ConvStateAI Hukuk Departmanı</p>
-                        <p class="text-gray-300"><strong>Telefon:</strong> +90 (XXX) XXX XX XX</p>
-                    </div>
+                
 
-                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">13. Kabul</h2>
-                    <p class="text-gray-300">
-                        ConvStateAI platformunu kullanarak bu kullanım şartlarını kabul etmiş olursunuz. Şartları kabul etmiyorsanız, lütfen platformu kullanmayın.
-                    </p>
+               
                 </div>
             </div>
         </div>

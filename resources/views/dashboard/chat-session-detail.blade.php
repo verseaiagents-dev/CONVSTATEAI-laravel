@@ -13,7 +13,7 @@
             <div class="flex justify-between items-start mb-4">
                 <div>
                     <h1 class="text-4xl font-bold mb-4">
-                        <span class="gradient-text">Chat Session Detail</span>
+                        <span class="gradient-text">Tekil Chat Oturumu Detayı</span>
                     </h1>
                     <p class="text-xl text-gray-300">
                         Session ID: {{ Str::limit($session->session_id, 30) }}
@@ -298,6 +298,158 @@
         </div>
     </div>
 
+    <!-- Chat History Section -->
+    <div class="glass-effect rounded-xl border border-gray-700">
+        <div class="p-6 border-b border-gray-700">
+            <h3 class="text-lg font-semibold text-white">Chat History</h3>
+        </div>
+        <div class="p-6">
+            <div id="chatHistoryContainer" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <p>Chat history yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadChatHistoryForDetail();
+});
+
+function loadChatHistoryForDetail() {
+    const sessionId = '{{ $session->session_id }}';
+    const container = document.getElementById('chatHistoryContainer');
+    
+    console.log('Loading chat history for session:', sessionId);
+    
+    fetch(`/api/chat-history/${sessionId}`)
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received data:', data);
+            if (data.success) {
+                displayChatHistoryForDetail(data);
+            } else {
+                container.innerHTML = `
+                    <div class="text-center text-red-500 py-8">
+                        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>Hata: ${data.message}</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Chat history fetch error:', error);
+            container.innerHTML = `
+                <div class="text-center text-red-500 py-8">
+                    <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p>Bağlantı hatası: ${error.message}</p>
+                </div>
+            `;
+        });
+}
+
+function displayChatHistoryForDetail(data) {
+    console.log('Displaying chat history:', data);
+    
+    const container = document.getElementById('chatHistoryContainer');
+    if (!container) {
+        console.error('chatHistoryContainer element not found');
+        return;
+    }
+    
+    const chatHistory = data.chat_history || [];
+    console.log('Chat history array:', chatHistory);
+    
+    // Display messages
+    if (chatHistory && chatHistory.length > 0) {
+        try {
+            container.innerHTML = chatHistory.map(message => {
+                console.log('Processing message:', message);
+                
+                // Mesaj içeriğini belirle
+                let messageContent = '';
+                if (message.role === 'user') {
+                    messageContent = message.content || 'Mesaj içeriği bulunamadı';
+                } else if (message.role === 'assistant') {
+                    // Asistan mesajları için response_data.message kullan
+                    messageContent = message.response_data && message.response_data.message 
+                        ? message.response_data.message 
+                        : message.content || 'Asistan cevabı bulunamadı';
+                } else {
+                    messageContent = message.content || 'Bilinmeyen mesaj türü';
+                }
+                
+                // Tarih formatını düzenle
+                let messageDate = 'Bilinmiyor';
+                if (message.timestamp) {
+                    try {
+                        messageDate = new Date(message.timestamp).toLocaleString('tr-TR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    } catch (e) {
+                        console.error('Date parsing error:', e);
+                        messageDate = message.timestamp;
+                    }
+                }
+                
+                return `
+                    <div class="flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mb-4">
+                        <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            message.role === 'user' 
+                                ? 'bg-purple-glow text-white' 
+                                : 'bg-gray-700 text-gray-100'
+                        }">
+                            <div class="text-sm">${messageContent}</div>
+                            <div class="text-xs mt-1 opacity-70">
+                                ${messageDate}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            console.log('Chat history displayed successfully');
+        } catch (error) {
+            console.error('Error processing chat history:', error);
+            container.innerHTML = `
+                <div class="text-center text-red-500 py-8">
+                    <p>Mesajlar işlenirken hata oluştu: ${error.message}</p>
+                </div>
+            `;
+        }
+    } else {
+        console.log('No chat history found');
+        container.innerHTML = `
+            <div class="text-center text-gray-500 py-8">
+                <svg class="w-12 h-12 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <p>Bu session'da henüz chat mesajı bulunmuyor.</p>
+            </div>
+        `;
+    }
+}
+</script>
+
 @endsection

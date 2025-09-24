@@ -152,7 +152,84 @@
                         Kişisel verilerinizi, hizmet sağlama amacıyla gerekli olduğu sürece saklarız. Hesabınızı kapattığınızda, verileriniz 30 gün içinde güvenli şekilde silinir.
                     </p>
 
-                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">7. Haklarınız</h2>
+                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">7. KVKK Aydınlatma Metni</h2>
+                    <p class="text-gray-300 mb-6">
+                        Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun ("KVKK") 10. maddesi ile Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ kapsamında veri sorumlusu sıfatıyla Kadir Burak Durmazlar (Şahıs Şirketi) tarafından hazırlanmıştır.
+                    </p>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.1. Veri Sorumlusu Bilgileri</h3>
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <p class="text-gray-300 mb-2"><strong>Şirket Ünvanı:</strong> Kadir Burak Durmazlar (Şahıs Şirketi)</p>
+                        <p class="text-gray-300 mb-2"><strong>Adres:</strong> Osmaniye Mah. Sevgi Sokak No:5 Alpu / Eskişehir</p>
+                        <p class="text-gray-300 mb-2"><strong>Telefon:</strong> +90 545 852 76 93</p>
+                        <p class="text-gray-300 mb-2"><strong>E-posta:</strong> kadirdurmazlar@gmail.com</p>
+                        <p class="text-gray-300"><strong>Web Sitesi:</strong> https://convstateai.com</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.2. İşlenen Kişisel Veri Kategorileri</h3>
+                    <p class="text-gray-300 mb-4">ConvStateAI olarak işlediğimiz kişisel veriler:</p>
+                    <ul class="list-disc list-inside text-gray-300 mb-6 space-y-2">
+                        <li><strong>Kimlik Verileri:</strong> Ad Soyad, kullanıcı ID, müşteri hesabı bilgileri</li>
+                        <li><strong>İletişim Verileri:</strong> E-posta, telefon numarası, IP adresi, giriş/çıkış logları</li>
+                        <li><strong>İşlem Güvenliği Verileri:</strong> IP adresi, tarayıcı bilgileri, giriş-çıkış kayıtları, sistem logları</li>
+                        <li><strong>Hizmet Kullanım Verileri:</strong> Kullanıcının ConvStateAI paneli üzerinden gerçekleştirdiği işlemler, müşteri temsilcisi sohbet kayıtları</li>
+                        <li><strong>Finansal Veriler:</strong> Üyelik/abonelik ödemelerine ilişkin fatura ve ödeme bilgileri</li>
+                    </ul>
+                    <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
+                        <p class="text-blue-300 text-sm"><strong>Not:</strong> Kişisel veriler, 3. parti yazılımlar veya harici hizmetler üzerinde kullanılmamaktadır. Tüm veriler ConvStateAI altyapısı üzerinde işlenmektedir.</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.3. Kişisel Verilerin İşlenme Amaçları</h3>
+                    <p class="text-gray-300 mb-4">Kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:</p>
+                    <ul class="list-disc list-inside text-gray-300 mb-6 space-y-2">
+                        <li>ConvStateAI üyelerinin kendi websitelerinde müşteri temsilcisi olarak hizmet verebilmesi</li>
+                        <li>Ürün/hizmet aboneliklerinin oluşturulması ve yönetilmesi</li>
+                        <li>Kullanıcı desteği ve müşteri memnuniyet süreçlerinin yürütülmesi</li>
+                        <li>Hizmetin güvenliğinin ve sistem bütünlüğünün sağlanması</li>
+                        <li>Faturalandırma ve yasal yükümlülüklerin yerine getirilmesi</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.4. Kişisel Verilerin Aktarımı</h3>
+                    <ul class="list-disc list-inside text-gray-300 mb-6 space-y-2">
+                        <li><strong>Yurt içi aktarım:</strong> Yasal yükümlülükler çerçevesinde; resmi kurumlar, mahkemeler, vergi daireleri ve ödeme alınan bankalarla paylaşılabilir.</li>
+                        <li><strong>Yurt dışı aktarım:</strong> Şu anda herhangi bir yurt dışı veri aktarımı yapılmamaktadır.</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.5. Kişisel Verilerin Toplanma Yöntemi ve Hukuki Sebep</h3>
+                    <p class="text-gray-300 mb-4">Kişisel verileriniz;</p>
+                    <ul class="list-disc list-inside text-gray-300 mb-4 space-y-2">
+                        <li>ConvStateAI web sitesi (https://convstateai.com) üzerinden üyelik kaydı sırasında</li>
+                        <li>Elektronik formlar, e-posta, destek talepleri ve abonelik işlemleri aracılığıyla otomatik yollarla toplanmaktadır.</li>
+                    </ul>
+                    <p class="text-gray-300 mb-4"><strong>Hukuki sebepler:</strong></p>
+                    <ul class="list-disc list-inside text-gray-300 mb-6 space-y-2">
+                        <li>KVKK md.5 uyarınca sözleşmenin kurulması ve ifası</li>
+                        <li>Hukuki yükümlülüklerin yerine getirilmesi</li>
+                        <li>Meşru menfaat kapsamında hizmetin güvenliği ve geliştirilmesi</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.6. İlgili Kişi Hakları</h3>
+                    <p class="text-gray-300 mb-4">KVKK md.11 kapsamında kişisel veri sahipleri olarak aşağıdaki haklara sahipsiniz:</p>
+                    <ul class="list-disc list-inside text-gray-300 mb-6 space-y-2">
+                        <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+                        <li>İşlenmişse buna ilişkin bilgi talep etme</li>
+                        <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
+                        <li>Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme</li>
+                        <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme</li>
+                        <li>KVKK'ya aykırı işlenmişse silinmesini veya yok edilmesini isteme</li>
+                        <li>İşlenen verilerin yalnızca otomatik sistemlerle analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme</li>
+                        <li>Zarara uğramanız halinde tazminat talep etme</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold mb-4 text-purple-glow">7.7. Başvuru Yöntemleri</h3>
+                    <p class="text-gray-300 mb-4">Belirtilen haklarınızı kullanmak için:</p>
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <p class="text-gray-300 mb-2"><strong>Web:</strong> https://convstateai.com</p>
+                        <p class="text-gray-300"><strong>E-posta:</strong> kadirdurmazlar@gmail.com</p>
+                    </div>
+                    <p class="text-gray-300 mb-6">Başvurularınız, en geç 30 gün içinde ücretsiz olarak sonuçlandırılacaktır. Ancak, işlemin ayrıca bir maliyet gerektirmesi halinde Kişisel Verileri Koruma Kurulu tarafından belirlenen tarifedeki ücret esas alınacaktır.</p>
+
+                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">8. Haklarınız (Genel)</h2>
                     <p class="text-gray-300 mb-6">
                         KVKK ve GDPR kapsamında aşağıdaki haklara sahipsiniz:
                     </p>
@@ -164,24 +241,25 @@
                         <li>Veri taşınabilirliği hakkı</li>
                     </ul>
 
-                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">8. İletişim</h2>
+                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">9. İletişim</h2>
                     <p class="text-gray-300 mb-6">
-                        Gizlilik politikamız hakkında sorularınız için bizimle iletişime geçebilirsiniz:
+                        Gizlilik politikamız ve KVKK haklarınız hakkında sorularınız için bizimle iletişime geçebilirsiniz:
                     </p>
                     <div class="bg-gray-800 rounded-lg p-6">
-                        <p class="text-gray-300 mb-2"><strong>E-posta:</strong> privacy@convstateai.com</p>
-                        <p class="text-gray-300 mb-2"><strong>Adres:</strong> ConvStateAI Gizlilik Ofisi</p>
-                        <p class="text-gray-300"><strong>Telefon:</strong> +90 (XXX) XXX XX XX</p>
+                        <p class="text-gray-300 mb-2"><strong>E-posta:</strong> kadirdurmazlar@gmail.com</p>
+                        <p class="text-gray-300 mb-2"><strong>Adres:</strong> Osmaniye Mah. Sevgi Sokak No:5 Alpu / Eskişehir</p>
+                        <p class="text-gray-300 mb-2"><strong>Telefon:</strong> +90 545 852 76 93</p>
+                        <p class="text-gray-300"><strong>Web Sitesi:</strong> https://convstateai.com</p>
                     </div>
 
-                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">9. Politika Güncellemeleri</h2>
+                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">10. Politika Güncellemeleri</h2>
                     <p class="text-gray-300 mb-6">
                         Bu gizlilik politikasını zaman zaman güncelleyebiliriz. Önemli değişiklikler olduğunda size e-posta ile bildirim göndeririz. Güncel politika her zaman web sitemizde yayınlanır.
                     </p>
 
-                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">10. Onay</h2>
+                    <h2 class="text-2xl font-bold mb-6 text-purple-glow">11. Onay</h2>
                     <p class="text-gray-300">
-                        Hizmetlerimizi kullanarak bu gizlilik politikasını kabul etmiş olursunuz. Politikamız hakkında herhangi bir sorunuz varsa, lütfen bizimle iletişime geçin.
+                        Hizmetlerimizi kullanarak bu gizlilik politikasını ve KVKK aydınlatma metnini kabul etmiş olursunuz. Politikamız hakkında herhangi bir sorunuz varsa, lütfen bizimle iletişime geçin.
                     </p>
                 </div>
             </div>

@@ -148,8 +148,8 @@
             <p>Bu e-posta {{ $user->email }} adresine gönderilmiştir.</p>
             <p style="margin-top: 10px;">
                 <a href="#" style="color: #667eea;">E-posta tercihleri</a> |
-                <a href="#" style="color: #667eea;">Gizlilik politikası</a> |
-                <a href="#" style="color: #667eea;">Kullanım şartları</a>
+                <a href="{{ route('privacy-policy') }}" style="color: #667eea;">Gizlilik politikası</a> |
+                <a href="{{ route('terms-of-service') }}" style="color: #667eea;">Kullanım şartları</a>
             </p>
         </div>
     </div>

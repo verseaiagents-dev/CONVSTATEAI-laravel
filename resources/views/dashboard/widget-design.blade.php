@@ -106,80 +106,7 @@
             </div>
         </div>
 
-        <!-- Embed Script Container -->
-        <div class="glass-effect rounded-2xl p-8 relative overflow-hidden">
-            <div
-                class="absolute top-0 right-0 w-32 h-32 bg-green-glow rounded-full mix-blend-multiply filter blur-xl opacity-20">
-            </div>
-            <div
-                class="absolute bottom-0 left-0 w-40 h-40 bg-blue-glow rounded-full mix-blend-multiply filter blur-xl opacity-20">
-            </div>
-
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white mb-2">
-                            <span class="gradient-text">Embed Script</span>
-                        </h2>
-                        <p class="text-gray-300">Widget'ınızı web sitenize entegre etmek için aşağıdaki kodu kullanın</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button id="copyEmbedScriptBtn"
-                            class="px-4 py-2 bg-gradient-to-r from-purple-glow to-neon-purple text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            <span>Kodu Kopyala</span>
-                        </button>
-
-                        <!-- How to Use Button -->
-                        <button id="howToUseBtn"
-                            class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all duration-300 flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                </path>
-                            </svg>
-                            <span>Nasıl Kullanılır?</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Embed Script Display -->
-                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-white">Embed Kodu</h3>
-                        <span
-                            class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
-                            Hazır
-                        </span>
-                    </div>
-                    <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-600">
-                        <pre id="embedScriptDisplay" class="text-green-400 font-mono text-sm break-all whitespace-pre-wrap">
-                         <code>&lt;script src="{{ url('/embed/convstateai.min.js') }}"&gt;&lt;/script&gt;
-&lt;script&gt;
-    window.convstateaiConfig = {
-        projectId: "{{ request('project_id') ?? '1' }}",
-        customizationToken: "{{ Auth::user()->personal_token ?? 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246' }}"
-    };
-&lt;/script&gt;</code></pre>
-                        <div id="actualEmbedScript" style="display: none;">
-                            <pre><code>&lt;script src="{{ url('/embed/convstateai.min.js') }}"&gt;&lt;/script&gt;
-&lt;script&gt;
-    window.convstateaiConfig = {
-        projectId: "{{ request('project_id') ?? '1' }}",
-        customizationToken: "{{ Auth::user()->personal_token ?? 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246' }}"
-    };
-&lt;/script&gt;</code></pre>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
+      
         <!-- Usage Instructions Modal -->
         <div id="usageModal"
             class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -374,6 +301,79 @@
                 </div>
             </div>
         </div>
+  <!-- Embed Script Container -->
+  <div class="glass-effect rounded-2xl p-8 relative overflow-hidden">
+     <div
+         class="absolute top-0 right-0 w-32 h-32 bg-green-glow rounded-full mix-blend-multiply filter blur-xl opacity-20">
+     </div>
+     <div
+         class="absolute bottom-0 left-0 w-40 h-40 bg-blue-glow rounded-full mix-blend-multiply filter blur-xl opacity-20">
+     </div>
+
+     <div class="relative z-10">
+         <div class="flex items-center justify-between mb-6">
+             <div>
+                 <h2 class="text-2xl font-bold text-white mb-2">
+                     <span class="gradient-text">Embed Script</span>
+                 </h2>
+                 <p class="text-gray-300">Widget'ınızı web sitenize entegre etmek için aşağıdaki kodu kullanın</p>
+             </div>
+             <div class="flex items-center space-x-3">
+                 <button id="copyEmbedScriptBtn"
+                     class="px-4 py-2 bg-gradient-to-r from-purple-glow to-neon-purple text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                             d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                         </path>
+                     </svg>
+                     <span>Kodu Kopyala</span>
+                 </button>
+
+                 <!-- How to Use Button -->
+                 <button id="howToUseBtn"
+                     class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all duration-300 flex items-center space-x-2">
+                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                         </path>
+                     </svg>
+                     <span>Nasıl Kullanılır?</span>
+                 </button>
+             </div>
+         </div>
+
+         <!-- Embed Script Display -->
+         <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+             <div class="flex items-center justify-between mb-4">
+                 <h3 class="text-lg font-semibold text-white">Embed Kodu</h3>
+                 <span
+                     class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
+                     Hazır
+                 </span>
+             </div>
+             <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-600">
+                 <pre id="embedScriptDisplay" class="text-green-400 font-mono text-sm break-all whitespace-pre-wrap">
+                  <code>&lt;script src="{{ url('/embed/convstateai.min.js') }}"&gt;&lt;/script&gt;
+&lt;script&gt;
+window.convstateaiConfig = {
+ projectId: "{{ request('project_id') ?? '1' }}",
+ customizationToken: "{{ Auth::user()->personal_token ?? 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246' }}"
+};
+&lt;/script&gt;</code></pre>
+                 <div id="actualEmbedScript" style="display: none;">
+                     <pre><code>&lt;script src="{{ url('/embed/convstateai.min.js') }}"&gt;&lt;/script&gt;
+&lt;script&gt;
+window.convstateaiConfig = {
+ projectId: "{{ request('project_id') ?? '1' }}",
+ customizationToken: "{{ Auth::user()->personal_token ?? 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246' }}"
+};
+&lt;/script&gt;</code></pre>
+                 </div>
+             </div>
+
+         </div>
+     </div>
+ </div>
 
         <!-- Loading State -->
         <div id="loadingState" class="glass-effect rounded-2xl p-8">
@@ -678,6 +678,7 @@
                                 <select id="font_family" name="font_family"
                                     class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
                                     <option value="Inter">Inter</option>
+                                    <option value="Montserrat, sans-serif">Montserrat</option>
                                     <option value="Arial, sans-serif">Arial</option>
                                     <option value="Helvetica, sans-serif">Helvetica</option>
                                     <option value="Georgia, serif">Georgia</option>
@@ -686,14 +687,16 @@
                                 </select>
                             </div>
 
-                            <!-- Logo URL -->
+                            <!-- Widget Pozisyonu -->
                             <div>
-                                <label for="logo_url" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Logo URL
+                                <label for="widget_position" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Widget Pozisyonu
                                 </label>
-                                <input type="url" id="logo_url" name="logo_url"
-                                    placeholder="https://example.com/logo.png"
-                                    class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                <select id="widget_position" name="widget_position"
+                                    class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                    <option value="right">Sağ Alt</option>
+                                    <option value="left">Sol Alt</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -907,6 +910,7 @@
                         </div>
                     </div>
 
+
                     <!-- Save Button -->
                     <div class="flex justify-end">
                         <button type="submit" id="saveButton"
@@ -921,6 +925,7 @@
                 </form>
             </div>
         </div>
+
 
         <!-- Error State -->
         <div id="errorState" class="hidden glass-effect rounded-2xl p-8 fade-in-scale">
@@ -1080,8 +1085,8 @@
                 if (customization.font_family) {
                     document.getElementById('font_family').value = customization.font_family;
                 }
-                if (customization.logo_url) {
-                    document.getElementById('logo_url').value = customization.logo_url;
+                if (customization.widget_position) {
+                    document.getElementById('widget_position').value = customization.widget_position;
                 }
 
                 // Gelişmiş Ayarlar
@@ -1182,6 +1187,7 @@
             if (projectId) {
                 data.project_id = projectId;
             }
+
 
             // Debug: Form verilerini console'a yazdır
             console.log('📝 Form Data:', data);
@@ -1873,7 +1879,7 @@
     }
   }
 }`;
-        }
+        };
 
         // Get Kargo API Example - Global function
         window.getKargoApiExample = function() {
@@ -1951,6 +1957,38 @@
     "last_updated": "2024-01-17T08:30:00Z"
   }
 }`;
+        };
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white font-medium transition-all duration-300 transform translate-x-full`;
+            
+            // Set color based on type
+            if (type === 'success') {
+                toast.classList.add('bg-green-500');
+            } else if (type === 'error') {
+                toast.classList.add('bg-red-500');
+            } else {
+                toast.classList.add('bg-blue-500');
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
         }
     </script>
 @endsection

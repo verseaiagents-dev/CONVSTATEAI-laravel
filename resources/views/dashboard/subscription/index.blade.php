@@ -58,7 +58,7 @@
     </div>
 
     <!-- Usage Token Status -->
-    @if($usageToken)
+    @if($user->tokens_total > 0)
     <div class="glass-effect rounded-xl p-6 border border-gray-700 hover:border-purple-glow/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-glow/10">
         <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
             <svg class="w-6 h-6 mr-3 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,15 +69,15 @@
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div class="text-center bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div class="text-3xl font-bold text-blue-400">{{ $usageToken->tokens_remaining }}</div>
+                <div class="text-3xl font-bold text-blue-400">{{ $user->tokens_remaining }}</div>
                 <div class="text-sm text-gray-300">Kalan Token</div>
             </div>
             <div class="text-center bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div class="text-3xl font-bold text-green-400">{{ $usageToken->tokens_used }}</div>
+                <div class="text-3xl font-bold text-green-400">{{ $user->tokens_used }}</div>
                 <div class="text-sm text-gray-300">Kullanılan Token</div>
             </div>
             <div class="text-center bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div class="text-3xl font-bold text-purple-glow">{{ $usageToken->tokens_total }}</div>
+                <div class="text-3xl font-bold text-purple-glow">{{ $user->tokens_total }}</div>
                 <div class="text-sm text-gray-300">Toplam Token</div>
             </div>
         </div>
@@ -86,27 +86,27 @@
         <div class="mb-4">
             <div class="flex justify-between text-sm text-gray-300 mb-2">
                 <span>Kullanım Oranı</span>
-                <span>{{ number_format($usageToken->usage_percentage, 1) }}%</span>
+                <span>{{ number_format($user->token_usage_percentage, 1) }}%</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-3">
                 <div class="bg-gradient-to-r from-blue-500 to-purple-glow h-3 rounded-full transition-all duration-300" 
-                     style="width: {{ $usageToken->usage_percentage }}%"></div>
+                     style="width: {{ $user->token_usage_percentage }}%"></div>
             </div>
         </div>
 
         <!-- Reset Date -->
-        @if($usageToken->reset_date)
+        @if($user->token_reset_date)
         <div class="text-sm text-gray-300 flex items-center">
             <svg class="w-4 h-4 mr-2 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            Token'lar {{ $usageToken->reset_date->format('d.m.Y') }} tarihinde yenilenecek
-            ({{ $usageToken->days_until_reset }} gün kaldı)
+            Token'lar {{ $user->token_reset_date->format('d.m.Y') }} tarihinde yenilenecek
+            ({{ $user->days_until_token_reset }} gün kaldı)
         </div>
         @endif
 
         <!-- Warning if low tokens -->
-        @if($usageToken->usage_percentage > 80)
+        @if($user->token_usage_percentage > 80)
         <div class="mt-4 p-4 bg-yellow-900/20 border border-yellow-600/50 rounded-lg">
             <div class="flex">
                 <svg class="w-5 h-5 text-yellow-400 mt-1 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

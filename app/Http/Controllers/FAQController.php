@@ -61,11 +61,22 @@ class FAQController extends Controller
                 'description' => 'nullable|string',
                 'answer' => 'required|string',
                 'short_answer' => 'required|string|max:255',
-                'category' => 'nullable|string|max:100',
+                'category' => 'required|string|max:100',
                 'is_active' => 'boolean',
-                'site_id' => 'required|exists:sites,id',
-                'project_id' => 'required|integer|exists:projects,id',
-                'sort_order' => 'nullable|integer|min:0'
+                'site_id' => 'nullable|integer',
+                'project_id' => 'required|integer',
+                'sort_order' => 'nullable|integer|min:0',
+                // Yeni tasarım modeli fieldları
+                'faq_code' => 'nullable|string|max:50|unique:faqs,faq_code',
+                'keywords' => 'nullable|string',
+                'related_faqs' => 'nullable|array',
+                'related_faqs.*' => 'integer|exists:faqs,id',
+                'difficulty_level' => 'nullable|in:easy,medium,hard,expert',
+                'estimated_read_time' => 'nullable|integer|min:1',
+                'featured' => 'boolean',
+                'author' => 'nullable|string|max:100',
+                'review_notes' => 'nullable|string',
+                'metadata' => 'nullable|array'
             ]);
 
             if ($validator->fails()) {
@@ -76,7 +87,47 @@ class FAQController extends Controller
                 ], 422);
             }
 
-            $faq = FAQ::create($request->all());
+            $data = $request->all();
+            
+            // Site ID'yi otomatik olarak ayarla veya oluştur
+            if (empty($data['site_id'])) {
+                $projectId = $data['project_id'];
+                
+                // Projeye ait site var mı kontrol et
+                $site = Site::where('project_id', $projectId)->first();
+                
+                if (!$site) {
+                    // Site yoksa oluştur
+                    $project = \App\Models\Project::find($projectId);
+                    $site = Site::create([
+                        'name' => $project ? $project->name . ' Site' : 'Default Site',
+                        'domain' => $project ? parse_url($project->url ?? 'https://example.com', PHP_URL_HOST) ?? 'example.com' : 'example.com',
+                        'description' => 'Otomatik oluşturulan site',
+                        'project_id' => $projectId,
+                        'is_active' => true
+                    ]);
+                }
+                
+                $data['site_id'] = $site->id;
+            }
+            
+            // Otomatik FAQ kodu oluştur
+            if (empty($data['faq_code'])) {
+                $data['faq_code'] = FAQ::generateFaqCode();
+            }
+            
+            // Varsayılan değerler
+            $data['difficulty_level'] = $data['difficulty_level'] ?? 'easy';
+            $data['featured'] = $data['featured'] ?? false;
+            $data['description'] = $data['description'] ?? '';
+            
+            // Otomatik okuma süresi hesapla
+            if (empty($data['estimated_read_time'])) {
+                $tempFaq = new FAQ($data);
+                $data['estimated_read_time'] = $tempFaq->calculateReadTime();
+            }
+            
+            $faq = FAQ::create($data);
 
             return response()->json([
                 'success' => true,
@@ -129,10 +180,22 @@ class FAQController extends Controller
                 'description' => 'nullable|string',
                 'answer' => 'sometimes|required|string',
                 'short_answer' => 'sometimes|required|string|max:255',
-                'category' => 'nullable|string|max:100',
+                'category' => 'sometimes|required|string|max:100',
                 'is_active' => 'sometimes|boolean',
-                'project_id' => 'sometimes|required|integer|exists:projects,id',
-                'sort_order' => 'nullable|integer|min:0'
+                'site_id' => 'nullable|integer',
+                'project_id' => 'sometimes|required|integer',
+                'sort_order' => 'nullable|integer|min:0',
+                // Yeni tasarım modeli fieldları
+                'faq_code' => 'nullable|string|max:50|unique:faqs,faq_code,' . $id,
+                'keywords' => 'nullable|string',
+                'related_faqs' => 'nullable|array',
+                'related_faqs.*' => 'integer|exists:faqs,id',
+                'difficulty_level' => 'nullable|in:easy,medium,hard,expert',
+                'estimated_read_time' => 'nullable|integer|min:1',
+                'featured' => 'boolean',
+                'author' => 'nullable|string|max:100',
+                'review_notes' => 'nullable|string',
+                'metadata' => 'nullable|array'
             ]);
 
             if ($validator->fails()) {
@@ -143,7 +206,38 @@ class FAQController extends Controller
                 ], 422);
             }
 
-            $faq->update($request->all());
+            $data = $request->all();
+            
+            // Site ID'yi otomatik olarak ayarla veya oluştur (sadece project_id varsa)
+            if (isset($data['project_id']) && empty($data['site_id'])) {
+                $projectId = $data['project_id'];
+                
+                // Projeye ait site var mı kontrol et
+                $site = Site::where('project_id', $projectId)->first();
+                
+                if (!$site) {
+                    // Site yoksa oluştur
+                    $project = \App\Models\Project::find($projectId);
+                    $site = Site::create([
+                        'name' => $project ? $project->name . ' Site' : 'Default Site',
+                        'domain' => $project ? parse_url($project->url ?? 'https://example.com', PHP_URL_HOST) ?? 'example.com' : 'example.com',
+                        'description' => 'Otomatik oluşturulan site',
+                        'project_id' => $projectId,
+                        'is_active' => true
+                    ]);
+                }
+                
+                $data['site_id'] = $site->id;
+            }
+            
+            // Okuma süresini yeniden hesapla eğer içerik değiştiyse
+            if (isset($data['answer']) || isset($data['description'])) {
+                $tempFaq = clone $faq;
+                $tempFaq->fill($data);
+                $data['estimated_read_time'] = $tempFaq->calculateReadTime();
+            }
+            
+            $faq->update($data);
 
             return response()->json([
                 'success' => true,

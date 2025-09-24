@@ -10,6 +10,7 @@ class WidgetCustomization extends Model
 {
     protected $fillable = [
         'user_id',
+        'project_id',
         'ai_name',
         'welcome_message',
         'welcome_message_custom',
@@ -18,7 +19,7 @@ class WidgetCustomization extends Model
         'error_message_template',
         'order_not_found_message',
         'theme_color',
-        'logo_url',
+        'widget_position',
         'font_family',
         'primary_color',
         'secondary_color',
@@ -31,12 +32,16 @@ class WidgetCustomization extends Model
         'enable_typing_indicator',
         'enable_sound_notifications',
         'customization_data',
+        'action_buttons',
+        'custom_buttons',
         'is_active'
     ];
 
     protected $casts = [
         'customization_data' => 'array',
         'custom_messages' => 'array',
+        'action_buttons' => 'array',
+        'custom_buttons' => 'array',
         'is_active' => 'boolean',
         'enable_typing_indicator' => 'boolean',
         'enable_sound_notifications' => 'boolean'
@@ -135,7 +140,7 @@ class WidgetCustomization extends Model
             'secondary_color' => $this->secondary_color ?? '#6B7280',
             'theme_color' => $this->theme_color ?? '#3B82F6',
             'font_family' => $this->font_family ?? 'Inter',
-            'logo_url' => $this->logo_url
+            'widget_position' => $this->widget_position ?? 'right'
         ];
     }
     
@@ -149,5 +154,78 @@ class WidgetCustomization extends Model
             'enable_typing_indicator' => $this->enable_typing_indicator ?? true,
             'enable_sound_notifications' => $this->enable_sound_notifications ?? false
         ];
+    }
+    
+    // Action buttons ayarlarını al
+    public function getActionButtons(): array
+    {
+        $customButtons = $this->action_buttons ?? [];
+        
+        // Eğer özel action buttons yoksa default'ları döndür
+        if (empty($customButtons)) {
+            return $this->getDefaultActionButtons();
+        }
+        
+        return $customButtons;
+    }
+    
+    // Default action buttons'ları tanımla
+    public function getDefaultActionButtons(): array
+    {
+        return [
+            [
+                'id' => 'random_product',
+                'text' => 'Rastgele bir ürün öner.',
+                'action' => 'random_product',
+                'enabled' => true,
+                'order' => 1
+            ],
+            [
+                'id' => 'cargo_tracking',
+                'text' => 'Kargom nerede?',
+                'action' => 'cargo_tracking',
+                'enabled' => true,
+                'order' => 2
+            ],
+            [
+                'id' => 'order_tracking',
+                'text' => 'Siparişim nerede?',
+                'action' => 'order_tracking',
+                'enabled' => true,
+                'order' => 3
+            ]
+        ];
+    }
+    
+    // Action button'ı aktif/pasif yap
+    public function toggleActionButton(string $buttonId, bool $enabled): bool
+    {
+        $actionButtons = $this->action_buttons ?? $this->getDefaultActionButtons();
+        
+        foreach ($actionButtons as &$button) {
+            if ($button['id'] === $buttonId) {
+                $button['enabled'] = $enabled;
+                $this->action_buttons = $actionButtons;
+                return $this->save();
+            }
+        }
+        
+        return false;
+    }
+    
+    // Action button metnini güncelle
+    public function updateActionButtonText(string $buttonId, string $newText): bool
+    {
+        $actionButtons = $this->action_buttons ?? $this->getDefaultActionButtons();
+        
+        foreach ($actionButtons as &$button) {
+            if ($button['id'] === $buttonId) {
+                $button['text'] = $newText;
+                $this->action_buttons = $actionButtons;
+                return $this->save();
+            }
+        }
+        
+        return false;
     }
 }

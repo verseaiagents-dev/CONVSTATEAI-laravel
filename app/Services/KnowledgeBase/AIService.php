@@ -258,10 +258,19 @@ class AIService
     }
 
     /**
-     * Intent detection prompt'u oluşturur
+     * Intent detection prompt'u oluşturur - Dinamik prompt sistemi
      */
     private function buildIntentDetectionPrompt(array $context): string
     {
+        // Dinamik prompt yönetimi
+        $promptIntegration = app(\App\Services\PromptIntegrationService::class);
+        $dynamicPrompt = $promptIntegration->getIntentDetectionPrompt($context);
+        
+        if ($dynamicPrompt) {
+            return $dynamicPrompt;
+        }
+        
+        // Fallback - eski statik prompt
         $prompt = "Sen bir e-ticaret intent detection uzmanısın. Kullanıcının sorgusunu analiz et ve aşağıdaki intent'lerden birini belirle.
 
         Intent Categories ve Örnekler:
@@ -581,40 +590,48 @@ class AIService
     public function semanticSearch(string $query, array $chunks, array $context = []): array
     {
         try {
-            if (config('app.debug')) {
+            Log::info('=== AISERVICE SEMANTIC SEARCH START ===');
+            Log::info('Query: ' . $query);
+            Log::info('Chunks count: ' . count($chunks));
+            
+            if (empty($chunks)) {
+                Log::warning('No chunks provided to semantic search');
+                return [
+                    'query' => $query,
+                    'expanded_query' => null,
+                    'results' => [],
+                    'total_found' => 0,
+                    'search_strategy' => 'no_chunks'
+                ];
             }
             
             // Query expansion yap
             $expandedQuery = $this->expandQuery($query, $context);
             
             // Debug: Log expanded query (production'da kapatılabilir)
-            if (config('app.debug')) {
-                Log::debug('Query expanded', [
-                    'original_query' => $query,
-                    'expanded_terms' => $expandedQuery['expanded_terms'] ?? [],
-                    'similar_words' => $expandedQuery['similar_words'] ?? [],
-                    'related_categories' => $expandedQuery['related_categories'] ?? []
-                ]);
-            }
+            Log::info('Query expanded', [
+                'original_query' => $query,
+                'expanded_terms' => $expandedQuery['expanded_terms'] ?? [],
+                'similar_words' => $expandedQuery['similar_words'] ?? [],
+                'related_categories' => $expandedQuery['related_categories'] ?? []
+            ]);
             
             // Her chunk için relevance score hesapla
             $scoredChunks = [];
-            foreach ($chunks as $chunk) {
+            Log::info('Starting relevance score calculation for ' . count($chunks) . ' chunks');
+            
+            foreach ($chunks as $index => $chunk) {
                 $relevanceScore = $this->calculateRelevanceScore($chunk, $expandedQuery);
                 
-                // Debug: Log scores for first few chunks (production'da kapatılabilir)
-                if (config('app.debug') && count($scoredChunks) < 3) {
-                    Log::debug('Chunk relevance score calculated', [
-                        'chunk_id' => $chunk['id'] ?? 'unknown',
-                        'content_preview' => mb_substr($chunk['content'], 0, 100),
-                        'relevance_score' => $relevanceScore
-                    ]);
-                }
+                Log::info("Chunk {$index} relevance score: {$relevanceScore}");
                 
-                if ($relevanceScore >= 0.3) { // %30+ ilgili olanları al (daha düşük threshold)
+                if ($relevanceScore >= 0.1) { // %10+ ilgili olanları al (daha düşük threshold)
                     $chunk['relevance_score'] = $relevanceScore;
                     $chunk['matched_terms'] = $this->findMatchedTerms($chunk, $expandedQuery);
                     $scoredChunks[] = $chunk;
+                    Log::info("Chunk {$index} added to results with score: {$relevanceScore}");
+                } else {
+                    Log::info("Chunk {$index} rejected with low score: {$relevanceScore}");
                 }
             }
             
@@ -659,35 +676,61 @@ class AIService
         $score = 0.0;
         $content = mb_strtolower($chunk['content']);
         
-        // Ana terimler için yüksek puan
-        foreach ($expandedQuery['expanded_terms'] as $term) {
-            if (mb_strpos($content, $term) !== false) {
-                $score += 0.4; // Daha yüksek puan
+        // Embedding varsa cosine similarity kullan
+        if (isset($chunk['vector_embedding']) && !empty($chunk['vector_embedding'])) {
+            try {
+                $chunkEmbedding = is_string($chunk['vector_embedding']) 
+                    ? json_decode($chunk['vector_embedding'], true) 
+                    : $chunk['vector_embedding'];
+                
+                if (is_array($chunkEmbedding) && count($chunkEmbedding) > 0) {
+                    // Query embedding oluştur
+                    $queryText = implode(' ', $expandedQuery['expanded_terms']);
+                    $queryEmbedding = $this->createEmbedding($queryText);
+                    
+                    if ($queryEmbedding && is_array($queryEmbedding)) {
+                        $cosineSimilarity = $this->calculateCosineSimilarity($queryEmbedding, $chunkEmbedding);
+                        $score = max($score, $cosineSimilarity);
+                        Log::info("Embedding similarity for chunk: {$cosineSimilarity}");
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error("Error calculating embedding similarity: " . $e->getMessage());
             }
         }
         
-        // Benzer kelimeler için orta puan
-        foreach ($expandedQuery['similar_words'] as $word) {
-            if (mb_strpos($content, $word) !== false) {
-                $score += 0.25; // Daha yüksek puan
-            }
-        }
-        
-        // İlgili kategoriler için bonus puan
-        if (isset($chunk['content_type'])) {
-            foreach ($expandedQuery['related_categories'] as $category) {
-                if (mb_strpos(mb_strtolower($chunk['content_type']), $category) !== false) {
-                    $score += 0.2; // Daha yüksek puan
+        // Fallback: Text-based arama
+        if ($score < 0.1) {
+            // Ana terimler için yüksek puan
+            foreach ($expandedQuery['expanded_terms'] as $term) {
+                if (mb_strpos($content, $term) !== false) {
+                    $score += 0.4; // Daha yüksek puan
                 }
             }
-        }
-        
-        // Metadata'dan bonus puan
-        if (isset($chunk['metadata'])) {
-            $metadata = json_encode($chunk['metadata']);
-            foreach ($expandedQuery['expanded_terms'] as $term) {
-                if (mb_strpos($metadata, $term) !== false) {
-                    $score += 0.15; // Daha yüksek puan
+            
+            // Benzer kelimeler için orta puan
+            foreach ($expandedQuery['similar_words'] as $word) {
+                if (mb_strpos($content, $word) !== false) {
+                    $score += 0.25; // Daha yüksek puan
+                }
+            }
+            
+            // İlgili kategoriler için bonus puan
+            if (isset($chunk['content_type'])) {
+                foreach ($expandedQuery['related_categories'] as $category) {
+                    if (mb_strpos(mb_strtolower($chunk['content_type']), $category) !== false) {
+                        $score += 0.2; // Daha yüksek puan
+                    }
+                }
+            }
+            
+            // Metadata'dan bonus puan
+            if (isset($chunk['metadata'])) {
+                $metadata = json_encode($chunk['metadata']);
+                foreach ($expandedQuery['expanded_terms'] as $term) {
+                    if (mb_strpos($metadata, $term) !== false) {
+                        $score += 0.15; // Daha yüksek puan
+                    }
                 }
             }
         }
@@ -917,40 +960,109 @@ class AIService
             8. Türkçe yanıt ver
             9. Ürün türüne göre özel özellikleri vurgula
 
-            Ürün türüne göre özel alanlar:
-            - Giyim ürünleri: Kalıp, kumaş türü, cep detayları, fermuar, dikiş, astar
-            - Ayakkabı: Taban, topuk, malzeme, bağcık, iç taban
-            - Aksesuar: Malzeme, boyut, ayarlanabilir özellikler
-            - Elektronik: Teknik özellikler, bağlantı türleri, güç
-            - Ev eşyaları: Malzeme, boyut, montaj, kullanım alanı
+            E-ticaret kategorilerine göre özel analiz alanları:
+            
+            👕 GİYİM & MODA:
+            - Giyim ürünleri: Kalıp, kumaş türü, cep detayları, fermuar, dikiş, astar, beden rehberi
+            - Ayakkabı: Taban, topuk, malzeme, bağcık, iç taban, ayak numarası, topuk yüksekliği
+            - Aksesuar: Malzeme, boyut, ayarlanabilir özellikler, takı türü, metal türü
+            
+            📱 ELEKTRONİK & TEKNOLOJİ:
+            - Telefon & Tablet: Ekran boyutu, işlemci, kamera, depolama, bağlantı türleri
+            - Bilgisayar: İşlemci, RAM, depolama, grafik kartı, işletim sistemi
+            - Ev elektroniği: Güç tüketimi, bağlantı türleri, ses kalitesi, kullanım kolaylığı
+            - Yazılım: Platform uyumluluğu, özellikler, lisans türü, sistem gereksinimleri
+            
+            🏠 EV & YAŞAM:
+            - Mobilya: Malzeme, boyut, montaj, kullanım alanı, renk seçenekleri
+            - Ev tekstili: Kumaş türü, desen, boyut, yıkama talimatları
+            - Mutfak eşyaları: Malzeme, kapasite, kullanım alanı, temizlik kolaylığı
+            - Dekorasyon: Stil, malzeme, boyut, uyum renkler
+            
+            🔧 HIRDAVAT & YAPIMALETLERİ:
+            - El aletleri: Malzeme, boyut, kullanım alanı, güvenlik özellikleri
+            - Elektrikli aletler: Güç, voltaj, kullanım alanı, güvenlik standartları
+            - Yapı malzemeleri: Malzeme türü, boyut, dayanıklılık, uygulama alanı
+            - Bahçe aletleri: Malzeme, boyut, kullanım alanı, hava koşullarına dayanıklılık
+            
+            🎮 OYUN & EĞLENCE:
+            - Video oyunları: Platform, yaş sınırı, tür, çok oyunculu özellikler
+            - Oyun konsolları: Teknik özellikler, oyun uyumluluğu, bağlantı türleri
+            - Masa oyunları: Yaş grubu, oyuncu sayısı, oyun süresi, zorluk seviyesi
+            
+            🏃‍♂️ SPOR & OUTDOOR:
+            - Spor ekipmanları: Malzeme, boyut, kullanım alanı, güvenlik standartları
+            - Outdoor ürünleri: Hava koşullarına dayanıklılık, malzeme, boyut, taşıma kolaylığı
+            - Fitness: Ağırlık kapasitesi, boyut, kullanım alanı, güvenlik özellikleri
+            
+            💄 KİŞİSEL BAKIM & SAĞLIK:
+            - Kozmetik: Cilt tipi, yaş grubu, kullanım şekli, içerik maddeleri
+            - Sağlık ürünleri: Kullanım alanı, yaş grubu, güvenlik uyarıları, dozaj
+            - Kişisel bakım: Malzeme, boyut, kullanım kolaylığı, temizlik talimatları
+            
+            🚗 OTOMOTİV & MOTOSİKLET:
+            - Otomotiv aksesuarları: Uyumluluk, malzeme, boyut, kurulum kolaylığı
+            - Motosiklet ekipmanları: Güvenlik standartları, malzeme, boyut, hava koşullarına dayanıklılık
+            - Yedek parçalar: Uyumluluk, malzeme, boyut, kurulum talimatları
 
             Yanıtı şu formatta ver:
             {
                 \"product_type\": \"ürün türü\",
                 \"category\": \"kategori\",
+                \"subcategory\": \"alt kategori\",
                 \"visual_features\": {
                     \"color\": \"renk\",
                     \"style\": \"stil\",
                     \"fit\": \"kalıp\",
-                    \"design\": \"tasarım özellikleri\"
+                    \"design\": \"tasarım özellikleri\",
+                    \"size\": \"boyut\",
+                    \"weight\": \"ağırlık\"
                 },
                 \"material_features\": {
                     \"fabric\": \"kumaş türü\",
                     \"lining\": \"astar\",
-                    \"hardware\": \"metal aksesuarlar\"
+                    \"hardware\": \"metal aksesuarlar\",
+                    \"construction\": \"yapım malzemesi\",
+                    \"finish\": \"yüzey işlemi\"
+                },
+                \"technical_specs\": {
+                    \"dimensions\": \"boyutlar\",
+                    \"capacity\": \"kapasite\",
+                    \"power\": \"güç\",
+                    \"voltage\": \"voltaj\",
+                    \"connectivity\": \"bağlantı türleri\",
+                    \"compatibility\": \"uyumluluk\"
                 },
                 \"design_details\": {
                     \"pockets\": \"cep detayları\",
                     \"closures\": \"kapanma sistemi\",
                     \"stitching\": \"dikiş detayları\",
-                    \"special_features\": \"özel özellikler\"
+                    \"special_features\": \"özel özellikler\",
+                    \"safety_features\": \"güvenlik özellikleri\",
+                    \"ergonomics\": \"ergonomi\"
                 },
                 \"usage_info\": {
                     \"season\": \"sezon\",
                     \"occasion\": \"kullanım alanı\",
-                    \"care_instructions\": \"bakım talimatları\"
+                    \"care_instructions\": \"bakım talimatları\",
+                    \"installation\": \"kurulum\",
+                    \"maintenance\": \"bakım\",
+                    \"warranty\": \"garanti\"
                 },
-                \"target_audience\": \"hedef kitle\",
+                \"target_audience\": {
+                    \"age_group\": \"yaş grubu\",
+                    \"gender\": \"cinsiyet\",
+                    \"skill_level\": \"beceri seviyesi\",
+                    \"lifestyle\": \"yaşam tarzı\"
+                },
+                \"ecommerce_features\": {
+                    \"best_seller\": \"en çok satan\",
+                    \"new_arrival\": \"yeni ürün\",
+                    \"sale_item\": \"indirimli\",
+                    \"limited_edition\": \"sınırlı sayıda\",
+                    \"eco_friendly\": \"çevre dostu\",
+                    \"premium\": \"premium\"
+                },
                 \"summary\": \"kısa ürün özeti\"
             }";
 
@@ -1153,6 +1265,18 @@ class AIService
             $imageUrls = array_merge($imageUrls, $matches[0]);
         }
         
+        // Unsplash ve diğer resim servislerini bul
+        preg_match_all('/https?:\/\/images\.unsplash\.com\/[^\s<>"\']+/i', $content, $matches);
+        if (!empty($matches[0])) {
+            $imageUrls = array_merge($imageUrls, $matches[0]);
+        }
+        
+        // Query parametreli resim URL'lerini bul
+        preg_match_all('/https?:\/\/[^\s<>"\']*\.(jpg|jpeg|png|gif|webp|svg)(\?[^\s<>"\']*)?/i', $content, $matches);
+        if (!empty($matches[0])) {
+            $imageUrls = array_merge($imageUrls, $matches[0]);
+        }
+        
         // JSON içeriğindeki resim URL'lerini bul
         try {
             $jsonData = json_decode($content, true);
@@ -1313,5 +1437,31 @@ class AIService
             Log::error("Single image analysis error for {$imageUrl}: " . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Cosine similarity hesaplar
+     */
+    private function calculateCosineSimilarity(array $vectorA, array $vectorB): float
+    {
+        if (count($vectorA) !== count($vectorB)) {
+            return 0.0;
+        }
+
+        $dotProduct = 0.0;
+        $normA = 0.0;
+        $normB = 0.0;
+
+        for ($i = 0; $i < count($vectorA); $i++) {
+            $dotProduct += $vectorA[$i] * $vectorB[$i];
+            $normA += $vectorA[$i] * $vectorA[$i];
+            $normB += $vectorB[$i] * $vectorB[$i];
+        }
+
+        if ($normA == 0.0 || $normB == 0.0) {
+            return 0.0;
+        }
+
+        return $dotProduct / (sqrt($normA) * sqrt($normB));
     }
 }

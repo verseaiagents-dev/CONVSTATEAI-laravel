@@ -27,6 +27,9 @@
                 <a href="{{ route('admin.payment-settings.index') }}" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105">
                     Ödeme Ayarları
                 </a>
+                <a href="{{ route('admin.demo-requests.index') }}" class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg text-white font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 transform hover:scale-105">
+                    Demo Talepleri
+                </a>
             </div>
         </div>
     </div>

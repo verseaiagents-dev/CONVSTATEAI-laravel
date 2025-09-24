@@ -366,15 +366,28 @@ class User extends Authenticatable
 
     /**
      * Usage token ile uyumluluk için (API arayüzünü korumak için)
+     * Artık User tablosunda token bilgileri tutulduğu için bu metod kaldırıldı
      */
-    public function usageToken()
-    {
-        return $this; // User'ın kendisi token bilgilerini tutar
-    }
 
     public function planRequests()
     {
         return $this->hasMany(PlanRequest::class);
+    }
+
+    /**
+     * Orders ile ilişki
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * SubscriptionInvoices ile ilişki
+     */
+    public function subscriptionInvoices()
+    {
+        return $this->hasMany(SubscriptionInvoice::class);
     }
 
 }

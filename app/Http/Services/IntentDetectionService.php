@@ -397,9 +397,9 @@ class IntentDetectionService {
                 'confidence_threshold' => 0.3
             ],
             'cart_add' => [
-                'keywords' => ['sepete ekle', 'sepete ekler misin', 'ekle', 'ekler misin', 'sepete koy', 'sepete koyar mısın', 'koy', 'koyar mısın', 'ürün ekle', 'ürün koy', 'cart', 'basket', 'iphone sepete ekle', 'telefon sepete ekle', 'bilgisayar sepete ekle'],
+                'keywords' => ['sepete ekle', 'sepete ekler misin', 'ekle', 'ekler misin', 'sepete koy', 'sepete koyar mısın', 'koy', 'koyar mısın', 'ürün ekle', 'ürün koy', 'cart', 'basket', 'iphone sepete ekle', 'telefon sepete ekle', 'bilgisayar sepete ekle', 'ayakkabı sepete ekle', 'elbise sepete ekle', 'pantolon sepete ekle', 'tişört sepete ekle', 'çanta sepete ekle', 'saat sepete ekle', 'kulaklık sepete ekle', 'kamera sepete ekle', 'tablet sepete ekle', 'laptop sepete ekle', 'mavi sepete ekle', 'kırmızı sepete ekle', 'siyah sepete ekle', 'beyaz sepete ekle', '44 numara sepete ekle', '42 numara sepete ekle', 'L beden sepete ekle', 'M beden sepete ekle', 'S beden sepete ekle', 'XL beden sepete ekle', 'adet sepete ekle', 'tane sepete ekle', 'sepete at', 'sepete atar mısın', 'at', 'atar mısın'],
                 'response' => 'Ürünü sepete ekliyorum. Hangi ürünü eklemek istiyorsunuz?',
-                'confidence_threshold' => 0.25
+                'confidence_threshold' => 0.3
             ],
             'cart_remove' => [
                 'keywords' => ['sepetten çıkar', 'sepetten çıkarır mısın', 'çıkar', 'çıkarır mısın', 'sepetten sil', 'sepetten siler misin', 'sil', 'siler misin', 'ürün çıkar', 'ürün sil'],
@@ -417,9 +417,14 @@ class IntentDetectionService {
                 'confidence_threshold' => 0.25
             ],
             'cargo_tracking' => [
-                'keywords' => ['kargo', 'kargom', 'kargom nerede', 'kargo takip', 'kargo durumu', 'kargo numarası', 'kargo firması', 'kargo takip numarası', 'kargo bilgisi', 'kargo sorgula'],
+                'keywords' => ['kargo takip', 'kargo numarası', 'kargo firması', 'kargo takip numarası', 'kargo bilgisi', 'kargo sorgula', 'kargo takip et', 'kargo durumu sorgula'],
                 'response' => 'Kargo takip numaranızı girerek kargo durumunuzu öğrenebilirsiniz.',
-                'confidence_threshold' => 0.25
+                'confidence_threshold' => 0.4
+            ],
+            'faq_search' => [
+                'keywords' => ['kargo süresi', 'kargo ne kadar sürer', 'kargo ücreti', 'teslimat', 'teslimat süresi', 'ödeme yöntemleri', 'taksit', 'kredi kartı', 'havale', 'iade', 'değişim', 'iade politikası', 'garanti', 'müşteri hizmetleri', 'yardım', 'sorun', 'nasıl', 'neden', 'ne zaman', 'hangi', 'hakkında', 'bilgi', 'açıklama', 'detay', 'nasıl yapılır', 'nasıl kullanılır', 'nasıl çalışır', 'nedir', 'ne demek', 'anlamı', 'açıklama', 'bilgi ver', 'öğrenmek istiyorum', 'merak ediyorum', 'sorular', 'sık sorulan', 'sss', 'faq', 'sıkça sorulan sorular'],
+                'response' => 'Size yardımcı olmak için buradayım. Hangi konuda bilgi almak istiyorsunuz?',
+                'confidence_threshold' => 0.3
             ],
             'campaign_inquiry' => [
                 'keywords' => ['kampanya', 'kampanyalar', 'kampanyalarda', 'indirim', 'fırsat', 'bedava', 'ücretsiz', 'taksit', 'promosyon', 'teklif', 'özel', 'avantaj'],
@@ -535,6 +540,48 @@ class IntentDetectionService {
         $bestIntent = null;
         $highestConfidence = 0;
         
+        // Kategori kelimeleri varsa kategori tarama (en önce kontrol et)
+        $categoryKeywords = ['elektronik', 'giyim', 'ev', 'spor', 'kitap', 'kozmetik', 'otomotiv', 'sağlık', 'bahçe'];
+        foreach ($categoryKeywords as $category) {
+            if (mb_strpos($message, $category) !== false) {
+                return [
+                    'intent' => 'category_browse',
+                    'confidence' => 0.8,
+                    'message' => $message,
+                    'threshold_met' => true,
+                    'category' => $category
+                ];
+            }
+        }
+        
+        // Check for open-ended product search patterns first (special case)
+        $openEndedProductPatterns = [
+            // Renk + ürün kombinasyonları
+            '/(mavi|kırmızı|siyah|beyaz|yeşil|sarı|mor|pembe|turuncu|gri|kahverengi|lacivert|bordo|turkuaz|koyu|açık)\s+(tshirt|tişört|gömlek|pantolon|elbise|ayakkabı|çanta|şapka|eldiven|çorap|mont|ceket|kazak|sweat|hoodie|jean|jeans|etek|şort|bot|çizme|sandalet|terlik|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)/i',
+            // Beden + ürün kombinasyonları
+            '/(xs|s|m|l|xl|xxl|xxxl|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|büyük|küçük|orta)\s+(tshirt|tişört|gömlek|pantolon|elbise|ayakkabı|çanta|şapka|eldiven|çorap|mont|ceket|kazak|sweat|hoodie|jean|jeans|etek|şort|bot|çizme|sandalet|terlik|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)/i',
+            // Marka + ürün kombinasyonları
+            '/(nike|adidas|apple|samsung|sony|lg|hp|dell|lenovo|huawei|xiaomi|puma|reebok|converse|vans|tommy hilfiger|calvin klein|levi|wrangler|zara|h&m|uniqlo|gap|polo|ralph lauren|armani|gucci|prada|versace|dolce|gabbana|louis vuitton|chanel|dior|hermes|burberry|fendi|bottega|veneta|balenciaga|givenchy|ysl|saint laurent|valentino|ferragamo|tods|hugo boss|versace|emporio armani|diesel|guess|michael kors|coach|kate spade|tory burch|stuart weitzman|jimmy choo|manolo blahnik|christian louboutin|alexander mcqueen|balmain|isabel marant|acne studios|off white|supreme|palace|bape|stussy|carhartt|patagonia|north face|columbia|marmot|arc teryx|salomon|merrell|keen|timberland|dr martens|clarks|ecco|geox|birkenstock|ugg|hunter|wellies|rainbow|havianas|flip flops|sandals|slippers|loafers|oxfords|derby|brogues|monk|chelsea|ankle|mid|high|knee|thigh|over|thigh|high|boots|shoes|sneakers|trainers|runners|joggers|walking|hiking|climbing|mountaineering|trail|road|track|field|court|gym|fitness|cross|training|running|jogging|walking|hiking|climbing|mountaineering|trail|road|track|field|court|gym|fitness|cross|training)\s+(tshirt|tişört|gömlek|pantolon|elbise|ayakkabı|çanta|şapka|eldiven|çorap|mont|ceket|kazak|sweat|hoodie|jean|jeans|etek|şort|bot|çizme|sandalet|terlik|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)/i',
+            // Malzeme + ürün kombinasyonları
+            '/(pamuk|polyester|deri|jean|keten|yün|ipek|naylon|koton|kaşmir|alpaka|mohair|angora|cashmere|merino|bambu|lyocell|modal|viscose|rayon|acetate|triacetate|spandex|elastan|lycra|nylon|polyamide|polypropylene|acrylic|polyacrylonitrile|polyester|polyethylene|polypropylene|polyurethane|polyvinyl|chloride|pvc|polyvinyl|acetate|pva|polyvinyl|alcohol|pva|polyvinyl|chloride|pvc|polyvinyl|acetate|pva|polyvinyl|alcohol|pva)\s+(tshirt|tişört|gömlek|pantolon|elbise|ayakkabı|çanta|şapka|eldiven|çorap|mont|ceket|kazak|sweat|hoodie|jean|jeans|etek|şort|bot|çizme|sandalet|terlik|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)/i',
+            // Genel ürün arama pattern'leri (daha esnek)
+            '/(ara|bul|hangi|nerede|var mı|göster|listele|ürün|ne var|bulabilir miyim|istiyorum|arıyorum|görmek|satın almak|almak|satın|alışveriş|shopping|buy|purchase|find|search|look for|need|want)\s+(tshirt|tişört|gömlek|pantolon|elbise|ayakkabı|çanta|şapka|eldiven|çorap|mont|ceket|kazak|sweat|hoodie|jean|jeans|etek|şort|bot|çizme|sandalet|terlik|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı|telefon|bilgisayar|laptop|tablet|kulaklık|kamera|saat|gözlük|aksesuar|mücevher|takı|yüzük|kolye|küpe|bilezik|halı|mobilya|masa|sandalye|koltuk|yatak|dolap|buzdolabı|çamaşır makinesi|bulaşık makinesi|fırın|mikrodalga|televizyon|tv|monitör|ekran|klavye|mouse|fare|yazıcı|scanner|projeksiyon|hoparlör|ses sistemi|müzik|kitap|dergi|gazete|oyun|oyuncak|spor|fitness|yoga|pilates|koşu|yürüyüş|bisiklet|motorsiklet|araba|otomobil|araç|lastik|akü|motor|fren|filtre|yağ|benzin|mazot)/i',
+            // Basit ürün arama pattern'leri
+            '/(telefon|bilgisayar|laptop|tablet|kulaklık|kamera|saat|gözlük|aksesuar|mücevher|takı|yüzük|kolye|küpe|bilezik|halı|mobilya|masa|sandalye|koltuk|yatak|dolap|buzdolabı|çamaşır makinesi|bulaşık makinesi|fırın|mikrodalga|televizyon|tv|monitör|ekran|klavye|mouse|fare|yazıcı|scanner|projeksiyon|hoparlör|ses sistemi|müzik|kitap|dergi|gazete|oyun|oyuncak|spor|fitness|yoga|pilates|koşu|yürüyüş|bisiklet|motorsiklet|araba|otomobil|araç|lastik|akü|motor|fren|filtre|yağ|benzin|mazot)\s+(ara|bul|hangi|nerede|var mı|göster|listele|ürün|ne var|bulabilir miyim|istiyorum|arıyorum|görmek|satın almak|almak|satın|alışveriş|shopping|buy|purchase|find|search|look for|need|want)/i'
+        ];
+        
+        foreach ($openEndedProductPatterns as $pattern) {
+            if (preg_match($pattern, $message)) {
+                return [
+                    'intent' => 'product_search',
+                    'confidence' => 0.95,
+                    'message' => $message,
+                    'threshold_met' => true,
+                    'search_type' => 'open_ended_product'
+                ];
+            }
+        }
+
         // Check for product recommendation patterns first (special case)
         $recommendationPatterns = [
             'ne önerirsin', 'ne tavsiye edersin', 'ne öneriyorsun', 'ne tavsiye ediyorsun',
@@ -578,6 +625,49 @@ class IntentDetectionService {
                     'threshold_met' => true
                 ];
             }
+        }
+        
+        // Check for cart operations first (special case - HIGH PRIORITY)
+        // Sadece açık cart kelimeleri ile başla
+        $explicitCartKeywords = ['sepete ekle', 'sepete ekler misin', 'sepete koy', 'sepete koyar mısın', 'sepete at', 'sepete atar mısın', 'cart', 'basket'];
+        $hasExplicitCartKeyword = false;
+        foreach ($explicitCartKeywords as $keyword) {
+            if (mb_strpos($message, $keyword) !== false) {
+                $hasExplicitCartKeyword = true;
+                break;
+            }
+        }
+        
+        // Daha gelişmiş cart pattern matching - regex ile
+        $cartPatterns = [
+            '/(\w+)\s+(?:numara|numara|beden|size)\s+(\w+)\s+(?:ayakkabı|elbise|pantolon|tişört|gömlek|etek|şort|mont|ceket|kazak|sweat|hoodie|t-shirt|jean|jeans|ayakkabı|sandalet|terlik|bot|çizme|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı|spor ayakkabı|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)\s+(?:sepete ekle|sepete koy|sepete at)/i',
+            '/(\w+)\s+(\w+)\s+(?:ayakkabı|elbise|pantolon|tişört|gömlek|etek|şort|mont|ceket|kazak|sweat|hoodie|t-shirt|jean|jeans|ayakkabı|sandalet|terlik|bot|çizme|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı|spor ayakkabı|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)\s+(?:sepete ekle|sepete koy|sepete at)/i',
+            '/(\w+)\s+(?:ayakkabı|elbise|pantolon|tişört|gömlek|etek|şort|mont|ceket|kazak|sweat|hoodie|t-shirt|jean|jeans|ayakkabı|sandalet|terlik|bot|çizme|spor ayakkabı|sneaker|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı|spor ayakkabı|koşu ayakkabısı|basketbol ayakkabısı|futbol ayakkabısı|tenis ayakkabısı|yürüyüş ayakkabısı|trekking ayakkabısı|dağcılık ayakkabısı|kışlık ayakkabı|yazlık ayakkabı|günlük ayakkabı|resmi ayakkabı|gece ayakkabısı|topuklu ayakkabı|düz ayakkabı)\s+(?:sepete ekle|sepete koy|sepete at)/i',
+            '/(?:sepete ekle|sepete koy|sepete at)\s+(?:bu|şu|o)\s+(\w+)/i',
+            '/(?:sepete ekle|sepete koy|sepete at)\s+(\w+)/i',
+            '/(\d+)\s*[\.\s]?\s*(?:numaralı\s+)?ürün(?:ü)?\s+(?:sepete ekle|sepete koy|sepete at)/i'
+        ];
+        
+        foreach ($cartPatterns as $pattern) {
+            if (preg_match($pattern, $message)) {
+                return [
+                    'intent' => 'cart_add',
+                    'confidence' => 0.98,
+                    'message' => $message,
+                    'threshold_met' => true,
+                    'pattern_matched' => true
+                ];
+            }
+        }
+        
+        // Eğer açık cart kelimesi varsa, cart intent'ini öncelikli yap
+        if ($hasExplicitCartKeyword) {
+            return [
+                'intent' => 'cart_add',
+                'confidence' => 0.95,
+                'message' => $message,
+                'threshold_met' => true
+            ];
         }
         
         // Check for cargo tracking with number (special case)
@@ -896,6 +986,7 @@ class IntentDetectionService {
                 return $this->handleComparison($originalMessage);
                 
             case 'cart_add':
+                return $this->handleCartAddIntent($originalMessage);
                 
             case 'cart_remove':
                 return $this->handleCartRemove($originalMessage);
@@ -908,6 +999,12 @@ class IntentDetectionService {
                 
             case 'order_tracking':
                 return $this->handleOrderTracking($originalMessage);
+                
+            case 'faq_search':
+                return $this->handleFAQSearch($originalMessage);
+                
+            case 'cargo_tracking':
+                return $this->handleCargoTracking($originalMessage);
                 
             // === FUNNEL INTENT HANDLERS ===
             case 'capabilities_inquiry':
@@ -1033,10 +1130,16 @@ class IntentDetectionService {
         }
         
         // Kategori kelimeleri varsa kategori tarama
-        $categoryKeywords = ['elektronik', 'giyim', 'ev', 'spor', 'kitap'];
+        $categoryKeywords = ['elektronik', 'giyim', 'ev', 'spor', 'kitap', 'kozmetik', 'otomotiv', 'sağlık', 'bahçe'];
         foreach ($categoryKeywords as $category) {
             if (mb_strpos($message, $category) !== false) {
-                return 'category_browse';
+                return [
+                    'intent' => 'category_browse',
+                    'confidence' => 0.8,
+                    'message' => $message,
+                    'threshold_met' => true,
+                    'category' => $category
+                ];
             }
         }
         
@@ -1165,7 +1268,7 @@ class IntentDetectionService {
             $categoryDetails = $this->getSampleCategoryDetails($category);
             
             if ($categoryDetails) {
-                $limitedProducts = array_slice($categoryDetails['all_products'], 0, 5);
+                $limitedProducts = array_slice($categoryDetails['all_products'], 0, 6);
                 
                 return [
                     'intent' => 'category_browse',
@@ -1214,7 +1317,7 @@ class IntentDetectionService {
         
         if ($brand) {
             $products = $this->getSampleProductsByBrand($brand);
-            $limitedProducts = array_slice($products, 0, 5);
+            $limitedProducts = array_slice($products, 0, 6);
             
             return [
                 'intent' => 'brand_search',
@@ -1322,7 +1425,7 @@ class IntentDetectionService {
             return [
                 'intent' => 'cart_add',
                 'confidence' => 0.8,
-                'response' => 'Hangi ürünü sepete eklemek istiyorsunuz? Ürün numarası veya adını belirtebilir misiniz?',
+                'response' => 'Hangi ürünü sepete eklemek istiyorsunuz? Ürün numarası veya adını belirtebilir misiniz? Örneğin: "Mavi 44 numara ayakkabıyı sepete ekle" veya "3. ürünü sepete ekle"',
                 'products' => null,
                 'suggestions' => ['Ürün listesini göster', 'Kategoriye göre ara', 'Markaya göre ara']
             ];
@@ -1331,12 +1434,24 @@ class IntentDetectionService {
         // Ürünü sepete ekle (burada gerçek sepet işlemi yapılacak)
         $cartResult = $this->addToCart($productInfo);
         
+        // Daha detaylı response oluştur
+        $response = $cartResult['message'];
+        if (isset($productInfo['attributes'])) {
+            $attrs = $productInfo['attributes'];
+            if (isset($attrs['color']) && isset($attrs['size']) && isset($attrs['type'])) {
+                $response = "✅ " . ucfirst($attrs['color']) . " " . $attrs['size'] . " numara " . $attrs['type'] . " sepete eklendi!";
+            } elseif (isset($attrs['color']) && isset($attrs['type'])) {
+                $response = "✅ " . ucfirst($attrs['color']) . " " . $attrs['type'] . " sepete eklendi!";
+            }
+        }
+        
         return [
             'intent' => 'cart_add',
             'confidence' => 0.9,
-            'response' => $cartResult['message'],
+            'response' => $response,
             'products' => $cartResult['added_product'],
             'cart_status' => $cartResult['status'],
+            'extracted_info' => $productInfo,
             'suggestions' => ['Sepetimi göster', 'Başka ürün ekle', 'Alışverişe devam et']
         ];
     }
@@ -1503,8 +1618,12 @@ class IntentDetectionService {
     }
     
     private function extractProductFromMessage($message) {
+        // Önce cart-specific pattern'ları temizle
+        $cleanMessage = preg_replace('/(?:sepete ekle|sepete koy|sepete at|ekle|koy|at)\s*/i', '', $message);
+        $cleanMessage = trim($cleanMessage);
+        
         // Ürün numarası ara (örn: "9. ürün", "9 numaralı ürün", "9. ürünü")
-        if (preg_match('/(\d+)\s*[\.\s]?\s*(?:numaralı\s+)?ürün(?:ü)?/i', $message, $matches)) {
+        if (preg_match('/(\d+)\s*[\.\s]?\s*(?:numaralı\s+)?ürün(?:ü)?/i', $cleanMessage, $matches)) {
             $productNumber = (int)$matches[1];
             $product = $this->findProductByNumber($productNumber);
             if ($product) {
@@ -1516,14 +1635,114 @@ class IntentDetectionService {
             }
         }
         
+        // Renk + numara + ürün türü pattern'i (örn: "Mavi 44 numara ayakkabı")
+        if (preg_match('/(\w+)\s+(\d+)\s+(?:numara|numara|beden|size)\s+(\w+)/i', $cleanMessage, $matches)) {
+            $color = $matches[1];
+            $size = $matches[2];
+            $productType = $matches[3];
+            
+            // Bu pattern'e uygun ürün ara
+            $product = $this->findProductByAttributes($color, $size, $productType);
+            if ($product) {
+                return [
+                    'type' => 'by_attributes',
+                    'value' => $color . ' ' . $size . ' numara ' . $productType,
+                    'product' => $product,
+                    'attributes' => ['color' => $color, 'size' => $size, 'type' => $productType]
+                ];
+            }
+        }
+        
+        // Renk + ürün türü pattern'i (örn: "Mavi ayakkabı")
+        if (preg_match('/(\w+)\s+(\w+)/i', $cleanMessage, $matches)) {
+            $color = $matches[1];
+            $productType = $matches[2];
+            
+            // Bu pattern'e uygun ürün ara
+            $product = $this->findProductByAttributes($color, null, $productType);
+            if ($product) {
+                return [
+                    'type' => 'by_attributes',
+                    'value' => $color . ' ' . $productType,
+                    'product' => $product,
+                    'attributes' => ['color' => $color, 'type' => $productType]
+                ];
+            }
+        }
+        
         // Ürün adı ara
         foreach ($this->getSampleProducts() as $product) {
-            if (stripos($message, $product['name']) !== false) {
+            if (stripos($cleanMessage, $product['name']) !== false) {
                 return [
                     'type' => 'by_name',
                     'value' => $product['name'],
                     'product' => $product
                 ];
+            }
+        }
+        
+        // Sadece ürün türü ara (örn: "ayakkabı")
+        $productTypes = ['ayakkabı', 'elbise', 'pantolon', 'tişört', 'gömlek', 'etek', 'şort', 'mont', 'ceket', 'kazak', 'sweat', 'hoodie', 't-shirt', 'jean', 'jeans', 'sandalet', 'terlik', 'bot', 'çizme', 'spor ayakkabı', 'sneaker'];
+        foreach ($productTypes as $type) {
+            if (stripos($cleanMessage, $type) !== false) {
+                $product = $this->findProductByType($type);
+                if ($product) {
+                    return [
+                        'type' => 'by_type',
+                        'value' => $type,
+                        'product' => $product
+                    ];
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    private function findProductByAttributes($color, $size, $productType) {
+        $products = $this->getSampleProducts();
+        
+        // Renk, beden ve ürün türüne göre ürün ara
+        foreach ($products as $product) {
+            $match = true;
+            
+            // Renk kontrolü
+            if ($color && stripos($product['name'], $color) === false && stripos($product['description'], $color) === false) {
+                $match = false;
+            }
+            
+            // Beden kontrolü
+            if ($size && stripos($product['name'], $size) === false && stripos($product['description'], $size) === false) {
+                $match = false;
+            }
+            
+            // Ürün türü kontrolü
+            if ($productType && stripos($product['name'], $productType) === false && stripos($product['description'], $productType) === false) {
+                $match = false;
+            }
+            
+            if ($match) {
+                return $product;
+            }
+        }
+        
+        // Eşleşme bulunamazsa, en yakın ürünü döndür
+        foreach ($products as $product) {
+            if ($productType && (stripos($product['name'], $productType) !== false || stripos($product['description'], $productType) !== false)) {
+                return $product;
+            }
+        }
+        
+        return null;
+    }
+    
+    private function findProductByType($type) {
+        $products = $this->getSampleProducts();
+        
+        // Ürün türüne göre ürün ara
+        foreach ($products as $product) {
+            if (stripos($product['name'], $type) !== false || stripos($product['description'], $type) !== false) {
+                return $product;
             }
         }
         
@@ -1743,7 +1962,7 @@ class IntentDetectionService {
                 return $b['product_count'] <=> $a['product_count'];
             });
             
-            return array_slice($recommendations, 0, 8);
+            return array_slice($recommendations, 0, 6);
             
         } catch (\Exception $e) {
             Log::error('Knowledge base category recommendations fetch error: ' . $e->getMessage());
@@ -1931,7 +2150,7 @@ class IntentDetectionService {
             });
         }
         
-        $limitedResults = array_slice($searchResults, 0, 5);
+        $limitedResults = array_slice($searchResults, 0, 6);
         
         return [
             'intent' => 'contextual_product_search',
@@ -1965,7 +2184,7 @@ class IntentDetectionService {
                 return $b['rating'] <=> $a['rating'];
             });
             
-            $topProducts = array_slice($products, 0, 5);
+            $topProducts = array_slice($products, 0, 6);
             
             return [
                 'intent' => 'contextual_recommendation',
@@ -1987,7 +2206,7 @@ class IntentDetectionService {
     private function handleContextualComparison($message, $context, $lastProducts) {
         if (count($lastProducts) >= 2) {
             $comparison = [];
-            foreach (array_slice($lastProducts, 0, 2) as $product) {
+            foreach (array_slice($lastProducts, 0, 6) as $product) {
                 $comparison[] = $product['name'] . ' - ' . number_format($product['price'], 2) . ' TL - Puan: ' . $product['rating'] . '/5';
             }
             
@@ -1995,7 +2214,7 @@ class IntentDetectionService {
                 'intent' => 'contextual_comparison',
                 'confidence' => 0.9,
                 'response' => 'Son konuştuğumuz ürünleri karşılaştırıyorum: ' . implode(' vs ', $comparison),
-                'products' => array_slice($lastProducts, 0, 2),
+                'products' => array_slice($lastProducts, 0, 6),
                 'context_used' => [
                     'last_products' => count($lastProducts),
                     'category' => $context['current_category'],
@@ -2277,7 +2496,7 @@ class IntentDetectionService {
                     'intent' => 'specific_product_recommendation',
                     'confidence' => 0.95,
                     'response' => $this->generateSpecificProductResponse($productAttributes, count($filteredProducts)),
-                    'products' => array_slice($filteredProducts, 0, 5), // Limit to 5 products
+                    'products' => array_slice($filteredProducts, 0, 6), // Limit to 6 products
                     'search_attributes' => $productAttributes,
                     'total_found' => count($filteredProducts),
                     'suggestions' => [
@@ -2597,6 +2816,120 @@ class IntentDetectionService {
         }
         
         // En fazla 5 ürün döndür
-        return array_slice($categoryProducts, 0, 5);
+        return array_slice($categoryProducts, 0, 6);
+    }
+
+    /**
+     * FAQ arama handler'ı
+     */
+    private function handleFAQSearch($message) {
+        $message = mb_strtolower($message, 'UTF-8');
+        
+        // FAQ kategorilerini belirle
+        $faqCategories = [
+            'kargo' => [
+                'keywords' => ['kargo', 'teslimat', 'gönderi', 'kurye', 'süre', 'ne kadar'],
+                'response' => 'Kargo ve teslimat bilgileri: Kargo süremiz 1-3 iş günüdür. 150 TL ve üzeri siparişlerde ücretsiz kargo!'
+            ],
+            'ödeme' => [
+                'keywords' => ['ödeme', 'taksit', 'kredi', 'havale', 'para', 'fiyat'],
+                'response' => 'Ödeme seçenekleri: Kredi kartı, banka kartı, havale/EFT ve kapıda ödeme. 2-12 taksit imkanı!'
+            ],
+            'iade' => [
+                'keywords' => ['iade', 'değişim', 'geri', 'iptal', 'vazgeç'],
+                'response' => 'İade politikası: 14 gün içinde koşulsuz iade hakkınız vardır. Ürün orijinal ambalajında olmalıdır.'
+            ],
+            'ürün' => [
+                'keywords' => ['ürün', 'detay', 'özellik', 'garanti', 'kalite'],
+                'response' => 'Ürün bilgileri: Tüm ürünlerimiz 2 yıl garantilidir. Detaylı bilgi için ürün sayfasını inceleyebilirsiniz.'
+            ],
+            'hesap' => [
+                'keywords' => ['hesap', 'üyelik', 'giriş', 'şifre', 'profil'],
+                'response' => 'Hesap işlemleri: Ücretsiz üyelik oluşturabilir, profil bilgilerinizi güncelleyebilirsiniz.'
+            ],
+            'destek' => [
+                'keywords' => ['destek', 'yardım', 'sorun', 'iletişim', 'müşteri'],
+                'response' => 'Müşteri desteği: 7/24 WhatsApp, telefon ve e-posta ile bize ulaşabilirsiniz. Yanıt süremiz 1 saattir.'
+            ]
+        ];
+        
+        // Hangi kategoriye ait olduğunu belirle
+        $matchedCategory = 'genel';
+        $maxMatches = 0;
+        
+        foreach ($faqCategories as $category => $data) {
+            $matches = 0;
+            foreach ($data['keywords'] as $keyword) {
+                if (mb_strpos($message, $keyword) !== false) {
+                    $matches++;
+                }
+            }
+            if ($matches > $maxMatches) {
+                $maxMatches = $matches;
+                $matchedCategory = $category;
+            }
+        }
+        
+        $response = $faqCategories[$matchedCategory]['response'] ?? 'Size nasıl yardımcı olabilirim?';
+        
+        return [
+            'intent' => 'faq_search',
+            'confidence' => 0.9,
+            'response' => $response,
+            'category' => $matchedCategory,
+            'suggestions' => [
+                'Kargo bilgileri',
+                'Ödeme seçenekleri', 
+                'İade politikası',
+                'Ürün garantisi',
+                'Müşteri desteği'
+            ]
+        ];
+    }
+
+    /**
+     * Kargo takip handler'ı
+     */
+    private function handleCargoTracking($message) {
+        // Kargo takip numarası çıkarma
+        $trackingNumber = $this->extractTrackingNumber($message);
+        
+        if ($trackingNumber) {
+            return [
+                'intent' => 'cargo_tracking',
+                'confidence' => 0.9,
+                'response' => "Kargo takip numaranız: {$trackingNumber}. Kargo durumunuzu kontrol ediyorum...",
+                'tracking_number' => $trackingNumber,
+                'suggestions' => ['Kargo firması seç', 'SMS ile takip et', 'E-posta ile bildirim al']
+            ];
+        }
+        
+        return [
+            'intent' => 'cargo_tracking',
+            'confidence' => 0.8,
+            'response' => 'Kargo takip numaranızı girin. Size kargo durumunuzu gösterebilirim.',
+            'suggestions' => ['Kargo numarası nedir?', 'Nasıl takip ederim?', 'Kargo firması hangisi?']
+        ];
+    }
+
+    /**
+     * Kargo takip numarası çıkar
+     */
+    private function extractTrackingNumber($message) {
+        // Kargo takip numarası pattern'ları
+        $patterns = [
+            '/\b[A-Z0-9]{10,20}\b/',  // Genel kargo numarası
+            '/\b[0-9]{10,15}\b/',      // Sadece rakam
+            '/\b[A-Z]{2}[0-9]{9}[A-Z]{2}\b/',  // MNG kargo formatı
+            '/\b[0-9]{13}\b/'          // Aras kargo formatı
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $message, $matches)) {
+                return $matches[0];
+            }
+        }
+        
+        return null;
     }
 }

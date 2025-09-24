@@ -142,8 +142,8 @@
             <p>&copy; {{ date('Y') }} ConvState AI. Tüm hakları saklıdır.</p>
             <p style="margin-top: 10px;">
                 <a href="#" style="color: #3498db;">E-posta tercihleri</a> |
-                <a href="#" style="color: #3498db;">Gizlilik politikası</a> |
-                <a href="#" style="color: #3498db;">Kullanım şartları</a>
+                <a href="{{ route('privacy-policy') }}" style="color: #3498db;">Gizlilik politikası</a> |
+                <a href="{{ route('terms-of-service') }}" style="color: #3498db;">Kullanım şartları</a>
             </p>
         </div>
     </div>

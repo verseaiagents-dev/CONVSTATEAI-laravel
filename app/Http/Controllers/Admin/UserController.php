@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\PlanRequest;
+use App\Models\DemoRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +70,10 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin.users', compact('users', 'plans', 'subscriptions', 'planRequests'));
+        // Get demo requests for demo users tab
+        $demoRequests = DemoRequest::orderBy('created_at', 'desc')->paginate(10);
+
+        return view('admin.users.index', compact('users', 'plans', 'subscriptions', 'planRequests', 'demoRequests'));
     }
 
     /**
@@ -77,7 +81,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load(['subscriptions.plan', 'usageToken', 'payments']);
+        $user->load(['subscriptions.plan', 'payments']);
         
         $currentSubscription = $user->subscriptions()->where('status', 'active')->first();
         $subscriptionHistory = $user->subscriptions()->with('plan')->orderBy('created_at', 'desc')->get();
@@ -131,10 +135,17 @@ class UserController extends Controller
     {
         // Prevent deleting admin users
         if ($user->is_admin) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot delete admin users']);
+            }
             return back()->with('error', 'Cannot delete admin users');
         }
 
         $user->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully');

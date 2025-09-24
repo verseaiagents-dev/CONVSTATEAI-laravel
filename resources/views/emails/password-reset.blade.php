@@ -152,8 +152,8 @@
             <p>Bu e-posta güvenlik amaçlı gönderilmiştir.</p>
             <p style="margin-top: 10px;">
                 <a href="#" style="color: #e74c3c;">E-posta tercihleri</a> |
-                <a href="#" style="color: #e74c3c;">Gizlilik politikası</a> |
-                <a href="#" style="color: #e74c3c;">Kullanım şartları</a>
+                <a href="{{ route('privacy-policy') }}" style="color: #e74c3c;">Gizlilik politikası</a> |
+                <a href="{{ route('terms-of-service') }}" style="color: #e74c3c;">Kullanım şartları</a>
             </p>
         </div>
     </div>

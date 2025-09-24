@@ -146,16 +146,12 @@
                         Bekleyen Talep
                     </button>
                     @else
-                    <form action="{{ route('subscription.subscribe') }}" method="POST" class="w-full">
-                        @csrf
-                        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                        <button type="submit" class="w-full py-3 px-6 bg-gradient-to-r from-purple-glow to-neon-purple hover:from-purple-dark hover:to-neon-purple text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105">
-                            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Talep Oluştur
-                        </button>
-                    </form>
+                    <a href="{{ route('payment.billing-form', $plan->id) }}" class="w-full py-3 px-6 bg-gradient-to-r from-purple-glow to-neon-purple hover:from-purple-dark hover:to-neon-purple text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 inline-flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        Abone Ol
+                    </a>
                     @endif
                 </div>
             </div>

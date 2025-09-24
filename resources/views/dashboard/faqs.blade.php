@@ -109,7 +109,7 @@
             
             <form id="faqForm" class="space-y-4">
                 <input type="hidden" id="faqId" name="id">
-                <input type="hidden" name="site_id" value="1">
+                <input type="hidden" name="project_id" value="1">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -118,14 +118,43 @@
                     </div>
                     
                     <div>
-                        <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
-                        <input type="text" id="category" name="category" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Genel, Teknik, Fiyat vb.">
+                        <label for="faq_code" class="block text-sm font-medium text-gray-300 mb-2">SSS Kodu</label>
+                        <input type="text" id="faq_code" name="faq_code" readonly class="form-input w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 placeholder-gray-400 cursor-not-allowed" placeholder="Otomatik oluşturulur">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Kategori *</label>
+                        <input type="text" id="category" name="category" required class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Genel, Teknik, Fiyat vb.">
+                    </div>
+                    
+                    <div>
+                        <label for="difficulty_level" class="block text-sm font-medium text-gray-300 mb-2">Zorluk Seviyesi</label>
+                        <select id="difficulty_level" name="difficulty_level" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                            <option value="easy" class="bg-gray-800 text-white">Kolay</option>
+                            <option value="medium" class="bg-gray-800 text-white">Orta</option>
+                            <option value="hard" class="bg-gray-800 text-white">Zor</option>
+                            <option value="expert" class="bg-gray-800 text-white">Uzman</option>
+                        </select>
                     </div>
                 </div>
 
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama</label>
                     <textarea id="description" name="description" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="SSS için kısa açıklama"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="keywords" class="block text-sm font-medium text-gray-300 mb-2">Anahtar Kelimeler</label>
+                        <input type="text" id="keywords" name="keywords" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="kelime1, kelime2, kelime3">
+                    </div>
+                    
+                    <div>
+                        <label for="author" class="block text-sm font-medium text-gray-300 mb-2">Yazar</label>
+                        <input type="text" id="author" name="author" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="SSS yazarı">
+                    </div>
                 </div>
 
                 <div>
@@ -144,9 +173,16 @@
                 </div>
                 
 
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" id="is_active" name="is_active" checked class="form-checkbox">
-                    <label for="is_active" class="block text-sm text-gray-300">SSS'yi aktif yap</label>
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" id="is_active" name="is_active" checked class="form-checkbox">
+                        <label for="is_active" class="block text-sm text-gray-300">SSS'yi aktif yap</label>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" id="featured" name="featured" class="form-checkbox">
+                        <label for="featured" class="block text-sm text-gray-300">Öne çıkan SSS</label>
+                    </div>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-6">
@@ -352,12 +388,17 @@ function editFAQ(id) {
     // Fill form fields
     document.getElementById('faqId').value = faq.id;
     document.getElementById('title').value = faq.title || '';
+    document.getElementById('faq_code').value = faq.faq_code || '';
     document.getElementById('category').value = faq.category || '';
+    document.getElementById('difficulty_level').value = faq.difficulty_level || 'easy';
     document.getElementById('description').value = faq.description || '';
+    document.getElementById('keywords').value = faq.keywords || '';
+    document.getElementById('author').value = faq.author || '';
     document.getElementById('short_answer').value = faq.short_answer || '';
     document.getElementById('answer').value = faq.answer || '';
     document.getElementById('sort_order').value = faq.sort_order || 0;
     document.getElementById('is_active').checked = faq.is_active;
+    document.getElementById('featured').checked = faq.featured || false;
     
     document.getElementById('faqModal').classList.remove('hidden');
 }
@@ -374,8 +415,9 @@ document.getElementById('faqForm').addEventListener('submit', async function(e) 
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
     
-    // Convert checkbox value
+    // Convert checkbox values
     data.is_active = formData.get('is_active') === 'on';
+    data.featured = formData.get('featured') === 'on';
     
     // URL'den project_id parametresini al
     const urlParams = new URLSearchParams(window.location.search);

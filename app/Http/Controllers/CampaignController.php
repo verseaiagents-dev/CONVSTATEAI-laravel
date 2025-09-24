@@ -31,9 +31,7 @@ class CampaignController extends Controller
                 $projectId = $request->get('project_id', 1); // Default project ID
                 
                 $campaigns = Campaign::where('project_id', $projectId)
-                    ->active()
-                    ->valid()
-                    ->orderBy('start_date', 'desc')
+                    ->orderBy('created_at', 'desc')
                     ->get();
 
                 return response()->json([
@@ -67,7 +65,8 @@ class CampaignController extends Controller
                 'discount' => 'required|string|max:255',
                 'valid_until' => 'nullable|date',
                 'is_active' => 'boolean',
-                'site_id' => 'required|exists:sites,id',
+                'site_id' => 'nullable|integer',
+                'project_id' => 'required|integer',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date',
                 'discount_type' => 'required|in:percentage,fixed,buy_x_get_y,free_shipping',
@@ -75,7 +74,18 @@ class CampaignController extends Controller
                 'minimum_order_amount' => 'nullable|numeric|min:0',
                 'max_usage' => 'nullable|integer|min:1',
                 'image_url' => 'nullable|url',
-                'terms_conditions' => 'nullable|string'
+                'terms_conditions' => 'nullable|string',
+                // Yeni tasarım modeli fieldları
+                'campaign_code' => 'nullable|string|max:50|unique:campaigns,campaign_code',
+                'target_audience' => 'nullable|string',
+                'product_ids' => 'nullable|array',
+                'product_ids.*' => 'integer|exists:products,id',
+                'budget_limit' => 'nullable|numeric|min:0',
+                'priority_level' => 'nullable|integer|min:1|max:5',
+                'requires_approval' => 'boolean',
+                'approval_status' => 'nullable|in:pending,approved,rejected,draft',
+                'notes' => 'nullable|string',
+                'metadata' => 'nullable|array'
             ]);
 
             // Custom validation for end_date after start_date
@@ -95,7 +105,41 @@ class CampaignController extends Controller
                 ], 422);
             }
 
-            $campaign = Campaign::create($request->all());
+            $data = $request->all();
+            
+            // Site ID'yi otomatik olarak ayarla veya oluştur
+            if (empty($data['site_id'])) {
+                $projectId = $data['project_id'];
+                
+                // Projeye ait site var mı kontrol et
+                $site = Site::where('project_id', $projectId)->first();
+                
+                if (!$site) {
+                    // Site yoksa oluştur
+                    $project = \App\Models\Project::find($projectId);
+                    $site = Site::create([
+                        'name' => $project ? $project->name . ' Site' : 'Default Site',
+                        'domain' => $project ? parse_url($project->url ?? 'https://example.com', PHP_URL_HOST) ?? 'example.com' : 'example.com',
+                        'description' => 'Otomatik oluşturulan site',
+                        'project_id' => $projectId,
+                        'is_active' => true
+                    ]);
+                }
+                
+                $data['site_id'] = $site->id;
+            }
+            
+            // Otomatik kampanya kodu oluştur
+            if (empty($data['campaign_code'])) {
+                $data['campaign_code'] = Campaign::generateCampaignCode();
+            }
+            
+            // Varsayılan değerler
+            $data['priority_level'] = $data['priority_level'] ?? 2; // Normal öncelik
+            $data['approval_status'] = $data['approval_status'] ?? 'pending';
+            $data['last_modified_at'] = now();
+            
+            $campaign = Campaign::create($data);
 
             return response()->json([
                 'success' => true,
@@ -146,6 +190,8 @@ class CampaignController extends Controller
                 'discount' => 'sometimes|required|string|max:255',
                 'valid_until' => 'nullable|date',
                 'is_active' => 'sometimes|boolean',
+                'site_id' => 'nullable|integer',
+                'project_id' => 'sometimes|required|integer',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date',
                 'discount_type' => 'sometimes|required|in:percentage,fixed,buy_x_get_y,free_shipping',
@@ -153,7 +199,18 @@ class CampaignController extends Controller
                 'minimum_order_amount' => 'nullable|numeric|min:0',
                 'max_usage' => 'nullable|integer|min:1',
                 'image_url' => 'nullable|url',
-                'terms_conditions' => 'nullable|string'
+                'terms_conditions' => 'nullable|string',
+                // Yeni tasarım modeli fieldları
+                'campaign_code' => 'nullable|string|max:50|unique:campaigns,campaign_code,' . $id,
+                'target_audience' => 'nullable|string',
+                'product_ids' => 'nullable|array',
+                'product_ids.*' => 'integer|exists:products,id',
+                'budget_limit' => 'nullable|numeric|min:0',
+                'priority_level' => 'nullable|integer|min:1|max:5',
+                'requires_approval' => 'boolean',
+                'approval_status' => 'nullable|in:pending,approved,rejected,draft',
+                'notes' => 'nullable|string',
+                'metadata' => 'nullable|array'
             ]);
 
             // Custom validation for end_date after start_date
@@ -173,7 +230,33 @@ class CampaignController extends Controller
                 ], 422);
             }
 
-            $campaign->update($request->all());
+            $data = $request->all();
+            
+            // Site ID'yi otomatik olarak ayarla veya oluştur (sadece project_id varsa)
+            if (isset($data['project_id']) && empty($data['site_id'])) {
+                $projectId = $data['project_id'];
+                
+                // Projeye ait site var mı kontrol et
+                $site = Site::where('project_id', $projectId)->first();
+                
+                if (!$site) {
+                    // Site yoksa oluştur
+                    $project = \App\Models\Project::find($projectId);
+                    $site = Site::create([
+                        'name' => $project ? $project->name . ' Site' : 'Default Site',
+                        'domain' => $project ? parse_url($project->url ?? 'https://example.com', PHP_URL_HOST) ?? 'example.com' : 'example.com',
+                        'description' => 'Otomatik oluşturulan site',
+                        'project_id' => $projectId,
+                        'is_active' => true
+                    ]);
+                }
+                
+                $data['site_id'] = $site->id;
+            }
+            
+            $data['last_modified_at'] = now();
+            
+            $campaign->update($data);
 
             return response()->json([
                 'success' => true,

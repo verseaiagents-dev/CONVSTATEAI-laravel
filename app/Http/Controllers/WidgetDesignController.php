@@ -147,7 +147,7 @@ class WidgetDesignController extends Controller
                 'error_message_template' => $request->error_message_template ?? $widgetCustomization->error_message_template,
                 'order_not_found_message' => $request->order_not_found_message ?? $widgetCustomization->order_not_found_message,
                 'theme_color' => $request->theme_color ?? $widgetCustomization->theme_color,
-                'logo_url' => $request->logo_url ?? $widgetCustomization->logo_url,
+                'widget_position' => $request->widget_position ?? $widgetCustomization->widget_position ?? 'right',
                 'font_family' => $request->font_family ?? $widgetCustomization->font_family,
                 'primary_color' => $request->primary_color ?? $widgetCustomization->primary_color,
                 'secondary_color' => $request->secondary_color ?? $widgetCustomization->secondary_color,
@@ -159,6 +159,7 @@ class WidgetDesignController extends Controller
                 'max_retry_attempts' => $request->max_retry_attempts ?? $widgetCustomization->max_retry_attempts,
                 'enable_typing_indicator' => $request->boolean('enable_typing_indicator', $widgetCustomization->enable_typing_indicator ?? false),
                 'enable_sound_notifications' => $request->boolean('enable_sound_notifications', $widgetCustomization->enable_sound_notifications ?? false),
+                'action_buttons' => $request->action_buttons ?? $widgetCustomization->action_buttons,
             ]);
             
             // Sipariş durumu endpoint'ini güncelle/oluştur

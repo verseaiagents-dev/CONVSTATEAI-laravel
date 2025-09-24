@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AIController;
+// use App\Http\Controllers\AIController;
 use App\Http\Controllers\ConvStateAPI;
 use App\Http\Controllers\KnowledgeBaseController;
 
@@ -21,41 +21,16 @@ Route::get('/widgetcust/imgs/{filename}', function ($filename) {
         ->header('Cache-Control', 'public, max-age=31536000');
 })->where('filename', '[^/]+');
 
+// Widget Initialization Endpoint - Tek seferlik limit kontrolü
+Route::get('/widget/init', [ConvStateAPI::class, 'initWidget']);
+
 // AI Helper API Routes
-Route::prefix('ai')->group(function () {
-    Route::post('/response', [AIController::class, 'response']);
-    Route::post('/personalized', [AIController::class, 'personalizedResponse']);
-    Route::get('/stats', [AIController::class, 'getStats']);
-    Route::post('/test-quality', [AIController::class, 'testQuality']);
-    Route::get('/test-connection', [AIController::class, 'testConnection']);
-});
 
 
 
-// Chat Routes - Moved to protected routes section below
 
-// Test Routes (Yeni User tablosu sistemi)
-Route::post('/add-token', function() {
-    $userId = request('user_id');
-    $tokens = request('tokens', 100);
-    
-    $user = \App\Models\User::find($userId);
-    if (!$user) {
-        return response()->json(['error' => 'User not found'], 404);
-    }
-    
-    // Yeni User tablosundaki token sistemi
-    $user->addTokens($tokens);
-    
-    return response()->json([
-        'success' => true,
-        'message' => 'Token added successfully',
-        'tokens_remaining' => $user->tokens_remaining,
-        'tokens_total' => $user->tokens_total,
-        'tokens_used' => $user->tokens_used,
-        'usage_percentage' => $user->token_usage_percentage
-    ]);
-});
+
+
 
 Route::post('/exhaust-token', function() {
     $userId = request('user_id');
@@ -127,6 +102,7 @@ Route::prefix('knowledge-base')->middleware(['web'])->group(function () {
     
     // Field Mapping Routes
     Route::get('/{id}/detect-fields', [KnowledgeBaseController::class, 'detectFields']);
+    Route::post('/detect-fields-from-file', [KnowledgeBaseController::class, 'detectFieldsFromFile']);
     Route::post('/{id}/save-mappings', [KnowledgeBaseController::class, 'saveFieldMappings']);
     Route::post('/{id}/field-mappings', [KnowledgeBaseController::class, 'getFieldMappings']);
     Route::post('/{id}/preview-data', [KnowledgeBaseController::class, 'previewTransformedData']);
@@ -221,16 +197,19 @@ Route::prefix('widget')->group(function () {
 // Widget Customization - Token check required
 Route::get('/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'getPublicCustomization'])->middleware('token.check');
 
+// Action Buttons Management - Token check required
+Route::middleware(['token.check'])->group(function () {
+    Route::post('/action-buttons/update', [App\Http\Controllers\WidgetCustomizationController::class, 'updateActionButtons']);
+    Route::post('/action-buttons/toggle', [App\Http\Controllers\WidgetCustomizationController::class, 'toggleActionButton']);
+    Route::post('/action-buttons/update-text', [App\Http\Controllers\WidgetCustomizationController::class, 'updateActionButtonText']);
+});
+
 // Protected API Routes (with Project Auth)
 Route::middleware(['project.auth'])->group(function () {
     Route::post('/chat', [App\Http\Controllers\ConvStateAPI::class, 'chat'])->name('api.chat');
     Route::post('/cargo/track', [App\Http\Controllers\CargoTrackingController::class, 'trackCargoPost']);
 });
 
-// === FUNNEL TEST ROUTES (No Auth Required) ===
-Route::get('/funnel/test', [App\Http\Controllers\ConvStateAPI::class, 'testFunnelIntents']);
-Route::post('/funnel/test-specific', [App\Http\Controllers\ConvStateAPI::class, 'testSpecificIntent']);
-Route::get('/funnel/intents', [App\Http\Controllers\ConvStateAPI::class, 'listFunnelIntents']);
 
 // === SESSION MONITORING ROUTES ===
 Route::get('/session-monitoring/{sessionId}', [App\Http\Controllers\ChatSessionDashboardController::class, 'getSessionMonitoringData']);
@@ -251,6 +230,10 @@ Route::prefix('subscription')->middleware(['auth:web'])->group(function () {
 });
 
 
+
+// Unified Availability API Routes
+Route::get('/check-availability', [App\Http\Controllers\UnifiedAvailabilityController::class, 'checkAvailability'])->middleware('token.check');
+Route::get('/check-availability/{module}', [App\Http\Controllers\UnifiedAvailabilityController::class, 'checkSpecificAvailability'])->middleware('token.check');
 
 // Notification Widget API Routes
 Route::prefix('notification-widget')->group(function () {

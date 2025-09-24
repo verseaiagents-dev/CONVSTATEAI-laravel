@@ -91,87 +91,12 @@
                 </button>
             </div>
             
-            <!-- AI Campaign Creation Tab -->
-            <div class="mb-6">
-                <div class="flex space-x-1 bg-gray-800 rounded-lg p-1">
-                    <button id="aiTab" onclick="switchTab('ai')" class="flex-1 py-2 px-4 rounded-md text-sm font-medium text-white bg-purple-600 transition-all duration-200">
-                        🤖 AI ile Kampanya Oluştur
-                    </button>
-                    <button id="manualTab" onclick="switchTab('manual')" class="flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-300 hover:text-white transition-all duration-200">
-                        ✏️ Manuel Oluştur
-                    </button>
-                </div>
-            </div>
-
-            <!-- AI Campaign Creation Form -->
-            <div id="aiForm" class="space-y-6">
-                <!-- Step 1: Product Selection -->
-                <div id="step1" class="step-content">
-                    <h4 class="text-lg font-semibold text-white mb-4">1. Ürün Seçimi</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Ürün Kategorisi</label>
-                            <select id="productCategory" onchange="filterProducts()" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                <option value="">Tüm Kategoriler</option>
-                                <option value="men's clothing">Erkek Giyim</option>
-                                <option value="women's clothing">Kadın Giyim</option>
-                                <option value="jewelery">Takı</option>
-                                <option value="electronics">Elektronik</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Stok Durumu</label>
-                            <select id="stockFilter" onchange="filterProducts()" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                <option value="">Tüm Stoklar</option>
-                                <option value="high">Yüksek Stok (>50)</option>
-                                <option value="medium">Orta Stok (10-50)</option>
-                                <option value="low">Düşük Stok (<10)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Ürünleri Seçin (Çoklu seçim için Ctrl tuşu ile tıklayın)</label>
-                        <div class="max-h-60 overflow-y-auto border border-gray-600 rounded-lg p-3 bg-gray-800">
-                            <div id="productList" class="space-y-2">
-                                <!-- Products will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Product Campaign Settings -->
-                <div id="step2" class="step-content hidden">
-                    <h4 class="text-lg font-semibold text-white mb-4">2. Ürün Kampanya Ayarları</h4>
-                    <div id="productSettingsContainer" class="space-y-6 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-                        <!-- Her ürün için ayrı ayar alanları buraya dinamik olarak eklenecek -->
-                    </div>
-                </div>
-
-                <!-- Step 3: AI Suggestions -->
-                <div id="step3" class="step-content hidden">
-                    <h4 class="text-lg font-semibold text-white mb-4">3. AI Kampanya Önerileri</h4>
-                    <div id="aiSuggestions" class="space-y-4">
-                        <!-- AI suggestions will be loaded here -->
-                    </div>
-                </div>
-
-                <!-- Navigation Buttons -->
-                <div class="flex justify-between pt-6">
-                    <button type="button" id="prevBtn" onclick="previousStep()" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all duration-200 hidden">
-                        ← Önceki
-                    </button>
-                    <button type="button" id="nextBtn" onclick="nextStep()" class="px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105">
-                        Sonraki →
-                    </button>
-                </div>
-            </div>
-
-            <!-- Manual Campaign Creation Form -->
-            <div id="manualForm" class="hidden space-y-4">
+            <!-- Campaign Creation Form -->
+            <div class="space-y-6">
+                <h4 class="text-lg font-semibold text-white mb-4">Kampanya Ayarları</h4>
                 <form id="campaignForm" class="space-y-4">
                     <input type="hidden" id="campaignId" name="id">
-                    <input type="hidden" name="site_id" value="1">
+                    <input type="hidden" name="project_id" value="1">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -179,6 +104,13 @@
                             <input type="text" id="title" name="title" required class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
                         </div>
                         
+                        <div>
+                            <label for="campaign_code" class="block text-sm font-medium text-gray-300 mb-2">Kampanya Kodu</label>
+                            <input type="text" id="campaign_code" name="campaign_code" readonly class="form-input w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 cursor-not-allowed" placeholder="Otomatik oluşturulur">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Kategori *</label>
                             <select id="category" name="category" required class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
@@ -194,11 +126,27 @@
                                 <option value="Kargo" class="bg-gray-800 text-white">Kargo</option>
                             </select>
                         </div>
+                        
+                        <div>
+                            <label for="priority_level" class="block text-sm font-medium text-gray-300 mb-2">Öncelik Seviyesi</label>
+                            <select id="priority_level" name="priority_level" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                <option value="1" class="bg-gray-800 text-white">Düşük</option>
+                                <option value="2" class="bg-gray-800 text-white" selected>Normal</option>
+                                <option value="3" class="bg-gray-800 text-white">Orta</option>
+                                <option value="4" class="bg-gray-800 text-white">Yüksek</option>
+                                <option value="5" class="bg-gray-800 text-white">Kritik</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama *</label>
                         <textarea id="description" name="description" rows="3" required class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="target_audience" class="block text-sm font-medium text-gray-300 mb-2">Hedef Kitle</label>
+                        <textarea id="target_audience" name="target_audience" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Örn: 18-35 yaş arası, teknoloji meraklısı müşteriler"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -242,8 +190,25 @@
                         </div>
                         
                         <div>
+                            <label for="budget_limit" class="block text-sm font-medium text-gray-300 mb-2">Bütçe Limiti (TL)</label>
+                            <input type="number" id="budget_limit" name="budget_limit" step="0.01" min="0" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
                             <label for="max_usage" class="block text-sm font-medium text-gray-300 mb-2">Maksimum Kullanım</label>
                             <input type="number" id="max_usage" name="max_usage" min="1" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                        </div>
+                        
+                        <div>
+                            <label for="approval_status" class="block text-sm font-medium text-gray-300 mb-2">Onay Durumu</label>
+                            <select id="approval_status" name="approval_status" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                <option value="pending" class="bg-gray-800 text-white">Beklemede</option>
+                                <option value="approved" class="bg-gray-800 text-white">Onaylandı</option>
+                                <option value="rejected" class="bg-gray-800 text-white">Reddedildi</option>
+                                <option value="draft" class="bg-gray-800 text-white">Taslak</option>
+                            </select>
                         </div>
                     </div>
 
@@ -257,9 +222,21 @@
                         <textarea id="terms_conditions" name="terms_conditions" rows="3" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"></textarea>
                     </div>
 
-                    <div class="flex items-center space-x-3">
-                        <input type="checkbox" id="is_active" name="is_active" checked class="form-checkbox">
-                        <label for="is_active" class="block text-sm text-gray-300">Kampanyayı aktif yap</label>
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-300 mb-2">Notlar</label>
+                        <textarea id="notes" name="notes" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Kampanya hakkında ek notlar..."></textarea>
+                    </div>
+
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" id="is_active" name="is_active" checked class="form-checkbox">
+                            <label for="is_active" class="block text-sm text-gray-300">Kampanyayı aktif yap</label>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" id="requires_approval" name="requires_approval" class="form-checkbox">
+                            <label for="requires_approval" class="block text-sm text-gray-300">Onay gerektir</label>
+                        </div>
                     </div>
 
                     <div class="flex justify-end space-x-3 pt-6">
@@ -315,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadCampaigns() {
     try {
         showLoading();
-        const response = await fetch('/api/campaigns?site_id=1', {
+        const response = await fetch('/api/campaigns?project_id=1', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -363,26 +340,38 @@ function displayCampaigns() {
             <td class="px-6 py-4">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 h-12 w-12">
-                        <img class="h-12 w-12 rounded-xl object-cover border border-gray-600" src="${campaign.image_url || '/images/default-campaign.png'}" alt="" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0yMCAxMkMxNi42ODYzIDEyIDEzLjYyNjEgMTMuNzQwOSAxMiAxNi41QzEzLjYyNjEgMTkuMjU5MSAxNi42ODYzIDIxIDIwIDIxQzIzLjMxMzcgMjEgMjYuMzczOSAxOS4yNTkxIDI4IDE2LjVDMjYuMzczOSAxMy43NDA5IDIzLjMxMzcgMTIgMjAgMTJaIiBmaWxsPSIjNkI3Mjg4Ii8+CjxwYXRoIGQ9Ik0zMiAyOEMzMCAyNC42ODYzIDI2LjMxMzcgMjIgMjIgMjJIMThDMTMuNjg2MyAyMiAxMCAyNC42ODYzIDEwIDI4IiBmaWxsPSIjNkI3Mjg4Ii8+Cjwvc3ZnPg=='">
+                        <img class="h-12 w-12 rounded-xl object-cover border border-gray-600" src="${campaign.image_url || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0yMCAxMkMxNi42ODYzIDEyIDEzLjYyNjEgMTMuNzQwOSAxMiAxNi41QzEzLjYyNjEgMTkuMjU5MSAxNi42ODYzIDIxIDIwIDIxQzIzLjMxMzcgMjEgMjYuMzczOSAxOS4yNTkxIDI4IDE2LjVDMjYuMzczOSAxMy43NDA5IDIzLjMxMzcgMTIgMjAgMTJaIiBmaWxsPSIjNkI3Mjg4Ii8+CjxwYXRoIGQ9Ik0zMiAyOEMzMCAyNC42ODYzIDI2LjMxMzcgMjIgMjIgMjJIMThDMTMuNjg2MyAyMiAxMCAyNC42ODYzIDEwIDI4IiBmaWxsPSIjNkI3Mjg4Ii8+Cjwvc3ZnPg=='}" alt="" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0yMCAxMkMxNi42ODYzIDEyIDEzLjYyNjEgMTMuNzQwOSAxMiAxNi41QzEzLjYyNjEgMTkuMjU5MSAxNi42ODYzIDIxIDIwIDIxQzIzLjMxMzcgMjEgMjYuMzczOSAxOS4yNTkxIDI4IDE2LjVDMjYuMzczOSAxMy43NDA5IDIzLjMxMzcgMTIgMjAgMTJaIiBmaWxsPSIjNkI3Mjg4Ii8+CjxwYXRoIGQ9Ik0zMiAyOEMzMCAyNC42ODYzIDI2LjMxMzcgMjIgMjIgMjJIMThDMTMuNjg2MyAyMiAxMCAyNC42ODYzIDEwIDI4IiBmaWxsPSIjNkI3Mjg4Ii8+Cjwvc3ZnPg=='">
                     </div>
                     <div class="ml-4">
                         <div class="text-sm font-semibold text-white">${campaign.title}</div>
                         <div class="text-sm text-gray-400">${campaign.description.substring(0, 50)}${campaign.description.length > 50 ? '...' : ''}</div>
+                        ${campaign.campaign_code ? `<div class="text-xs text-gray-500 mt-1">Kod: ${campaign.campaign_code}</div>` : ''}
                     </div>
                 </div>
             </td>
             <td class="px-6 py-4">
-                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-purple-glow/20 text-purple-glow border border-purple-glow/30">
-                    ${campaign.category}
-                </span>
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-300">
-                ${campaign.discount}
+                <div class="space-y-1">
+                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-purple-glow/20 text-purple-glow border border-purple-glow/30">
+                        ${campaign.category}
+                    </span>
+                    ${campaign.priority_level ? `<div class="text-xs text-gray-400">Öncelik: ${getPriorityText(campaign.priority_level)}</div>` : ''}
+                </div>
             </td>
             <td class="px-6 py-4">
-                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full ${campaign.is_active ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
-                    ${campaign.is_active ? 'Aktif' : 'Pasif'}
-                </span>
+                <div class="space-y-1">
+                    <div class="text-sm text-gray-300">${campaign.discount}</div>
+                    ${campaign.discount_value ? `<div class="text-xs text-gray-400">Değer: ${campaign.discount_value}</div>` : ''}
+                    ${campaign.minimum_order_amount ? `<div class="text-xs text-gray-400">Min: ${campaign.minimum_order_amount} TL</div>` : ''}
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="space-y-1">
+                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full ${campaign.is_active ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
+                        ${campaign.is_active ? 'Aktif' : 'Pasif'}
+                    </span>
+                    ${campaign.approval_status ? `<div class="text-xs text-gray-400">${getApprovalStatusText(campaign.approval_status)}</div>` : ''}
+                    ${campaign.end_date ? `<div class="text-xs text-gray-400">Bitiş: ${formatDate(campaign.end_date)}</div>` : ''}
+                </div>
             </td>
             <td class="px-6 py-4 text-sm font-medium">
                 <button onclick="editCampaign(${campaign.id})" class="text-purple-glow hover:text-neon-purple mr-3 transition-colors duration-200">Düzenle</button>
@@ -416,8 +405,13 @@ function openCreateModal() {
         campaignForm.reset();
         campaignId.value = '';
         currentCampaignId = null;
+        
+        // Kampanya kodu alanını readonly yap ve temizle
+        const campaignCodeField = document.getElementById('campaign_code');
+        campaignCodeField.value = '';
+        campaignCodeField.setAttribute('readonly', 'readonly');
+        
         campaignModal.classList.remove('hidden');
-        switchTab('manual'); // Open manual tab by default
         
         console.log('Modal opened successfully');
     } catch (error) {
@@ -436,21 +430,28 @@ function editCampaign(id) {
     // Fill form fields
     document.getElementById('campaignId').value = campaign.id;
     document.getElementById('title').value = campaign.title;
+    document.getElementById('campaign_code').value = campaign.campaign_code || '';
+    document.getElementById('campaign_code').setAttribute('readonly', 'readonly');
     document.getElementById('description').value = campaign.description;
     document.getElementById('category').value = campaign.category;
+    document.getElementById('priority_level').value = campaign.priority_level || 2;
+    document.getElementById('target_audience').value = campaign.target_audience || '';
     document.getElementById('discount').value = campaign.discount || '';
     document.getElementById('discount_type').value = campaign.discount_type;
     document.getElementById('discount_value').value = campaign.discount_value || '';
     document.getElementById('start_date').value = campaign.start_date ? campaign.start_date.slice(0, 16) : '';
     document.getElementById('end_date').value = campaign.end_date ? campaign.end_date.slice(0, 16) : '';
     document.getElementById('minimum_order_amount').value = campaign.minimum_order_amount || '';
+    document.getElementById('budget_limit').value = campaign.budget_limit || '';
     document.getElementById('max_usage').value = campaign.max_usage || '';
+    document.getElementById('approval_status').value = campaign.approval_status || 'pending';
     document.getElementById('image_url').value = campaign.image_url || '';
     document.getElementById('terms_conditions').value = campaign.terms_conditions || '';
+    document.getElementById('notes').value = campaign.notes || '';
     document.getElementById('is_active').checked = campaign.is_active;
+    document.getElementById('requires_approval').checked = campaign.requires_approval || false;
     
     document.getElementById('campaignModal').classList.remove('hidden');
-    switchTab('manual'); // Ensure manual tab is active for editing
 }
 
 // Close modal
@@ -462,26 +463,40 @@ function closeModal() {
 document.getElementById('campaignForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    console.log('Form submission started...');
+    
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
     
-    // Convert checkbox value
+    // Convert checkbox values
     data.is_active = formData.get('is_active') === 'on';
+    data.requires_approval = formData.get('requires_approval') === 'on';
+    
+    console.log('Form data:', data);
+    console.log('Current campaign ID:', currentCampaignId);
     
     try {
         const url = currentCampaignId ? `/api/dashboard/campaigns/${currentCampaignId}` : '/api/dashboard/campaigns';
         const method = currentCampaignId ? 'PUT' : 'POST';
         
+        console.log('API URL:', url);
+        console.log('Method:', method);
+        
         const response = await fetch(url, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify(data)
         });
         
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
         const result = await response.json();
+        console.log('Response result:', result);
         
         if (result.success) {
             closeModal();
@@ -491,9 +506,11 @@ document.getElementById('campaignForm').addEventListener('submit', async functio
             showError('Hata: ' + result.message);
         }
     } catch (error) {
+        console.error('Form submission error:', error);
         showError('İşlem sırasında hata oluştu: ' + error.message);
     }
 });
+
 
 // Delete campaign
 function deleteCampaign(id) {
@@ -532,83 +549,6 @@ async function confirmDelete() {
 }
 
 
-// Tab switching functions
-function switchTab(tab) {
-    try {
-        console.log('Switching to tab:', tab);
-        
-        const aiForm = document.getElementById('aiForm');
-        const manualForm = document.getElementById('manualForm');
-        const aiTab = document.getElementById('aiTab');
-        const manualTab = document.getElementById('manualTab');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const generateBtn = document.getElementById('generateBtn');
-
-        if (!aiForm || !manualForm || !aiTab || !manualTab) {
-            console.error('Required tab elements not found');
-            return;
-        }
-
-        if (tab === 'ai') {
-            aiForm.classList.remove('hidden');
-            manualForm.classList.add('hidden');
-            aiTab.classList.add('bg-purple-600', 'text-white');
-            manualTab.classList.remove('bg-purple-600', 'text-white');
-            aiTab.classList.add('text-gray-300');
-            manualTab.classList.add('text-gray-300');
-            if (prevBtn) prevBtn.classList.remove('hidden');
-            if (nextBtn) nextBtn.classList.remove('hidden');
-            if (generateBtn) generateBtn.classList.remove('hidden');
-            currentStep = 1;
-            resetAIForm();
-        } else {
-            aiForm.classList.add('hidden');
-            manualForm.classList.remove('hidden');
-            aiTab.classList.remove('bg-purple-600', 'text-white');
-            manualTab.classList.add('bg-purple-600', 'text-white');
-            aiTab.classList.add('text-gray-300');
-            manualTab.classList.add('text-gray-300');
-            if (prevBtn) prevBtn.classList.add('hidden');
-            if (nextBtn) nextBtn.classList.add('hidden');
-            if (generateBtn) generateBtn.classList.add('hidden');
-        }
-        
-        console.log('Tab switched successfully');
-    } catch (error) {
-        console.error('Error switching tab:', error);
-    }
-}
-
-// Reset AI form to initial state
-function resetAIForm() {
-    try {
-        currentStep = 1;
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const productList = document.getElementById('productList');
-        const aiSuggestions = document.getElementById('aiSuggestions');
-        const productSettingsContainer = document.getElementById('productSettingsContainer');
-        
-        if (step1) step1.classList.remove('hidden');
-        if (step2) step2.classList.add('hidden');
-        if (step3) step3.classList.add('hidden');
-        if (prevBtn) prevBtn.classList.add('hidden');
-        if (nextBtn) {
-            nextBtn.classList.remove('hidden');
-            nextBtn.textContent = 'Sonraki →';
-        }
-        if (productList) productList.innerHTML = '';
-        if (aiSuggestions) aiSuggestions.innerHTML = '';
-        if (productSettingsContainer) productSettingsContainer.innerHTML = '';
-        productSettings = {};
-    } catch (error) {
-        console.error('Error resetting AI form:', error);
-    }
-}
 
 // Add missing utility functions
 function showLoading() {
@@ -618,406 +558,92 @@ function showLoading() {
     if (emptyState) emptyState.classList.add('hidden');
 }
 
+// Helper functions for display
+function getPriorityText(priorityLevel) {
+    const priorities = {
+        1: 'Düşük',
+        2: 'Normal', 
+        3: 'Orta',
+        4: 'Yüksek',
+        5: 'Kritik'
+    };
+    return priorities[priorityLevel] || 'Normal';
+}
+
+function getApprovalStatusText(status) {
+    const statuses = {
+        'pending': 'Beklemede',
+        'approved': 'Onaylandı',
+        'rejected': 'Reddedildi',
+        'draft': 'Taslak'
+    };
+    return statuses[status] || 'Beklemede';
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Sürekli';
+    
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('tr-TR');
+    } catch {
+        return 'Geçersiz tarih';
+    }
+}
+
 function showSuccess(message) {
     console.log('Success:', message);
-    // You can implement a toast notification here
+    
+    // Create a temporary success message
+    const successDiv = document.createElement('div');
+    successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    successDiv.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        if (successDiv.parentNode) {
+            successDiv.parentNode.removeChild(successDiv);
+        }
+    }, 3000);
 }
 
 function showError(message) {
     console.error('Error:', message);
     
-    // Show a subtle error message in the UI
-    const loadingState = document.getElementById('loadingState');
-    if (loadingState) {
-        loadingState.innerHTML = `
-            <div class="text-center">
-                <div class="inline-flex items-center space-x-2 text-red-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>${message}</span>
-                </div>
-                <p class="text-gray-400 mt-2 text-sm">Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin</p>
-                <button onclick="loadCampaigns()" class="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
-                    Tekrar Dene
-                </button>
-            </div>
-        `;
-    }
-}
-
-
-
-// Product filtering and loading
-async function filterProducts() {
-    const productCategory = document.getElementById('productCategory').value;
-    const stockFilter = document.getElementById('stockFilter').value;
-    const productList = document.getElementById('productList');
-
-    productList.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div><p class="text-gray-400 mt-2">Ürünler yükleniyor...</p></div>';
-
-    if (!productCategory) {
-        productList.innerHTML = '<p class="text-gray-400 text-center">Lütfen bir kategori seçin.</p>';
-        return;
-    }
-
-    try {
-        const response = await fetch(`/dashboard/campaigns/products/list?category=${productCategory}&stock_status=${stockFilter}`, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        const result = await response.json();
-
-        if (result.success) {
-            if (result.data.length === 0) {
-                productList.innerHTML = '<p class="text-gray-400 text-center">Bu kategori ve stok durumunda ürün bulunamadı.</p>';
-            } else {
-                productList.innerHTML = result.data.map(product => `
-                    <div class="flex items-center space-x-3 p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors duration-200">
-                        <input type="checkbox" 
-                               value="${product.id}" 
-                               name="product_ids[]" 
-                               class="form-checkbox h-4 w-4 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500 focus:ring-2">
-                        <div class="flex-1">
-                            <label class="text-sm font-medium text-white cursor-pointer">${product.name}</label>
-                            <div class="text-xs text-gray-400">
-                                Kategori: ${product.category ? product.category.name : 'Genel'} | Fiyat: ${product.price} TL | Stok: ${product.stock || 0}
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        } else {
-            productList.innerHTML = '<p class="text-red-400 text-center">Ürünler yüklenirken hata oluştu: ' + result.message + '</p>';
-        }
-    } catch (error) {
-        productList.innerHTML = '<p class="text-red-400 text-center">Ürünler yüklenirken hata oluştu: ' + error.message + '</p>';
-    }
-}
-
-// AI Suggestions generation
-async function generateAISuggestions() {
-    const selectedProducts = Array.from(document.querySelectorAll('#productList input[name="product_ids[]"]:checked')).map(input => input.value);
-    
-    if (selectedProducts.length === 0) {
-        showError('Lütfen en az bir ürün seçin.');
-        return;
-    }
-
-    // Her ürün için ayarları kontrol et
-    let hasError = false;
-    for (const productId of selectedProducts) {
-        if (!productSettings[productId] || 
-            !productSettings[productId].salePrice || 
-            !productSettings[productId].profitMargin || 
-            !productSettings[productId].stockQuantity) {
-            showError(`Lütfen ${productId} ID'li ürün için tüm kampanya ayarlarını doldurun.`);
-            hasError = true;
-            break;
-        }
-    }
-    
-    if (hasError) {
-        return;
-    }
-
-    const aiSuggestions = document.getElementById('aiSuggestions');
-    aiSuggestions.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div><p class="text-gray-400 mt-2">AI önerileri oluşturuluyor...</p></div>';
-
-    try {
-        const response = await fetch('/dashboard/campaigns/ai-suggestions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                product_ids: selectedProducts,
-                product_settings: productSettings,
-                season: 'all' // Genel sezon kullan
-            })
-        });
-        const result = await response.json();
-
-        if (result.success) {
-            currentAISuggestions = result.data; // Store suggestions for later use
-            displayAISuggestions(result.data, selectedProducts);
-        } else {
-            aiSuggestions.innerHTML = '<p class="text-red-400 text-center">AI önerileri oluşturulurken hata oluştu: ' + result.message + '</p>';
-        }
-    } catch (error) {
-        aiSuggestions.innerHTML = '<p class="text-red-400 text-center">AI önerileri oluşturulurken hata oluştu: ' + error.message + '</p>';
-    }
-}
-
-// Display AI suggestions
-function displayAISuggestions(suggestions, selectedProducts) {
-    const aiSuggestions = document.getElementById('aiSuggestions');
-    
-    if (!suggestions.suggestions || suggestions.suggestions.length === 0) {
-        aiSuggestions.innerHTML = '<p class="text-gray-400 text-center">AI önerisi bulunamadı.</p>';
-        return;
-    }
-
-    aiSuggestions.innerHTML = `
-        <div class="mb-4 p-4 bg-gray-800 rounded-lg border border-gray-600">
-            <h5 class="text-lg font-semibold text-white mb-2">📊 AI Analiz Özeti</h5>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <span class="text-gray-400">Toplam Öneri:</span>
-                    <span class="text-white ml-2">${suggestions.summary?.total_suggestions || suggestions.suggestions.length}</span>
-                </div>
-                <div>
-                    <span class="text-gray-400">En İyi Tür:</span>
-                    <span class="text-white ml-2">${suggestions.summary?.best_campaign || 'N/A'}</span>
-                </div>
-                <div>
-                    <span class="text-gray-400">Tahmini Gelir:</span>
-                    <span class="text-white ml-2">${suggestions.summary?.estimated_revenue || 'N/A'}</span>
-                </div>
-                <div>
-                    <span class="text-gray-400">Risk Seviyesi:</span>
-                    <span class="text-white ml-2">${suggestions.summary?.risk_level || 'N/A'}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="space-y-4">
-            ${suggestions.suggestions.map((suggestion, index) => `
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-600 hover:border-purple-500 transition-colors duration-200">
-                    <div class="flex items-start justify-between mb-3">
-                        <h5 class="text-lg font-semibold text-white">${suggestion.title}</h5>
-                        <div class="flex items-center space-x-2">
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
-                                ${suggestion.confidence_score || 'N/A'}% Güven
-                            </span>
-                            <input type="checkbox" name="selected_suggestions[]" value="${index}" class="form-checkbox h-4 w-4 text-purple-600 bg-gray-800 border-gray-600 focus:ring-purple-500 focus:ring-2">
-                        </div>
-                    </div>
-                    
-                    <p class="text-sm text-gray-300 mb-3">${suggestion.description}</p>
-                    
-                    <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-                        <div>
-                            <span class="text-gray-400">Kampanya Türü:</span>
-                            <span class="text-white ml-2">${suggestion.campaign_type || 'N/A'}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400">İndirim:</span>
-                            <span class="text-white ml-2">${suggestion.discount_type || 'N/A'}: ${suggestion.discount_value || 'N/A'}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400">Geçerlilik:</span>
-                            <span class="text-white ml-2">${suggestion.validity_days || 'N/A'} gün</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400">Min. Sipariş:</span>
-                            <span class="text-white ml-2">${suggestion.minimum_order || 'N/A'} TL</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-sm text-gray-400 mb-3">
-                        <strong>Şartlar:</strong> ${suggestion.terms || 'Belirtilmemiş'}
-                    </div>
-                    
-                    <div class="text-sm text-gray-400">
-                        <strong>Hedef Kitle:</strong> ${suggestion.target_audience || 'N/A'} | 
-                        <strong>Beklenen Etki:</strong> ${suggestion.expected_impact || 'N/A'}
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-        
-        <div class="mt-6 text-center">
-            <button onclick="createCampaignFromAI()" class="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105">
-                🚀 Seçili Önerileri Kampanya Olarak Oluştur
-            </button>
+    // Create a temporary error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    errorDiv.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <span>${message}</span>
         </div>
     `;
-}
-
-// Create campaign from AI suggestion
-async function createCampaignFromAI() {
-    const selectedSuggestionIndexes = Array.from(document.querySelectorAll('input[name="selected_suggestions[]"]:checked')).map(input => input.value);
-    const selectedProducts = Array.from(document.querySelectorAll('#productList input[name="product_ids[]"]:checked')).map(input => input.value);
-
-    if (selectedSuggestionIndexes.length === 0) {
-        showError('Lütfen en az bir kampanya önerisi seçin.');
-        return;
-    }
-
-    if (selectedProducts.length === 0) {
-        showError('Lütfen en az bir ürün seçin.');
-        return;
-    }
-
-    try {
-        // Birden fazla kampanya oluştur
-        const selectedSuggestions = selectedSuggestionIndexes.map(index => currentAISuggestions.suggestions[index]);
-        
-        try {
-            const response = await fetch('/dashboard/campaigns/create-multiple-from-ai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    suggestions: selectedSuggestions,
-                    selected_products: selectedProducts,
-                    site_id: 1
-                })
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                showSuccess(result.message);
-                closeModal();
-                loadCampaigns(); // Refresh campaign list
-            } else {
-                showError('Kampanyalar oluşturulurken hata oluştu: ' + result.message);
-            }
-        } catch (error) {
-            showError('Kampanyalar oluşturulurken hata oluştu: ' + error.message);
-        }
-
-
-    } catch (error) {
-        showError('Kampanya oluşturulurken hata oluştu: ' + error.message);
-    }
-}
-
-// Product settings storage
-let productSettings = {};
-
-// Create product settings for each selected product
-function createProductSettings(selectedProducts) {
-    const container = document.getElementById('productSettingsContainer');
-    container.innerHTML = '';
     
-    selectedProducts.forEach((productId, index) => {
-        const productElement = document.querySelector(`#productList input[value="${productId}"]`).closest('.flex');
-        const productName = productElement.querySelector('label').textContent;
-        
-        const productSettingsHtml = `
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-600" data-product-id="${productId}">
-                <h5 class="text-lg font-semibold text-white mb-4 flex items-center">
-                    <span class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-sm font-bold mr-3">${index + 1}</span>
-                    ${productName}
-                </h5>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="salePrice_${productId}" class="block text-sm font-medium text-gray-300 mb-2">Satış Fiyatı (TL)</label>
-                        <input type="number" id="salePrice_${productId}" step="0.01" min="0" class="form-input w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="0" onchange="updateProductSetting('${productId}', 'salePrice', this.value)">
-                    </div>
-                    <div>
-                        <label for="profitMargin_${productId}" class="block text-sm font-medium text-gray-300 mb-2">Kar Oranı (%)</label>
-                        <input type="number" id="profitMargin_${productId}" step="0.1" min="0" max="100" class="form-input w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="20" onchange="updateProductSetting('${productId}', 'profitMargin', this.value)">
-                    </div>
-                    <div>
-                        <label for="stockQuantity_${productId}" class="block text-sm font-medium text-gray-300 mb-2">Stok Miktarı</label>
-                        <input type="number" id="stockQuantity_${productId}" min="0" class="form-input w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="100" onchange="updateProductSetting('${productId}', 'stockQuantity', this.value)">
-                    </div>
-                    <div>
-                        <label for="season_${productId}" class="block text-sm font-medium text-gray-300 mb-2">Sezon</label>
-                        <select id="season_${productId}" class="form-input w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" onchange="updateProductSetting('${productId}', 'season', this.value)">
-                            <option value="spring">İlkbahar</option>
-                            <option value="summer">Yaz</option>
-                            <option value="autumn">Sonbahar</option>
-                            <option value="winter">Kış</option>
-                            <option value="all">Tüm Sezon</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        container.innerHTML += productSettingsHtml;
-        
-        // Default değerleri ayarla
-        productSettings[productId] = {
-            salePrice: 0,
-            profitMargin: 20,
-            stockQuantity: 100,
-            season: 'spring'
-        };
-    });
-}
-
-// Update product setting value
-function updateProductSetting(productId, field, value) {
-    if (!productSettings[productId]) {
-        productSettings[productId] = {};
-    }
-    productSettings[productId][field] = value;
-}
-
-// Step navigation
-let currentStep = 1;
-
-function nextStep() {
-    if (currentStep === 1) {
-        const selectedProducts = document.querySelectorAll('#productList input[name="product_ids[]"]:checked');
-        if (selectedProducts.length === 0) {
-            showError('Lütfen en az bir ürün seçin.');
-            return;
+    document.body.appendChild(errorDiv);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.parentNode.removeChild(errorDiv);
         }
-        
-        // Her seçilen ürün için ayrı ayar alanları oluştur
-        createProductSettings(selectedProducts);
-        
-        currentStep = 2;
-        document.getElementById('step1').classList.add('hidden');
-        document.getElementById('step2').classList.remove('hidden');
-        document.getElementById('prevBtn').classList.remove('hidden');
-        document.getElementById('nextBtn').textContent = 'Sonraki →';
-    } else if (currentStep === 2) {
-        // Her ürün için ayarları kontrol et
-        const selectedProducts = Array.from(document.querySelectorAll('#productList input[name="product_ids[]"]:checked')).map(input => input.value);
-        let hasError = false;
-        
-        for (const productId of selectedProducts) {
-            const salePrice = document.getElementById(`salePrice_${productId}`).value;
-            const profitMargin = document.getElementById(`profitMargin_${productId}`).value;
-            const stockQuantity = document.getElementById(`stockQuantity_${productId}`).value;
-            
-            if (!salePrice || !profitMargin || !stockQuantity) {
-                showError(`Lütfen ${productId} ID'li ürün için tüm kampanya ayarlarını doldurun.`);
-                hasError = true;
-                break;
-            }
-        }
-        
-        if (hasError) {
-            return;
-        }
-        
-        // Direkt AI önerileri oluştur
-        currentStep = 3;
-        document.getElementById('step2').classList.add('hidden');
-        document.getElementById('step3').classList.remove('hidden');
-        document.getElementById('nextBtn').classList.add('hidden');
-        
-        // AI önerileri oluştur
-        generateAISuggestions();
-    }
+    }, 5000);
 }
 
-function previousStep() {
-    if (currentStep === 2) {
-        currentStep = 1;
-        document.getElementById('step2').classList.add('hidden');
-        document.getElementById('step1').classList.remove('hidden');
-        document.getElementById('prevBtn').classList.add('hidden');
-        document.getElementById('nextBtn').textContent = 'Sonraki →';
-    } else if (currentStep === 3) {
-        currentStep = 2;
-        document.getElementById('step3').classList.add('hidden');
-        document.getElementById('step2').classList.remove('hidden');
-        document.getElementById('nextBtn').classList.remove('hidden');
-    }
-}
+
+
+
 
 
 </script>

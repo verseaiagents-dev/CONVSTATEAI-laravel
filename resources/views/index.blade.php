@@ -8,6 +8,14 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYZ8FQ8JV2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PYZ8FQ8JV2');
+</script>
     <script>
         tailwind.config = {
             theme: {
@@ -190,9 +198,10 @@
                         Kampanyalar, ürün önerileri ve anında destek ile satışlarınızı artırın.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-8">
-                     
-                   
-            </div>
+                        <button onclick="openDemoModal()" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 animate-glow">
+                            Demo Talebi Oluştur
+                        </button>
+                    </div>
              
                 </div>
                 
@@ -557,8 +566,12 @@
                          ConvStateAI'ın gücünü keşfedin ve e-ticaret sitenizi dönüştürün
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-                         @php $phone = '905458527693'; $message = "Merhaba, numaranızı convstateai.comdan aldım. Uygulama hakkında bilgi alabilirmiyim"; $url = "https://wa.me/{$phone}?text=" . urlencode($message); @endphp <a href="{{$url}}" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300 transform hover:scale-105 animate-glow">Demo Talebi Oluştur </a>
+                         <button onclick="openDemoModal()" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 animate-glow">
+                              Demo Talebi Oluştur
+                          </button>
                     </div>
+
+               
                  {{--    <div class="flex flex-wrap items-center justify-center space-x-8 text-sm text-gray-400">
                         <div class="flex items-center">
                             <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
@@ -614,7 +627,7 @@
                     <h4 class="text-lg font-semibold mb-4">Ürün</h4>
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="#features" class="hover:text-purple-glow transition-colors">Özellikler</a></li>
-                        <li><a href="#demo" class="hover:text-purple-glow transition-colors">Demo</a></li>
+
                         <li><a href="#pricing" class="hover:text-purple-glow transition-colors">Fiyatlandırma</a></li>
                     </ul>
                 </div>
@@ -622,7 +635,6 @@
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Şirket</h4>
                     <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-purple-glow transition-colors">Hakkımızda</a></li>
                         <li><a href="#" class="hover:text-purple-glow transition-colors">Kariyer</a></li>
                         <li><a href="#" class="hover:text-purple-glow transition-colors">Blog</a></li>
                     </ul>
@@ -632,7 +644,6 @@
                     <h4 class="text-lg font-semibold mb-4">Destek</h4>
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="#" class="hover:text-purple-glow transition-colors">Yardım Merkezi</a></li>
-                        <li><a href="#" class="hover:text-purple-glow transition-colors">Dokümantasyon</a></li>
                         <li><a href="#" class="hover:text-purple-glow transition-colors">İletişim</a></li>
                     </ul>
                 </div>
@@ -735,13 +746,156 @@
 
     </script>
 
-    <!-- ConvStateAI Widget -->
-    <script src="{{ url('/embed/convstateai.min.js') }}"></script>
-    <script>
-        window.convstateaiConfig = {
-            projectId: "2",
-            customizationToken: "dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246"
-        };
-    </script>
+
+    <!-- Demo Request Modal -->
+    <div id="demoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900 rounded-2xl p-8 max-w-md w-full glass-effect">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold gradient-text">Demo Talebi Oluştur</h3>
+                    <button onclick="closeDemoModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-gray-300 mb-4 text-center">Yapay zekanın gücüyle gelen ziyaretçi trafiğini müşteriye dönüştürün.</p>
+                <form id="demoForm" class="space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Ad</label>
+                            <input type="text" name="first_name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Soyad</label>
+                            <input type="text" name="last_name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">E-posta</label>
+                        <input type="email" name="email" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Şifre</label>
+                        <input type="password" name="password" required minlength="8" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Telefon Numarası</label>
+                        <input type="tel" name="phone" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Site Ziyaretçi Sayısı (Aylık)</label>
+                        <select name="site_visitor_count" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                            <option value="">Seçiniz</option>
+                            <option value="1000">1.000'den az</option>
+                            <option value="5000">1.000 - 5.000</option>
+                            <option value="10000">5.000 - 10.000</option>
+                            <option value="25000">10.000 - 25.000</option>
+                            <option value="50000">25.000 - 50.000</option>
+                            <option value="100000">50.000 - 100.000</option>
+                            <option value="250000">100.000'den fazla</option>
+                        </select>
+                    </div>
+                    
+                    <div id="demoFormMessage" class="hidden p-4 rounded-lg mb-4"></div>
+                    
+                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg font-semibold text-white hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105">
+                        Demo Talebi Gönder
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Demo Modal Functions
+    function openDemoModal() {
+        document.getElementById('demoModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeDemoModal() {
+        document.getElementById('demoModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        resetDemoForm();
+    }
+    
+    function resetDemoForm() {
+        document.getElementById('demoForm').reset();
+        document.getElementById('demoFormMessage').classList.add('hidden');
+    }
+    
+    // Demo Form Submission
+    document.getElementById('demoForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const messageDiv = document.getElementById('demoFormMessage');
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Gönderiliyor...';
+        
+        try {
+            const response = await fetch('{{ route("demo-request.store") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                messageDiv.className = 'p-4 rounded-lg mb-4 bg-green-900/20 border border-green-500/30 text-green-300';
+                messageDiv.textContent = data.message;
+                messageDiv.classList.remove('hidden');
+                
+                // Reset form after success
+                setTimeout(() => {
+                    resetDemoForm();
+                    closeDemoModal();
+                }, 2000);
+            } else {
+                messageDiv.className = 'p-4 rounded-lg mb-4 bg-red-900/20 border border-red-500/30 text-red-300';
+                messageDiv.textContent = data.message;
+                messageDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            messageDiv.className = 'p-4 rounded-lg mb-4 bg-red-900/20 border border-red-500/30 text-red-300';
+            messageDiv.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            messageDiv.classList.remove('hidden');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Demo Talebi Gönder';
+        }
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('demoModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDemoModal();
+        }
+    });
+
+ 
+</script>
+
+<script src="http://127.0.0.1:8000/embed/convstateai.min.js">
+
+</script>
+<script>
+    window.convstateaiConfig = {
+        projectId: "1",
+        customizationToken: "52f701bdbf9d376d508c7e2ea92f2a72e1d5d907bc4b90041d57a57a8a3a3887"
+    };
+</script>
 </body>
 </html>

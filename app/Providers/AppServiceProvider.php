@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,5 +32,10 @@ class AppServiceProvider extends ServiceProvider
         if (function_exists('json_encode')) {
             ini_set('default_charset', 'UTF-8');
         }
+
+        // Define permissions
+        Gate::define('manage-prompts', function ($user) {
+            return $user && $user->is_admin;
+        });
     }
 }

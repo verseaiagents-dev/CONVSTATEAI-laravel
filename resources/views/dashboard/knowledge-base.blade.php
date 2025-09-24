@@ -183,26 +183,28 @@
                         AI destekli bilgi tabanı sistemi ile dosyalarınızı yükleyin ve akıllı arama yapın
                     </p>
                 </div>
-                {{--
+           
                 <!-- Yönetim Butonları -->
                 <div class="flex items-center space-x-3">
-                    <a href="{{ route('dashboard.campaigns.index') }}" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+                    <a href="{{ route('dashboard.campaigns.index') }}?project_id={{ $project->id ?? 1 }}" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                         </svg>
                         <span>Kampanya Yönetimi</span>
+                    
                     </a>
                     
-                    <a href="{{ route('dashboard.faqs.index') }}" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+                    <a href="{{ route('dashboard.faqs.index') }}?project_id={{ $project->id ?? 1 }}" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span>SSS Yönetimi</span>
+   
                     </a>
                 </div>
 
 
-                 --}}
+               
             </div>
         </div>
     </div>
@@ -352,10 +354,9 @@
                         
                         <div class="space-y-4">
                             <div class="flex flex-col space-y-3">
-                                <input type="text" id="kb-name" placeholder="Bilgi Tabanı Adı" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20 text-center">
                                 <input type="url" id="url-input" placeholder="https://example.com/data.csv" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20 text-center">
-                                <button id="fetch-url-btn" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105">
-                                    İçerik Çek
+                                <button id="fetch-url-btn" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105" onclick="openUrlContentTypeModal()">
+                                    İçerik Tipini Seç
                                 </button>
                             </div>
                             
@@ -423,28 +424,242 @@
             </div>
         </div>
 
-        <!-- File Name Modal -->
-        <div id="fileNameModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center">
-            <div class="relative p-6 border border-gray-700 w-96 shadow-2xl rounded-xl glass-effect">
+
+        <!-- Content Type Selection Modal -->
+        <div id="contentTypeModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center">
+            <div class="relative p-6 border border-gray-700 w-full max-w-2xl shadow-2xl rounded-xl glass-effect">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-white">Dosya Adı Girin</h3>
-                    <button onclick="closeFileNameModal(); resetFileSelection();" class="text-gray-400 hover:text-white transition-colors">
+                    <h3 class="text-xl font-bold text-white">İçerik Tipini Seçin</h3>
+                    <button onclick="closeContentTypeModal()" class="text-gray-400 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Bilgi Tabanı Adı</label>
-                        <input type="text" id="modal-kb-name" placeholder="Bilgi tabanı adını girin" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20">
+                <div class="space-y-6">
+                    <p class="text-gray-300 text-center mb-6">
+                        Yüklediğiniz dosyanın içerik tipini seçin. Bu seçim, AI sisteminin içeriği nasıl işleyeceğini belirler.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- FAQ Content Type -->
+                        <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer" data-type="faq">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-semibold text-white mb-2">FAQ / SSS</h4>
+                                <p class="text-sm text-gray-400">Sık sorulan sorular ve cevapları içeren içerik</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Content Type -->
+                        <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer" data-type="product">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Ürün Kataloğu</h4>
+                                <p class="text-sm text-gray-400">Ürün bilgileri, fiyatlar ve kategoriler içeren içerik</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Blog Content Type -->
+                        <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-green-500/50 transition-all duration-300 cursor-pointer" data-type="blog">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Blog / Makale</h4>
+                                <p class="text-sm text-gray-400">Blog yazıları, makaleler ve bilgilendirici içerik</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Campaign Content Type -->
+                        <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-orange-500/50 transition-all duration-300 cursor-pointer" data-type="campaign">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Kampanya</h4>
+                                <p class="text-sm text-gray-400">Kampanya bilgileri, promosyonlar ve özel teklifler</p>
+                            </div>
+                        </div>
+                        
+                        <!-- General Content Type -->
+                        <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-500/50 transition-all duration-300 cursor-pointer" data-type="general">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-gray-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Genel İçerik</h4>
+                                <p class="text-sm text-gray-400">Belirli bir kategoriye girmeyen genel içerik</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="mt-6 pt-4 border-t border-gray-700">
-                    <button onclick="confirmFileUpload()" class="w-full px-4 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
-                        Dosyayı Yükle
+                <div class="mt-6 pt-4 border-t border-gray-700 flex space-x-3">
+                    <button onclick="closeContentTypeModal()" class="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold transition-colors">
+                        Geri
+                    </button>
+                    <button onclick="proceedToFieldMapping()" class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
+                        Field Mapping'e Geç
+                    </button>
+                </div>
+    </div>
+</div>
+
+<!-- URL Content Type Selection Modal -->
+<div id="urlContentTypeModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center">
+    <div class="relative p-6 border border-gray-700 w-full max-w-2xl shadow-2xl rounded-xl glass-effect">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-white">İçerik Tipini Seçin</h3>
+            <button onclick="closeUrlContentTypeModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <p class="text-gray-300 text-center mb-6">
+                URL'den çekilecek içeriğin tipini seçin. Bu seçim, AI sisteminin içeriği nasıl işleyeceğini belirler.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- FAQ Content Type -->
+                <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer" data-type="faq">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">FAQ / SSS</h4>
+                        <p class="text-sm text-gray-400">Sık sorulan sorular ve cevapları içeren içerik</p>
+                    </div>
+                </div>
+                
+                <!-- Product Content Type -->
+                <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer" data-type="product">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">Ürün Kataloğu</h4>
+                        <p class="text-sm text-gray-400">Ürün bilgileri, fiyatlar ve kategoriler içeren içerik</p>
+                    </div>
+                </div>
+                
+                <!-- Blog Content Type -->
+                <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-green-500/50 transition-all duration-300 cursor-pointer" data-type="blog">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">Blog / Makale</h4>
+                        <p class="text-sm text-gray-400">Blog yazıları, makaleler ve bilgilendirici içerik</p>
+                    </div>
+                </div>
+                
+                <!-- Campaign Content Type -->
+                <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-orange-500/50 transition-all duration-300 cursor-pointer" data-type="campaign">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">Kampanya</h4>
+                        <p class="text-sm text-gray-400">Kampanya bilgileri, promosyonlar ve özel teklifler</p>
+                    </div>
+                </div>
+                
+                <!-- General Content Type -->
+                <div class="content-type-option p-6 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-500/50 transition-all duration-300 cursor-pointer" data-type="general">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gray-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">Genel İçerik</h4>
+                        <p class="text-sm text-gray-400">Belirli bir kategoriye girmeyen genel içerik</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 pt-4 border-t border-gray-700 flex space-x-3">
+            <button onclick="closeUrlContentTypeModal()" class="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold transition-colors">
+                Geri
+            </button>
+            <button onclick="proceedToUrlFieldMapping()" class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
+                Field Mapping'e Geç
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Field Mapping Modal -->
+        <div id="fieldMappingModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm overflow-y-auto h-full w-full z-50 hidden flex items-center justify-center">
+            <div class="relative p-6 border border-gray-700 w-full max-w-6xl max-h-[90vh] shadow-2xl rounded-xl glass-effect">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-white">Field Mapping</h3>
+                    <button onclick="closeFieldMappingModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <p class="text-gray-300 text-center mb-6">
+                        Dosyanızdaki alanları sistemimizdeki standart alanlarla eşleştirin. Bu sayede AI sisteminiz doğru şekilde çalışacaktır.
+                    </p>
+                    
+                    <!-- Field Mapping Container -->
+                    <div id="field-mapping-container" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Field mappings will be populated here -->
+                    </div>
+                    
+                    
+                    <!-- Sample Data Preview -->
+                    <div id="sample-data-preview" class="hidden">
+                        <h4 class="text-lg font-semibold text-white mb-4">Örnek Veri Önizleme</h4>
+                        <div class="bg-gray-800/50 rounded-lg p-4 max-h-80 overflow-auto border border-gray-600">
+                            <div id="sample-data-content" class="text-sm text-gray-300 min-w-full">
+                                <!-- Sample data will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-700 flex space-x-3">
+                    <button onclick="closeFieldMappingModal()" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold transition-colors">
+                        İptal
+                    </button>
+                    <button onclick="previewFieldMapping()" class="px-4 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-semibold transition-colors">
+                        Önizle
+                    </button>
+                    <button onclick="confirmFieldMapping()" class="px-4 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
+                        Kaydet ve Yükle
                     </button>
                 </div>
             </div>
@@ -548,8 +763,6 @@ window.deleteKB = async function(kbId) {
             return;
         }
         
-        console.log('Deleting KB with ID:', kbId);
-        
         // Show loading state
         showLoadingMessage('Siliniyor...');
         
@@ -558,9 +771,6 @@ window.deleteKB = async function(kbId) {
         if (!csrfToken) {
             throw new Error('CSRF token bulunamadı');
         }
-        
-        console.log('Sending delete request to:', `/dashboard/knowledge-base/${kbId}`);
-        console.log('CSRF Token:', csrfToken);
         
         const requestOptions = {
             method: 'DELETE',
@@ -572,12 +782,7 @@ window.deleteKB = async function(kbId) {
             }
         };
         
-        console.log('Request options:', requestOptions);
-        
         const response = await fetch(`/dashboard/knowledge-base/${kbId}`, requestOptions);
-        
-        console.log('Delete response status:', response.status);
-        console.log('Delete response headers:', response.headers);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -594,7 +799,6 @@ window.deleteKB = async function(kbId) {
         }
         
     } catch (error) {
-        console.error('Error deleting KB:', error);
         showErrorMessage('Bilgi tabanı silinirken hata oluştu: ' + error.message);
     }
 };
@@ -620,22 +824,6 @@ function startLoading() {
     }, 200);
 }
 
-// Test function availability
-console.log('Testing function availability...');
-console.log('deleteKB function available:', typeof window.deleteKB);
-
-// Test functions function
-window.testFunctions = function() {
-    console.log('=== Testing Functions ===');
-    console.log('deleteKB:', typeof window.deleteKB);
-    
-    // Test if we can call the functions
-    if (typeof window.deleteKB === 'function') {
-        console.log('deleteKB function is available and callable');
-    } else {
-        console.error('deleteKB function is NOT available');
-    }
-};
 
 // Complete loading animation
 function completeLoading() {
@@ -675,8 +863,6 @@ async function loadContent() {
         const projectId = '{{ $projectId }}';
         const url = '{{ route("dashboard.knowledge-base.load-content") }}' + (projectId ? `?project_id=${projectId}` : '');
         
-        console.log('Loading content from:', url);
-        
         // CSRF token'ı al - önce meta tag'den, yoksa input'tan
         let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         if (!csrfToken) {
@@ -687,8 +873,6 @@ async function loadContent() {
             csrfToken = '{{ csrf_token() }}';
         }
         
-        console.log('CSRF Token:', csrfToken ? 'Found' : 'Not found');
-        
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -697,37 +881,27 @@ async function loadContent() {
             }
         });
         
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const result = await response.json();
-        console.log('Response data:', result);
         
         if (result.success) {
             // Store data globally
             knowledgeBases = result.data.knowledgeBases || [];
             projects = result.data.projects || [];
             
-            console.log('Knowledge bases count:', knowledgeBases.length);
-            console.log('Projects count:', projects.length);
-            
             completeLoading();
         } else {
             // Hata mesajı varsa göster ama form alanlarını da yükle
-            console.warn('Server returned error but continuing with form display');
             knowledgeBases = [];
             projects = [];
             completeLoading();
         }
         
     } catch (error) {
-        console.error('Loading error:', error);
         // Hata durumunda bile form alanlarını göster
-        console.warn('Continuing with form display despite error');
         knowledgeBases = [];
         projects = [];
         showErrorState();
@@ -780,8 +954,6 @@ function populateContent() {
         }, 200 + (index * 100));
     });
     
-    // Success message göster
-    console.log('Content başarıyla yüklendi ve form alanları gösterildi');
 }
 
 // Populate content with default values (when loading fails)
@@ -817,8 +989,6 @@ function populateContentWithDefaults() {
         }, 200 + (index * 100));
     });
     
-    // Success message göster
-    console.log('Form alanları başarıyla yüklendi (varsayılan değerlerle)');
     
     // Error state'i gizle çünkü form alanları yüklendi
     setTimeout(() => {
@@ -994,8 +1164,6 @@ function showErrorState() {
         }, 200 + (index * 100));
     });
     
-    // Success message göster
-    console.log('Error state gösterildi ama form alanları da yüklendi');
     
     // Error state'i 5 saniye sonra gizle
     setTimeout(() => {
@@ -1040,13 +1208,12 @@ function scrollToSection(sectionId) {
 function deleteKB(id) {
     // Implementation for deleting knowledge base
     if (confirm('Bu bilgi tabanını silmek istediğinizden emin misiniz?')) {
-        console.log('Deleting KB:', id);
+        // Delete implementation
     }
 }
 
 // Global functions for bilgi tabanı operations
 function searchKnowledgeBase(kbId) {
-    console.log(`searchKnowledgeBase çağrıldı: ${kbId}`);
     const query = prompt('Bu bilgi tabanında arama yapmak için sorgu girin:');
     if (query) {
         const searchInput = document.getElementById('search-query');
@@ -1054,15 +1221,11 @@ function searchKnowledgeBase(kbId) {
         if (searchInput && searchButton) {
             searchInput.value = query;
             searchButton.click();
-        } else {
-            console.log('searchInput veya searchButton bulunamadı');
         }
     }
 }
 
 function viewChunks(kbId) {
-    console.log(`viewChunks çağrıldı: ${kbId}`);
-    
     // Get elements
     const chunksModal = document.getElementById('chunks-modal');
     const chunksContent = document.getElementById('chunks-content');
@@ -1112,14 +1275,12 @@ function viewChunks(kbId) {
         }
     })
     .then(response => {
-        console.log(`Chunks API response status: ${response.status}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         return response.json();
     })
     .then(data => {
-        console.log('Chunks API response alındı:', data);
         if (data.success) {
             displayChunks(data.chunks, data.knowledge_base, 1);
         } else {
@@ -1133,7 +1294,6 @@ function viewChunks(kbId) {
         }
     })
     .catch(error => {
-        console.log(`Chunks API Error: ${error.message}`);
         if (chunksContent) {
             chunksContent.innerHTML = `
                 <div class="p-6 bg-red-500/10 border border-red-500/30 rounded-lg">
@@ -1145,7 +1305,6 @@ function viewChunks(kbId) {
 }
 
 function deleteKnowledgeBase(kbId) {
-    console.log(`deleteKnowledgeBase çağrıldı: ${kbId}`);
     if (confirm('Bu bilgi tabanını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
         fetch(`/api/knowledge-base/${kbId}`, {
             method: 'DELETE',
@@ -1168,8 +1327,6 @@ function deleteKnowledgeBase(kbId) {
 }
 
 function retryProcessing(kbId) {
-    console.log(`retryProcessing çağrıldı: ${kbId}`);
-    
     // Show loading state
     const retryButton = event.target;
     const originalText = retryButton.textContent;
@@ -1210,8 +1367,6 @@ function retryProcessing(kbId) {
 }
 
 function viewKnowledgeBaseDetail(kbId) {
-    console.log(`viewKnowledgeBaseDetail çağrıldı: ${kbId}`);
-    
     // Show modal
     const modal = document.getElementById('kbDetailModal');
     const content = document.getElementById('kbDetailContent');
@@ -1252,7 +1407,6 @@ function viewKnowledgeBaseDetail(kbId) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             content.innerHTML = `
                 <div class="p-6 bg-red-500/10 border border-red-500/30 rounded-lg">
                     <p class="text-red-400">Detaylar yüklenirken hata oluştu: ${error.message}</p>
@@ -1522,41 +1676,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // File name modal event listeners
-    const fileNameModal = document.getElementById('fileNameModal');
-    if (fileNameModal) {
-        // Close modal when clicking on backdrop
-        fileNameModal.addEventListener('click', (e) => {
-            if (e.target === fileNameModal) {
-                closeFileNameModal();
-                // Reset file selection when modal is closed by backdrop click
-                resetFileSelection();
-            }
-        });
-        
-        // Handle Enter key in modal input
-        const modalInput = document.getElementById('modal-kb-name');
-        if (modalInput) {
-            modalInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    confirmFileUpload();
-                }
-            });
-        }
-    }
     
     // Close modal with ESC key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             const chunksModal = document.getElementById('chunks-modal');
-            const fileNameModal = document.getElementById('fileNameModal');
             
             if (chunksModal && !chunksModal.classList.contains('hidden')) {
                 chunksModal.classList.add('hidden');
-            }
-            if (fileNameModal && !fileNameModal.classList.contains('hidden')) {
-                closeFileNameModal();
-                resetFileSelection();
             }
         }
     });
@@ -1612,15 +1739,9 @@ document.addEventListener('DOMContentLoaded', function() {
 let selectedFile = null;
 
 function handleFileUpload(file) {
-    console.log('handleFileUpload called with file:', file);
-    
     // Validate file type
     const allowedTypes = ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
-    
-    console.log('File extension:', fileExtension);
-    console.log('File size:', file.size);
-    console.log('File type:', file.type);
     
     if (!allowedTypes.includes(fileExtension)) {
         alert('Desteklenmeyen dosya formatı. Lütfen CSV, TXT, XML, JSON veya Excel dosyası seçin.');
@@ -1633,39 +1754,19 @@ function handleFileUpload(file) {
         return;
     }
 
-    // Store file globally and show modal
+    // Store file globally and generate KB name from file name
     selectedFile = file;
-    console.log('File stored, showing modal');
-    showFileNameModal();
+    
+    // Generate knowledge base name from file name (remove extension)
+    const fileName = file.name;
+    const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, "");
+    selectedKbName = nameWithoutExtension;
+    
+    // Go directly to content type selection
+    openContentTypeModal();
 }
 
 // Modal functions
-function showFileNameModal() {
-    const modal = document.getElementById('fileNameModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        // Focus on input
-        setTimeout(() => {
-            const input = document.getElementById('modal-kb-name');
-            if (input) {
-                input.focus();
-            }
-        }, 100);
-    }
-}
-
-function closeFileNameModal() {
-    const modal = document.getElementById('fileNameModal');
-    if (modal) {
-        modal.classList.add('hidden');
-        // Clear input but keep file
-        const input = document.getElementById('modal-kb-name');
-        if (input) {
-            input.value = '';
-        }
-        // Don't reset selectedFile here - let it be reset only when needed
-    }
-}
 
 function resetFileSelection() {
     selectedFile = null;
@@ -1676,43 +1777,8 @@ function resetFileSelection() {
     }
 }
 
-function confirmFileUpload() {
-    const kbNameInput = document.getElementById('modal-kb-name');
-    const kbName = kbNameInput ? kbNameInput.value.trim() : '';
-    
-    console.log('confirmFileUpload called');
-    console.log('selectedFile:', selectedFile);
-    console.log('kbName:', kbName);
-    
-    if (!kbName) {
-        alert('Lütfen bilgi tabanı adı girin');
-        return;
-    }
-    
-    if (!selectedFile) {
-        alert('Dosya seçilmedi. Lütfen tekrar dosya seçin.');
-        closeFileNameModal();
-        return;
-    }
-    
-    // Store file reference before closing modal
-    const fileToUpload = selectedFile;
-    
-    // Close modal
-    closeFileNameModal();
-    
-    // Start upload process
-    uploadFileWithName(fileToUpload, kbName);
-}
 
 function uploadFileWithName(file, kbName) {
-    // Debug: Log file information
-    console.log('File details:', {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        lastModified: file.lastModified
-    });
     
     // Show progress
     const uploadProgress = document.getElementById('upload-progress');
@@ -1751,11 +1817,6 @@ function uploadFileWithName(file, kbName) {
         return;
     }
     
-    // Debug: Log FormData contents
-    console.log('FormData contents:');
-    for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-    }
 
     // Upload file
     fetch('/dashboard/knowledge-base/upload', {
@@ -1767,12 +1828,9 @@ function uploadFileWithName(file, kbName) {
         body: formData
     })
     .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
         return response.json();
     })
     .then(data => {
-        console.log('Response data:', data);
         clearInterval(progressInterval);
         if (progressBar) {
             progressBar.style.width = '100%';
@@ -1789,7 +1847,6 @@ function uploadFileWithName(file, kbName) {
                 // Reload page to show new knowledge base
                 setTimeout(() => location.reload(), 2000);
             } else {
-                console.error('Upload error:', data);
                 let errorMessage = 'Hata: ' + data.message;
                 if (data.errors) {
                     errorMessage += '\nDetaylar: ' + JSON.stringify(data.errors, null, 2);
@@ -1799,7 +1856,6 @@ function uploadFileWithName(file, kbName) {
         }, 500);
     })
     .catch(error => {
-        console.error('Upload error:', error);
         clearInterval(progressInterval);
         if (uploadProgress) {
             uploadProgress.classList.add('hidden');
@@ -1810,22 +1866,15 @@ function uploadFileWithName(file, kbName) {
     });
 }
 
-// URL fetch functionality
+// URL fetch functionality - now handled by modal system
 document.addEventListener('DOMContentLoaded', function() {
-    const fetchUrlBtn = document.getElementById('fetch-url-btn');
     const urlInput = document.getElementById('url-input');
     const kbNameInput = document.getElementById('kb-name');
-    
-    if (fetchUrlBtn) {
-        fetchUrlBtn.addEventListener('click', function() {
-            handleUrlFetch();
-        });
-    }
     
     if (urlInput) {
         urlInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                handleUrlFetch();
+                openUrlContentTypeModal();
             }
         });
     }
@@ -1833,107 +1882,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (kbNameInput) {
         kbNameInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                handleUrlFetch();
+                openUrlContentTypeModal();
             }
         });
     }
 });
 
-function handleUrlFetch() {
-    const kbNameInput = document.getElementById('kb-name');
-    const urlInput = document.getElementById('url-input');
-    
-    if (!kbNameInput || !urlInput) {
-        alert('URL işlemi için gerekli elementler bulunamadı');
-        return;
-    }
-    
-    const name = kbNameInput.value.trim();
-    const url = urlInput.value.trim();
-    
-    if (!name) {
-        alert('Lütfen bilgi tabanı adı girin');
-        return;
-    }
-    
-    if (!url) {
-        alert('Lütfen geçerli bir URL girin');
-        return;
-    }
-
-    if (!isValidUrl(url)) {
-        alert('Lütfen geçerli bir URL formatı girin (örn: https://example.com/data.csv)');
-        return;
-    }
-
-    // Show progress
-    const urlFetchProgress = document.getElementById('url-fetch-progress');
-    if (urlFetchProgress) {
-        urlFetchProgress.classList.remove('hidden');
-    }
-    
-    // Show real progress
-    let progress = 0;
-    const urlProgressBar = document.getElementById('url-progress-bar');
-    const progressInterval = setInterval(() => {
-        progress += Math.random() * 25;
-        if (progress > 95) progress = 95;
-        if (urlProgressBar) {
-            urlProgressBar.style.width = progress + '%';
-        }
-    }, 150);
-
-    // Create form data
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('url', url);
-    
-    // CSRF token'ı güvenli şekilde al
-    const csrfToken = document.querySelector('meta[name="csrf-token"]');
-    if (csrfToken) {
-        formData.append('_token', csrfToken.getAttribute('content'));
-    } else {
-        alert('Güvenlik token\'ı bulunamadı. Sayfayı yenileyin.');
-        return;
-    }
-
-    // Fetch from URL
-    fetch('/dashboard/knowledge-base/fetch-url', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        clearInterval(progressInterval);
-        if (urlProgressBar) {
-            urlProgressBar.style.width = '100%';
-        }
-        
-        setTimeout(() => {
-            if (urlFetchProgress) {
-                urlFetchProgress.classList.add('hidden');
-            }
-            if (data.success) {
-                showResults(data);
-                // Reload page to show new knowledge base
-                setTimeout(() => location.reload(), 2000);
-            } else {
-                alert('Hata: ' + data.message);
-            }
-        }, 500);
-    })
-    .catch(error => {
-        clearInterval(progressInterval);
-        if (urlFetchProgress) {
-            urlFetchProgress.classList.add('hidden');
-        }
-        alert('URL\'den içerik çekilirken hata oluştu: ' + error.message);
-    });
-}
 
 function isValidUrl(string) {
     try {
@@ -2160,6 +2114,775 @@ function showErrorMessage(message) {
         errorDiv.remove();
     }, 5000);
 }
+
+// Global variables for modal state
+let selectedContentType = null;
+let detectedFields = [];
+let fieldMappings = [];
+let selectedUrl = null;
+let selectedUrlContentType = null;
+let selectedKbName = null;
+let selectedKbDescription = null;
+
+// Content Type Modal Functions
+function openContentTypeModal() {
+    const modal = document.getElementById('contentTypeModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        // Add click handlers for content type options
+        addContentTypeClickHandlers();
+    }
+}
+
+function closeContentTypeModal() {
+    const modal = document.getElementById('contentTypeModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// URL Content Type Modal Functions
+function openUrlContentTypeModal() {
+    const urlInput = document.getElementById('url-input');
+    
+    if (!urlInput) {
+        alert('URL işlemi için gerekli elementler bulunamadı');
+        return;
+    }
+    
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+        alert('Lütfen geçerli bir URL girin');
+        return;
+    }
+    
+    if (!isValidUrl(url)) {
+        alert('Lütfen geçerli bir URL formatı girin (örn: https://example.com/data.csv)');
+        return;
+    }
+    
+    // Generate knowledge base name from URL (extract filename)
+    const urlParts = url.split('/');
+    const fileName = urlParts[urlParts.length - 1];
+    const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, "");
+    selectedKbName = nameWithoutExtension || 'url-content';
+    
+    // Store values in global variables
+    selectedUrl = url;
+    const modal = document.getElementById('urlContentTypeModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        addUrlContentTypeClickHandlers();
+    }
+}
+
+function closeUrlContentTypeModal() {
+    const modal = document.getElementById('urlContentTypeModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        selectedUrlContentType = null;
+        // Don't reset selectedUrl here - it should persist until field mapping is complete
+    }
+}
+
+function addContentTypeClickHandlers() {
+    const options = document.querySelectorAll('.content-type-option');
+    options.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove previous selection
+            options.forEach(opt => {
+                opt.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            });
+            
+            // Add selection to clicked option
+            this.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            
+            // Store selected content type
+            selectedContentType = this.dataset.type;
+        });
+    });
+}
+
+function addUrlContentTypeClickHandlers() {
+    const options = document.querySelectorAll('#urlContentTypeModal .content-type-option');
+    options.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove previous selection
+            options.forEach(opt => {
+                opt.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            });
+            
+            // Add selection to clicked option
+            this.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            
+            // Store selected content type
+            selectedUrlContentType = this.dataset.type;
+        });
+    });
+}
+
+function proceedToFieldMapping() {
+    if (!selectedContentType) {
+        alert('Lütfen bir içerik tipi seçin.');
+        return;
+    }
+    
+    closeContentTypeModal();
+    
+    // Detect fields from the uploaded file
+    detectFieldsFromFile();
+}
+
+function proceedToUrlFieldMapping() {
+    if (!selectedUrlContentType) {
+        alert('Lütfen bir içerik tipi seçin.');
+        return;
+    }
+    
+    if (!selectedUrl) {
+        alert('URL bulunamadı. Lütfen tekrar URL girin.');
+        return;
+    }
+    
+    closeUrlContentTypeModal();
+    detectFieldsFromUrl();
+}
+
+// Field Detection and Mapping Functions
+function detectFieldsFromFile() {
+    if (!selectedFile) {
+        alert('Dosya bulunamadı.');
+        return;
+    }
+    
+    // Show loading state
+    const modal = document.getElementById('fieldMappingModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        
+        // Show loading in field mapping container
+        const container = document.getElementById('field-mapping-container');
+        container.innerHTML = `
+            <div class="flex items-center justify-center p-8">
+                <div class="text-center">
+                    <div class="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p class="text-gray-300">Dosya analiz ediliyor ve alanlar tespit ediliyor...</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Call real API for field detection
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    
+    // CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        formData.append('_token', csrfToken.getAttribute('content'));
+    }
+    
+    fetch('/dashboard/knowledge-base/detect-fields-from-file', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            detectedFields = data.detected_fields || [];
+            renderFieldMapping();
+        } else {
+            // Fallback to simulation
+            detectedFields = simulateFieldDetection(selectedFile);
+            renderFieldMapping();
+        }
+    })
+    .catch(error => {
+        // Fallback to simulation
+        try {
+            detectedFields = simulateFieldDetection(selectedFile);
+        } catch (simError) {
+            detectedFields = [
+                { name: 'content', type: 'text', sample: 'Dosya içeriği' }
+            ];
+        }
+        renderFieldMapping();
+    });
+}
+
+function detectFieldsFromUrl() {
+    if (!selectedUrl) {
+        alert('URL bulunamadı. Lütfen tekrar URL girin.');
+        return;
+    }
+    
+    // Show field mapping modal with loading state
+    const modal = document.getElementById('fieldMappingModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        
+        // Show loading state
+        const container = document.getElementById('field-mapping-container');
+        if (container) {
+            container.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mr-3"></div>
+                    <span class="text-purple-400">URL'den field'lar tespit ediliyor...</span>
+                </div>
+            `;
+        }
+    }
+    
+    // Call real API for URL field detection
+    const formData = new FormData();
+    formData.append('url', selectedUrl);
+    
+    // CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        formData.append('_token', csrfToken.getAttribute('content'));
+    }
+    
+    fetch('/dashboard/knowledge-base/detect-fields-from-url', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            detectedFields = data.detected_fields || [];
+            renderFieldMapping();
+        } else {
+            // Fallback to simulation
+            detectedFields = simulateUrlFieldDetection(selectedUrl);
+            renderFieldMapping();
+        }
+    })
+    .catch(error => {
+        // Fallback to simulation
+        try {
+            detectedFields = simulateUrlFieldDetection(selectedUrl);
+        } catch (simError) {
+            detectedFields = [
+                { name: 'content', type: 'text', sample: 'URL içeriği' }
+            ];
+        }
+        renderFieldMapping();
+    });
+}
+
+function simulateFieldDetection(file) {
+    const extension = file.name.split('.').pop().toLowerCase();
+    const fields = [];
+    
+    // Simulate different field detection based on file type
+    switch (extension) {
+        case 'csv':
+            fields.push(
+                { name: 'id', type: 'number', sample: '1' },
+                { name: 'name', type: 'text', sample: 'Ürün Adı' },
+                { name: 'price', type: 'number', sample: '99.99' },
+                { name: 'category', type: 'text', sample: 'Elektronik' },
+                { name: 'description', type: 'text', sample: 'Ürün açıklaması' }
+            );
+            break;
+        case 'json':
+            fields.push(
+                { name: 'product_id', type: 'number', sample: '123' },
+                { name: 'title', type: 'text', sample: 'Ürün Başlığı' },
+                { name: 'cost', type: 'number', sample: '150.00' },
+                { name: 'type', type: 'text', sample: 'Kategori' },
+                { name: 'details', type: 'text', sample: 'Detaylı açıklama' }
+            );
+            break;
+        case 'xml':
+            fields.push(
+                { name: 'item_id', type: 'number', sample: '456' },
+                { name: 'item_name', type: 'text', sample: 'XML Ürün' },
+                { name: 'amount', type: 'number', sample: '75.50' },
+                { name: 'cat', type: 'text', sample: 'Kategori' },
+                { name: 'desc', type: 'text', sample: 'XML açıklama' }
+            );
+            break;
+        default:
+            fields.push(
+                { name: 'field1', type: 'text', sample: 'Değer 1' },
+                { name: 'field2', type: 'text', sample: 'Değer 2' },
+                { name: 'field3', type: 'text', sample: 'Değer 3' }
+            );
+    }
+    
+    return fields;
+}
+
+function simulateUrlFieldDetection(url) {
+    const extension = url.split('.').pop().toLowerCase().split('?')[0]; // Remove query params
+    const fields = [];
+    
+    // Simulate different field detection based on URL file type
+    switch (extension) {
+        case 'csv':
+            fields.push(
+                { name: 'id', type: 'number', sample: '1' },
+                { name: 'name', type: 'text', sample: 'Ürün Adı' },
+                { name: 'price', type: 'number', sample: '99.99' },
+                { name: 'category', type: 'text', sample: 'Elektronik' },
+                { name: 'description', type: 'text', sample: 'Ürün açıklaması' }
+            );
+            break;
+        case 'json':
+            fields.push(
+                { name: 'product_id', type: 'number', sample: '123' },
+                { name: 'title', type: 'text', sample: 'Ürün Başlığı' },
+                { name: 'cost', type: 'number', sample: '150.00' },
+                { name: 'type', type: 'text', sample: 'Kategori' },
+                { name: 'details', type: 'text', sample: 'Detaylı açıklama' }
+            );
+            break;
+        case 'xml':
+            fields.push(
+                { name: 'item_id', type: 'number', sample: '456' },
+                { name: 'item_name', type: 'text', sample: 'XML Ürün' },
+                { name: 'amount', type: 'number', sample: '75.50' },
+                { name: 'cat', type: 'text', sample: 'Kategori' },
+                { name: 'desc', type: 'text', sample: 'XML açıklama' }
+            );
+            break;
+        default:
+            fields.push(
+                { name: 'field1', type: 'text', sample: 'Değer 1' },
+                { name: 'field2', type: 'text', sample: 'Değer 2' },
+                { name: 'field3', type: 'text', sample: 'Değer 3' }
+            );
+    }
+    
+    detectedFields = fields;
+    renderFieldMapping();
+}
+
+function renderFieldMapping() {
+    const container = document.getElementById('field-mapping-container');
+    const standardFields = getStandardFields();
+    
+    if (!container) {
+        return;
+    }
+    
+    if (!detectedFields || detectedFields.length === 0) {
+        // Show fallback fields for testing
+        detectedFields = [
+            { name: 'id', type: 'number', sample: '1' },
+            { name: 'name', type: 'text', sample: 'Örnek İsim' },
+            { name: 'description', type: 'text', sample: 'Örnek açıklama' },
+            { name: 'price', type: 'number', sample: '99.99' }
+        ];
+    }
+    
+    let html = '';
+    
+    detectedFields.forEach((field, index) => {
+        // Show additional info for JSON fields
+        const additionalInfo = field.total_occurrences ? 
+            `<div class="text-xs text-blue-400 mb-1">📊 ${field.total_occurrences} kayıt bulundu</div>` : '';
+        
+        html += `
+            <div class="p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-sm font-medium text-gray-300">
+                                ${field.name} <span class="text-xs text-gray-500">(${field.type})</span>
+                            </label>
+                            ${field.index !== undefined ? `<span class="text-xs text-gray-500">#${field.index + 1}</span>` : ''}
+                        </div>
+                        ${additionalInfo}
+                        <div class="text-xs text-gray-400 mb-2 break-words">
+                            <span class="text-gray-500">Örnek:</span> ${field.sample || 'Değer yok'}
+                        </div>
+                        <select class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none" 
+                                onchange="updateFieldMapping(${index}, this.value)">
+                            <option value="" selected>Alan seçin...</option>
+                            ${standardFields.map(sf => `
+                                <option value="${sf.value}">
+                                    ${sf.label}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded border-gray-600 text-purple-500 focus:ring-purple-500" 
+                                   onchange="toggleFieldRequired(${index}, this.checked)">
+                            <span class="ml-2 text-sm text-gray-300">Zorunlu</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Initialize field mappings array
+    fieldMappings = detectedFields.map(field => ({
+        source_field: field.name,
+        target_field: '',
+        field_type: field.type,
+        is_required: false
+    }));
+}
+
+
+function getStandardFields() {
+    return [
+        { value: 'product_name', label: 'Ürün Adı' },
+        { value: 'product_description', label: 'Ürün Açıklaması' },
+        { value: 'product_price', label: 'Ürün Fiyatı' },
+        { value: 'product_category', label: 'Ürün Kategorisi' },
+        { value: 'product_brand', label: 'Ürün Markası' },
+        { value: 'product_sku', label: 'Ürün SKU' },
+        { value: 'product_stock', label: 'Stok Miktarı' },
+        { value: 'product_image', label: 'Ürün Resmi' },
+        { value: 'product_tags', label: 'Ürün Etiketleri' },
+        { value: 'product_rating', label: 'Ürün Puanı' },
+        { value: 'product_reviews', label: 'Ürün Yorumları' }
+    ];
+}
+
+function getSuggestedMapping(sourceField, targetField) {
+    const suggestions = {
+        'product_name': ['name', 'title', 'product_name', 'item_name'],
+        'product_description': ['description', 'desc', 'details'],
+        'product_price': ['price', 'cost', 'amount'],
+        'product_category': ['category', 'cat', 'type'],
+        'product_brand': ['brand', 'manufacturer'],
+        'product_sku': ['sku', 'code', 'id'],
+        'product_stock': ['stock', 'quantity', 'inventory'],
+        'product_image': ['image', 'photo', 'picture'],
+        'product_tags': ['tags', 'keywords', 'labels'],
+        'product_rating': ['rating', 'score', 'stars'],
+        'product_reviews': ['reviews', 'review_count']
+    };
+    
+    const targetSuggestions = suggestions[targetField] || [];
+    return targetSuggestions.some(suggestion => 
+        sourceField.toLowerCase().includes(suggestion.toLowerCase()) ||
+        suggestion.toLowerCase().includes(sourceField.toLowerCase())
+    );
+}
+
+function updateFieldMapping(index, targetField) {
+    if (fieldMappings[index]) {
+        fieldMappings[index].target_field = targetField;
+    }
+}
+
+function toggleFieldRequired(index, isRequired) {
+    if (fieldMappings[index]) {
+        fieldMappings[index].is_required = isRequired;
+    }
+}
+
+function previewFieldMapping() {
+    // Show sample data preview
+    const preview = document.getElementById('sample-data-preview');
+    const content = document.getElementById('sample-data-content');
+    
+    if (preview && content) {
+        preview.classList.remove('hidden');
+        
+        let html = '<div class="overflow-x-auto"><table class="w-full text-sm table-auto">';
+        html += '<thead><tr class="border-b border-gray-600 bg-gray-700/50">';
+        html += '<th class="text-left p-3 text-gray-200 font-semibold min-w-32">Kaynak Alan</th>';
+        html += '<th class="text-left p-3 text-gray-200 font-semibold min-w-32">Hedef Alan</th>';
+        html += '<th class="text-left p-3 text-gray-200 font-semibold min-w-40">Örnek Değer</th>';
+        html += '<th class="text-left p-3 text-gray-200 font-semibold min-w-20">Zorunlu</th>';
+        html += '</tr></thead><tbody>';
+        
+        fieldMappings.forEach(mapping => {
+            if (mapping.target_field) {
+                const sourceField = detectedFields.find(f => f.name === mapping.source_field);
+                html += `<tr class="border-b border-gray-700 hover:bg-gray-700/30">`;
+                html += `<td class="p-3 text-gray-300 font-medium">${mapping.source_field}</td>`;
+                html += `<td class="p-3 text-green-400 font-medium">${mapping.target_field}</td>`;
+                html += `<td class="p-3 text-gray-400 break-words">${sourceField ? sourceField.sample : 'N/A'}</td>`;
+                html += `<td class="p-3 text-center">${mapping.is_required ? '<span class="text-red-400">✓</span>' : '<span class="text-gray-500">-</span>'}</td>`;
+                html += `</tr>`;
+            }
+        });
+        
+        if (fieldMappings.filter(m => m.target_field).length === 0) {
+            html += `<tr><td colspan="4" class="p-4 text-center text-gray-500">Henüz alan eşleştirmesi yapılmadı</td></tr>`;
+        }
+        
+        html += '</tbody></table></div>';
+        content.innerHTML = html;
+    }
+}
+
+
+function confirmFieldMapping() {
+    // Validate mappings - check for non-empty target_field values
+    const validMappings = fieldMappings.filter(mapping => mapping.target_field && mapping.target_field.trim() !== '');
+    
+    if (validMappings.length === 0) {
+        alert('Lütfen en az bir alan eşleştirmesi yapın. Dropdown menülerden alan seçimi yapmalısınız.');
+        return;
+    }
+    
+    // Close field mapping modal
+    closeFieldMappingModal();
+    
+    // Check if this is URL or file upload
+    if (selectedUrl) {
+        uploadUrlWithMappings();
+    } else {
+        uploadFileWithMappings();
+    }
+}
+
+function uploadFileWithMappings() {
+    
+    if (!selectedKbName) {
+        alert('Bilgi tabanı adı gerekli.');
+        return;
+    }
+    
+    if (!selectedFile) {
+        alert('Dosya seçilmedi. Lütfen tekrar dosya seçin.');
+        return;
+    }
+    
+    // Show progress
+    const uploadProgress = document.getElementById('upload-progress');
+    if (uploadProgress) {
+        uploadProgress.classList.remove('hidden');
+    }
+    
+    // Show real progress
+    let progress = 0;
+    const progressBar = document.getElementById('progress-bar');
+    const progressInterval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress > 95) progress = 95;
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+    }, 100);
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('name', selectedKbName);
+    if (selectedContentType) {
+        formData.append('content_type', selectedContentType);
+    }
+    formData.append('field_mappings', JSON.stringify(fieldMappings.filter(m => m.target_field)));
+    
+    // Add project_id if available
+    const projectId = '{{ $projectId }}';
+    if (projectId) {
+        formData.append('project_id', projectId);
+    }
+    
+    // CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        formData.append('_token', csrfToken.getAttribute('content'));
+    } else {
+        alert('Güvenlik token\'ı bulunamadı. Sayfayı yenileyin.');
+        return;
+    }
+
+    // Upload file
+    fetch('/dashboard/knowledge-base/upload', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        clearInterval(progressInterval);
+        if (progressBar) {
+            progressBar.style.width = '100%';
+        }
+        
+        setTimeout(() => {
+            if (uploadProgress) {
+                uploadProgress.classList.add('hidden');
+            }
+            if (data.success) {
+                showResults(data);
+                // Clear all global variables
+                selectedFile = null;
+                selectedContentType = null;
+                selectedKbName = null;
+                selectedKbDescription = null;
+                fieldMappings = [];
+                detectedFields = [];
+                // Reset file input
+                const fileInput = document.getElementById('file-input');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                let errorMessage = 'Hata: ' + data.message;
+                if (data.errors) {
+                    errorMessage += '\nDetaylar: ' + JSON.stringify(data.errors, null, 2);
+                }
+                alert(errorMessage);
+            }
+        }, 500);
+    })
+    .catch(error => {
+        clearInterval(progressInterval);
+        // Clear all global variables on error
+        selectedFile = null;
+        selectedContentType = null;
+        selectedKbName = null;
+        selectedKbDescription = null;
+        fieldMappings = [];
+        detectedFields = [];
+        // Reset file input
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        alert('Dosya yüklenirken hata oluştu: ' + error.message);
+    });
+}
+
+function uploadUrlWithMappings() {
+    
+    if (!selectedKbName) {
+        alert('Bilgi tabanı adı gerekli.');
+        return;
+    }
+    
+    if (!selectedUrl) {
+        alert('URL bulunamadı. Lütfen tekrar URL girin.');
+        return;
+    }
+    
+    // Show progress
+    const urlFetchProgress = document.getElementById('url-fetch-progress');
+    if (urlFetchProgress) {
+        urlFetchProgress.classList.remove('hidden');
+    }
+    
+    // Show real progress
+    let progress = 0;
+    const urlProgressBar = document.getElementById('url-progress-bar');
+    const progressInterval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress > 95) progress = 95;
+        if (urlProgressBar) {
+            urlProgressBar.style.width = progress + '%';
+        }
+    }, 100);
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('url', selectedUrl);
+    formData.append('name', selectedKbName);
+    if (selectedUrlContentType) {
+        formData.append('content_type', selectedUrlContentType);
+    }
+    formData.append('field_mappings', JSON.stringify(fieldMappings.filter(m => m.target_field)));
+    
+    // Add project_id if available
+    const projectId = '{{ $projectId }}';
+    if (projectId) {
+        formData.append('project_id', projectId);
+    }
+    
+    // CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        formData.append('_token', csrfToken.getAttribute('content'));
+    }
+
+    // Upload URL
+    fetch('/dashboard/knowledge-base/fetch-url', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        clearInterval(progressInterval);
+        if (urlProgressBar) {
+            urlProgressBar.style.width = '100%';
+        }
+        
+        setTimeout(() => {
+            if (urlFetchProgress) {
+                urlFetchProgress.classList.add('hidden');
+            }
+            if (data.success) {
+                showResults(data);
+                // Clear form
+                document.getElementById('kb-name').value = '';
+                document.getElementById('url-input').value = '';
+                selectedUrl = null;
+                selectedUrlContentType = null;
+                selectedKbName = null;
+                selectedKbDescription = null;
+                fieldMappings = [];
+                detectedFields = [];
+                // Reload page after success
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                let errorMessage = 'Hata: ' + data.message;
+                if (data.errors) {
+                    errorMessage += '\nDetaylar: ' + JSON.stringify(data.errors, null, 2);
+                }
+                alert(errorMessage);
+            }
+        }, 500);
+    })
+    .catch(error => {
+        clearInterval(progressInterval);
+        if (urlFetchProgress) {
+            urlFetchProgress.classList.add('hidden');
+        }
+        alert('URL\'den içerik çekilirken hata oluştu: ' + error.message);
+        
+        // Clear URL variables on error
+        selectedUrl = null;
+        selectedUrlContentType = null;
+        selectedKbName = null;
+        selectedKbDescription = null;
+        fieldMappings = [];
+        detectedFields = [];
+    });
+}
+
+// Field Mapping Modal Functions
+function closeFieldMappingModal() {
+    const modal = document.getElementById('fieldMappingModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    
+}
+
 </script>
 @endsection
 

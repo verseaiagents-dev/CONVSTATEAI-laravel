@@ -133,6 +133,17 @@ class EnhancedChatSession extends Model
     }
 
     /**
+     * Session'ı otomatik olarak 24 saat uzat
+     */
+    public function extendSession(): void
+    {
+        $this->update([
+            'expires_at' => now()->addHours(24),
+            'last_activity' => now()
+        ]);
+    }
+
+    /**
      * Session'ın süresi dolmuş mu kontrol et
      */
     public function isExpired(): bool

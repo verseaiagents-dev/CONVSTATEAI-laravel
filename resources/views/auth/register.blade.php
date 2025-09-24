@@ -201,8 +201,8 @@
                         <div class="flex items-start space-x-3">
                             <input type="checkbox" id="terms" name="terms" class="form-checkbox mt-1" required>
                             <label for="terms" class="text-sm text-gray-300">
-                                <a href="#" class="text-purple-glow hover:text-neon-purple underline">Kullanım şartları</a>nı ve 
-                                <a href="#" class="text-purple-glow hover:text-neon-purple underline">gizlilik politikası</a>nı kabul ediyorum
+                                <a href="{{ route('terms-of-service') }}" class="text-purple-glow hover:text-neon-purple underline">Kullanım şartları</a>nı ve 
+                                <a href="{{ route('privacy-policy') }}" class="text-purple-glow hover:text-neon-purple underline">gizlilik politikası</a>nı kabul ediyorum
                             </label>
                         </div>
 

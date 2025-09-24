@@ -11,7 +11,7 @@ class ProductImageHelper
      * @param string $defaultPath
      * @return string
      */
-    public static function getSafeImageUrl(?string $imagePath, string $defaultPath = '/widgetcust/imgs/default-product.svg'): string
+    public static function getSafeImageUrl(?string $imagePath, string $defaultPath = '/imgs/product-placeholder.svg'): string
     {
         // Eğer resim yolu boş veya null ise default resmi döndür
         if (empty($imagePath) || trim($imagePath) === '') {
@@ -51,13 +51,101 @@ class ProductImageHelper
     }
 
     /**
+     * URL'nin erişilebilir olup olmadığını kontrol eder (HTTP HEAD request)
+     * 
+     * @param string $url
+     * @return bool
+     */
+    public static function isUrlAccessible(string $url): bool
+    {
+        // URL formatını kontrol et
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        // cURL ile HEAD request gönder
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 saniye timeout
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // SSL sertifika kontrolünü atla
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+        
+        $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        // HTTP 200-299 arası kodlar başarılı sayılır
+        return $result !== false && $httpCode >= 200 && $httpCode < 300;
+    }
+
+    /**
+     * Ürün resmi için güvenli URL oluşturur ve erişilebilirlik kontrolü yapar
+     * 
+     * @param string|null $imagePath
+     * @param string $defaultPath
+     * @return array ['url' => string, 'is_accessible' => bool, 'fallback_used' => bool]
+     */
+    public static function getSafeImageUrlWithCheck(?string $imagePath, string $defaultPath = '/imgs/product-placeholder.svg'): array
+    {
+        $result = [
+            'url' => $defaultPath,
+            'is_accessible' => false,
+            'fallback_used' => true
+        ];
+
+        // Eğer resim yolu boş veya null ise default resmi döndür
+        if (empty($imagePath) || trim($imagePath) === '') {
+            return $result;
+        }
+
+        // Eğer resim yolu zaten tam URL ise (http/https ile başlıyorsa)
+        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+            // URL erişilebilir mi kontrol et
+            $isAccessible = self::isUrlAccessible($imagePath);
+            
+            return [
+                'url' => $imagePath,
+                'is_accessible' => $isAccessible,
+                'fallback_used' => !$isAccessible
+            ];
+        }
+
+        // Eğer resim yolu relative path ise (/) ile başlıyorsa olduğu gibi döndür
+        if (str_starts_with($imagePath, '/')) {
+            $fullPath = public_path(ltrim($imagePath, '/'));
+            $exists = file_exists($fullPath);
+            
+            return [
+                'url' => $imagePath,
+                'is_accessible' => $exists,
+                'fallback_used' => !$exists
+            ];
+        }
+
+        // Eğer resim yolu relative path ise başına / ekle
+        $safeUrl = '/' . ltrim($imagePath, '/');
+        $fullPath = public_path(ltrim($safeUrl, '/'));
+        $exists = file_exists($fullPath);
+        
+        return [
+            'url' => $safeUrl,
+            'is_accessible' => $exists,
+            'fallback_used' => !$exists
+        ];
+    }
+
+    /**
      * Ürün resmi için fallback mekanizması
      * 
      * @param string|null $imagePath
      * @param string $defaultPath
      * @return string
      */
-    public static function getImageWithFallback(?string $imagePath, string $defaultPath = '/widgetcust/imgs/default-product.svg'): string
+    public static function getImageWithFallback(?string $imagePath, string $defaultPath = '/imgs/product-placeholder.svg'): string
     {
         // Eğer resim yolu boş veya null ise default resmi döndür
         if (empty($imagePath) || trim($imagePath) === '') {

@@ -31,13 +31,13 @@
     "id": 2,
     "name": "ConvStateAI Professional",
     "description": "Gelişmiş AI özellikleri ve detaylı analitik raporlarla e-ticaret sitenizi bir üst seviyeye taşıyın.",
-    "price": 3000.00,
+    "price": 2500.00,
     "currency": "TRY",
     "category": "AI Chat Widget",
     "features": [
      "Temel AI chat widget",
       "Temel müşteri analizi",
-      "Aylık 3000 chat limiti"
+      "Aylık 2500 chat limiti"
     ],
     "target_audience": "Büyük e-ticaret siteleri ve kurumsal müşteriler",
     "benefits": [
@@ -82,34 +82,7 @@
     },
     "pricing_model": "Aylık abonelik",
     "trial_period": ""
-  },
- 
-  {
-    "id": 6,
-    "name": "ConvStateAI Private Server",
-    "description": "Pzaryerleri için özel bir server",
-    "price": 100.000,
-    "currency": "TRY",
-    "category": "Training & Support",
-    "features": [
-     "Temel AI chat widget",
-     "Temel müşteri analizi",
-     "Sınırsız chat limiti"
-   ],
-    "target_audience": "ConvStateAI kullanıcıları ve ekipleri",
-   "benefits": [
-     "Müşteri memnuniyetinde artış",
-      "Dönüşüm oranında iyileşme",
-      "7/24 müşteri desteği",
-      "Kolay entegrasyon"
-    ],
-  "technical_specs": {
-      "setup_time": "15 dakika",
-      "integration": "JavaScript SDK",
-      "browser_support": "Tüm modern tarayıcılar",
-      "mobile_responsive": true
-    },
-    "pricing_model": "Bir kerelik ödeme",
-    "trial_period": ""
   }
+ 
+
 ]

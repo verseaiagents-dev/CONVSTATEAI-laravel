@@ -106,6 +106,8 @@ class KnowledgeBaseController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
                 'project_id' => 'nullable|exists:projects,id',
+                'content_type' => 'nullable|string|in:faq,product,blog,campaign,general',
+                'field_mappings' => 'nullable|string', // JSON string
             ], [
                 'file.required' => 'Dosya seçilmedi',
                 'file.file' => 'Geçersiz dosya',
@@ -114,13 +116,24 @@ class KnowledgeBaseController extends Controller
                 'name.required' => 'Knowledge base adı gerekli',
                 'name.string' => 'Knowledge base adı metin olmalı',
                 'name.max' => 'Knowledge base adı çok uzun (maksimum 255 karakter)',
+                'content_type.in' => 'Geçersiz içerik tipi',
             ]);
 
             if ($validator->fails()) {
+                \Log::error('Validation failed', [
+                    'errors' => $validator->errors()->toArray(),
+                    'request_data' => $request->all()
+                ]);
+                
                 return response()->json([
                     'success' => false,
                     'message' => 'Validation hatası',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
+                    'debug' => [
+                        'content_type_received' => $request->input('content_type'),
+                        'content_type_type' => gettype($request->input('content_type')),
+                        'all_request_data' => $request->all()
+                    ]
                 ], 422);
             }
 
@@ -144,6 +157,12 @@ class KnowledgeBaseController extends Controller
             // Store file
             $path = $file->storeAs('knowledge-base', $fileName, 'public');
             
+            // Get content type from request or determine automatically
+            $contentType = $request->input('content_type');
+            if (!$contentType) {
+                $contentType = $this->determineContentType(file_get_contents($file->getPathname()), $extension);
+            }
+
             // Create knowledge base record
             $knowledgeBase = KnowledgeBase::create([
                 'site_id' => 1, // Default site
@@ -156,6 +175,7 @@ class KnowledgeBaseController extends Controller
                 'file_size' => $this->contentChunker->countTokens(file_get_contents($file->getPathname())),
                 'processing_status' => 'pending',
                 'is_processing' => false,
+                'content_type' => $contentType, // Store selected content type
             ]);
 
             // Process file directly instead of using background job
@@ -167,6 +187,12 @@ class KnowledgeBaseController extends Controller
 
                 // Process file and create chunks
                 $chunks = $this->processFileAndCreateChunks($file, $extension, $knowledgeBase);
+                
+                // Process field mappings if provided
+                $fieldMappings = $request->input('field_mappings');
+                if ($fieldMappings) {
+                    $this->processFieldMappings($knowledgeBase, $fieldMappings);
+                }
                 
                 // Update knowledge base with results
                 $knowledgeBase->update([
@@ -258,6 +284,8 @@ class KnowledgeBaseController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'project_id' => 'nullable|exists:projects,id',
+            'content_type' => 'nullable|string|in:faq,product,blog,campaign,general',
+            'field_mappings' => 'nullable|string|json',
         ]);
 
         try {
@@ -298,6 +326,12 @@ class KnowledgeBaseController extends Controller
             // Determine file type from content type or URL
             $extension = $this->determineExtensionFromUrl($url, $contentType);
             
+            // Get content type from request or determine automatically
+            $contentType = $request->input('content_type');
+            if (!$contentType) {
+                $contentType = $this->determineContentType($content, $extension);
+            }
+
             // Create knowledge base record
             $knowledgeBase = KnowledgeBase::create([
                 'site_id' => 1, // Default site
@@ -310,7 +344,13 @@ class KnowledgeBaseController extends Controller
                 'file_size' => $this->contentChunker->countTokens($content),
                 'processing_status' => 'pending',
                 'is_processing' => false,
+                'content_type' => $contentType, // Store selected content type
             ]);
+            
+            // Process field mappings if provided
+            if ($request->has('field_mappings')) {
+                $this->processFieldMappings($knowledgeBase, $request->input('field_mappings'));
+            }
             
             // Process URL content directly instead of using background job
             try {
@@ -320,7 +360,7 @@ class KnowledgeBaseController extends Controller
                 ]);
 
                 // Process content and create chunks
-                $chunks = $this->contentChunker->chunkContent($content, [
+                $chunks = $this->contentChunker->chunkContent($content, $knowledgeBase->id, [
                     'max_chunk_size' => 800,
                     'overlap_size' => 150,
                     'preserve_words' => true
@@ -341,6 +381,7 @@ class KnowledgeBaseController extends Controller
                         'processed_images' => 0,
                         'image_vision' => null,
                         'metadata' => $chunkData['metadata'] ?? null,
+                        'is_indexed' => true, // Chunk'ları otomatik olarak indexle
                     ]);
                 }
                 
@@ -403,6 +444,13 @@ class KnowledgeBaseController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
+            \Log::error('URL fetch error: ' . $e->getMessage(), [
+                'url' => $request->input('url'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            
             if (isset($knowledgeBase)) {
                 $knowledgeBase->update([
                     'processing_status' => 'failed',
@@ -413,7 +461,13 @@ class KnowledgeBaseController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'URL işlenirken hata oluştu: ' . $e->getMessage()
+                'message' => 'URL işlenirken hata oluştu: ' . $e->getMessage(),
+                'debug' => [
+                    'url' => $request->input('url'),
+                    'error_type' => get_class($e),
+                    'error_line' => $e->getLine(),
+                    'error_file' => basename($e->getFile())
+                ]
             ], 500);
         }
     }
@@ -621,6 +675,7 @@ class KnowledgeBaseController extends Controller
                     'original_content_type' => $chunkData['content_type'] ?? 'unknown',
                     'detected_content_type' => $contentType
                 ]),
+                'is_indexed' => true, // Chunk'ları otomatik olarak indexle
             ]);
         }
 
@@ -1012,6 +1067,7 @@ class KnowledgeBaseController extends Controller
                         'has_images' => false,
                         'processed_images' => 0,
                         'image_vision' => null,
+                        'is_indexed' => true, // Chunk'ları otomatik olarak indexle
                     ]);
                 }
 
@@ -1895,6 +1951,504 @@ class KnowledgeBaseController extends Controller
                 'message' => 'Durum bilgisi alınamadı: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Process field mappings for knowledge base
+     */
+    private function processFieldMappings(KnowledgeBase $knowledgeBase, $fieldMappingsJson)
+    {
+        try {
+            // Check if fieldMappingsJson is empty or null
+            if (empty($fieldMappingsJson)) {
+                Log::info('No field mappings provided', [
+                    'knowledge_base_id' => $knowledgeBase->id
+                ]);
+                return;
+            }
+
+            $fieldMappings = json_decode($fieldMappingsJson, true);
+            
+            if (!is_array($fieldMappings)) {
+                Log::warning('Invalid field mappings JSON', [
+                    'knowledge_base_id' => $knowledgeBase->id,
+                    'field_mappings' => $fieldMappingsJson,
+                    'json_error' => json_last_error_msg()
+                ]);
+                return;
+            }
+
+            // Delete existing field mappings
+            FieldMapping::where('knowledge_base_id', $knowledgeBase->id)->delete();
+
+            // Create new field mappings
+            foreach ($fieldMappings as $index => $mapping) {
+                if (isset($mapping['source_field']) && isset($mapping['target_field']) && !empty($mapping['target_field'])) {
+                    FieldMapping::create([
+                        'knowledge_base_id' => $knowledgeBase->id,
+                        'source_field' => $mapping['source_field'],
+                        'target_field' => $mapping['target_field'],
+                        'field_type' => $mapping['field_type'] ?? 'text',
+                        'is_required' => $mapping['is_required'] ?? false,
+                        'default_value' => $mapping['default_value'] ?? null,
+                        'transformation' => $mapping['transformation'] ?? null,
+                        'validation_rules' => $mapping['validation_rules'] ?? null,
+                        'mapping_order' => $index,
+                        'is_active' => true
+                    ]);
+                }
+            }
+
+            Log::info('Field mappings processed successfully', [
+                'knowledge_base_id' => $knowledgeBase->id,
+                'mappings_count' => count($fieldMappings)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Field mappings processing error: ' . $e->getMessage(), [
+                'knowledge_base_id' => $knowledgeBase->id,
+                'field_mappings' => $fieldMappingsJson,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Don't throw exception, just log the error to avoid breaking the upload process
+        }
+    }
+
+    /**
+     * Detect fields from uploaded file for field mapping
+     */
+    public function detectFieldsFromFile(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|file|mimes:csv,txt,xml,json,xlsx,xls|max:10240',
+            ]);
+
+            $file = $request->file('file');
+            $extension = strtolower($file->getClientOriginalExtension());
+            
+            $detectedFields = $this->detectFieldsFromFileContent($file, $extension);
+            $suggestedMappings = $this->generateSuggestedMappings($detectedFields);
+
+            return response()->json([
+                'success' => true,
+                'detected_fields' => $detectedFields,
+                'suggested_mappings' => $suggestedMappings,
+                'standard_fields' => FieldMapping::getStandardFields(),
+                'field_types' => FieldMapping::getFieldTypes()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Field detection error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Field detection hatası: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Detect fields from URL for field mapping
+     */
+    public function detectFieldsFromUrl(Request $request)
+    {
+        try {
+            $request->validate([
+                'url' => 'required|url|max:500',
+            ]);
+
+            $url = $request->input('url');
+            
+            // Fetch content from URL
+            $response = \Http::timeout(30)->get($url);
+            
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'URL\'den içerik alınamadı. HTTP Status: ' . $response->status()
+                ], 400);
+            }
+
+            $content = $response->body();
+            $contentType = $response->header('Content-Type');
+            
+            // UTF-8 encoding kontrolü ve düzeltme
+            if (!mb_check_encoding($content, 'UTF-8')) {
+                $encodings = ['ISO-8859-1', 'ISO-8859-9', 'Windows-1254', 'Windows-1252', 'ASCII'];
+                
+                foreach ($encodings as $encoding) {
+                    if (mb_check_encoding($content, $encoding)) {
+                        $content = mb_convert_encoding($content, 'UTF-8', $encoding);
+                        break;
+                    }
+                }
+                
+                if (!mb_check_encoding($content, 'UTF-8')) {
+                    $content = mb_convert_encoding($content, 'UTF-8', 'auto');
+                    Log::warning("URL content encoding force converted to UTF-8: " . $url);
+                }
+            }
+            
+            // Determine file type from content type or URL
+            $extension = $this->determineExtensionFromUrl($url, $contentType);
+            
+            // Create temporary file for processing
+            $tempFile = tempnam(sys_get_temp_dir(), 'kb_url_detect_');
+            file_put_contents($tempFile, $content);
+            
+            // Create a temporary UploadedFile object
+            $uploadedFile = new \Illuminate\Http\UploadedFile(
+                $tempFile,
+                basename($url),
+                $contentType,
+                null,
+                true
+            );
+            
+            $detectedFields = $this->detectFieldsFromFileContent($uploadedFile, $extension);
+            $suggestedMappings = $this->generateSuggestedMappings($detectedFields);
+            
+            // Clean up temporary file
+            unlink($tempFile);
+
+            return response()->json([
+                'success' => true,
+                'detected_fields' => $detectedFields,
+                'suggested_mappings' => $suggestedMappings,
+                'standard_fields' => FieldMapping::getStandardFields(),
+                'field_types' => FieldMapping::getFieldTypes(),
+                'file_type' => $extension,
+                'content_preview' => substr($content, 0, 500) // İlk 500 karakteri göster
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('URL Field detection error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'URL field detection hatası: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Detect fields from file content
+     */
+    private function detectFieldsFromFileContent($file, $extension)
+    {
+        $fields = [];
+        
+        try {
+            switch ($extension) {
+                case 'csv':
+                    $fields = $this->detectCsvFields($file);
+                    break;
+                case 'json':
+                    $fields = $this->detectJsonFields($file);
+                    break;
+                case 'xml':
+                    $fields = $this->detectXmlFields($file);
+                    break;
+                case 'xlsx':
+                case 'xls':
+                    $fields = $this->detectExcelFields($file);
+                    break;
+                default:
+                    $fields = $this->detectTextFields($file);
+            }
+        } catch (\Exception $e) {
+            Log::error('Field detection error for ' . $extension . ': ' . $e->getMessage());
+            $fields = [];
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Detect CSV fields
+     */
+    private function detectCsvFields($file)
+    {
+        $content = file_get_contents($file->getPathname());
+        $lines = explode("\n", $content);
+        $header = str_getcsv($lines[0] ?? '');
+        
+        $fields = [];
+        foreach ($header as $index => $fieldName) {
+            if (!empty(trim($fieldName))) {
+                $fields[] = [
+                    'name' => trim($fieldName),
+                    'type' => $this->detectFieldType($fieldName),
+                    'sample' => $this->getSampleValue($lines, $index, 1) ?? '',
+                    'index' => $index
+                ];
+            }
+        }
+        
+        return $fields;
+    }
+
+    /**
+     * Detect JSON fields
+     */
+    private function detectJsonFields($file)
+    {
+        $content = file_get_contents($file->getPathname());
+        $data = json_decode($content, true);
+        
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $fields = [];
+        
+        // Handle different JSON structures
+        if (isset($data[0]) && is_array($data[0])) {
+            // Array of objects: [{"id": 1, "name": "test"}, {"id": 2, "name": "test2"}]
+            $firstItem = $data[0];
+            $totalItems = count($data);
+        } elseif (is_array($data) && !empty($data)) {
+            // Single object: {"id": 1, "name": "test"}
+            $firstItem = $data;
+            $totalItems = 1;
+        } else {
+            return [];
+        }
+        
+        foreach ($firstItem as $key => $value) {
+            $sampleValue = $this->getJsonSampleValue($data, $key, $totalItems);
+            
+            $fields[] = [
+                'name' => $key,
+                'type' => $this->detectFieldType($key, $value),
+                'sample' => $sampleValue,
+                'index' => count($fields),
+                'total_occurrences' => $totalItems
+            ];
+        }
+        
+        return $fields;
+    }
+
+    /**
+     * Get sample value from JSON data
+     */
+    private function getJsonSampleValue($data, $key, $totalItems)
+    {
+        if ($totalItems == 1) {
+            // Single object
+            $value = $data[$key] ?? '';
+        } else {
+            // Array of objects - get first non-null value
+            foreach ($data as $item) {
+                if (isset($item[$key]) && !empty($item[$key])) {
+                    $value = $item[$key];
+                    break;
+                }
+            }
+            $value = $value ?? '';
+        }
+        
+        if (is_string($value)) {
+            return substr($value, 0, 100); // İlk 100 karakter
+        } elseif (is_numeric($value)) {
+            return (string)$value;
+        } elseif (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        } else {
+            return json_encode($value);
+        }
+    }
+
+    /**
+     * Detect XML fields
+     */
+    private function detectXmlFields($file)
+    {
+        $content = file_get_contents($file->getPathname());
+        $xml = simplexml_load_string($content);
+        
+        if ($xml === false) {
+            return [];
+        }
+
+        $fields = [];
+        $this->extractXmlFields($xml, $fields);
+        
+        return array_values($fields);
+    }
+
+    /**
+     * Extract fields from XML recursively
+     */
+    private function extractXmlFields($xml, &$fields, $prefix = '')
+    {
+        foreach ($xml->children() as $child) {
+            $fieldName = $prefix . $child->getName();
+            
+            if (count($child->children()) == 0) {
+                // Leaf node
+                $fields[$fieldName] = [
+                    'name' => $fieldName,
+                    'type' => $this->detectFieldType($fieldName, (string)$child),
+                    'sample' => substr((string)$child, 0, 50),
+                    'index' => count($fields)
+                ];
+            } else {
+                // Has children, recurse
+                $this->extractXmlFields($child, $fields, $fieldName . '_');
+            }
+        }
+    }
+
+    /**
+     * Detect Excel fields
+     */
+    private function detectExcelFields($file)
+    {
+        try {
+            $data = Excel::toArray(new \stdClass(), $file);
+            if (empty($data) || empty($data[0])) {
+                return [];
+            }
+
+            $header = $data[0][0] ?? [];
+            $fields = [];
+            
+            foreach ($header as $index => $fieldName) {
+                if (!empty(trim($fieldName))) {
+                    $fields[] = [
+                        'name' => trim($fieldName),
+                        'type' => $this->detectFieldType($fieldName),
+                        'sample' => $data[0][1][$index] ?? '',
+                        'index' => $index
+                    ];
+                }
+            }
+            
+            return $fields;
+        } catch (\Exception $e) {
+            Log::error('Excel field detection error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Detect text fields (fallback)
+     */
+    private function detectTextFields($file)
+    {
+        return [
+            [
+                'name' => 'content',
+                'type' => 'text',
+                'sample' => 'Text content',
+                'index' => 0
+            ]
+        ];
+    }
+
+    /**
+     * Detect field type based on name and value
+     */
+    private function detectFieldType($fieldName, $value = null)
+    {
+        $fieldName = strtolower($fieldName);
+        
+        // Check for common patterns
+        if (str_contains($fieldName, 'id') || str_contains($fieldName, 'no')) {
+            return 'number';
+        }
+        
+        if (str_contains($fieldName, 'price') || str_contains($fieldName, 'cost') || str_contains($fieldName, 'amount')) {
+            return 'number';
+        }
+        
+        if (str_contains($fieldName, 'date') || str_contains($fieldName, 'time')) {
+            return 'date';
+        }
+        
+        if (str_contains($fieldName, 'active') || str_contains($fieldName, 'enabled') || str_contains($fieldName, 'status')) {
+            return 'boolean';
+        }
+        
+        if (str_contains($fieldName, 'tags') || str_contains($fieldName, 'categories') || str_contains($fieldName, 'list')) {
+            return 'array';
+        }
+        
+        // Check value type if provided
+        if ($value !== null) {
+            if (is_numeric($value)) {
+                return 'number';
+            }
+            if (is_bool($value)) {
+                return 'boolean';
+            }
+            if (is_array($value)) {
+                return 'array';
+            }
+        }
+        
+        return 'text';
+    }
+
+    /**
+     * Get sample value from CSV lines
+     */
+    private function getSampleValue($lines, $index, $rowIndex = 1)
+    {
+        if (isset($lines[$rowIndex])) {
+            $row = str_getcsv($lines[$rowIndex]);
+            return $row[$index] ?? '';
+        }
+        return '';
+    }
+
+    /**
+     * Generate suggested mappings for detected fields
+     */
+    private function generateSuggestedMappings($detectedFields)
+    {
+        $suggestions = [];
+        
+        foreach ($detectedFields as $field) {
+            $suggestions[$field['name']] = $this->getSuggestedTargetField($field['name']);
+        }
+        
+        return $suggestions;
+    }
+
+    /**
+     * Get suggested target field for source field
+     */
+    private function getSuggestedTargetField($sourceFieldName)
+    {
+        $sourceFieldName = strtolower($sourceFieldName);
+        
+        $mappings = [
+            'product_name' => ['name', 'title', 'product_name', 'item_name', 'product_title'],
+            'product_description' => ['description', 'desc', 'details', 'product_description'],
+            'product_price' => ['price', 'cost', 'amount', 'product_price', 'sale_price'],
+            'product_category' => ['category', 'cat', 'type', 'product_category', 'product_type'],
+            'product_brand' => ['brand', 'manufacturer', 'maker', 'product_brand'],
+            'product_sku' => ['sku', 'code', 'id', 'product_sku', 'product_code'],
+            'product_stock' => ['stock', 'inventory', 'quantity', 'available', 'stock_quantity'],
+            'product_image' => ['image', 'photo', 'picture', 'img', 'image_url'],
+            'product_tags' => ['tags', 'keywords', 'labels', 'attributes', 'product_tags'],
+            'product_rating' => ['rating', 'score', 'stars', 'review_rating'],
+            'product_reviews' => ['reviews', 'review_count', 'total_reviews']
+        ];
+        
+        foreach ($mappings as $targetField => $patterns) {
+            foreach ($patterns as $pattern) {
+                if (str_contains($sourceFieldName, $pattern) || str_contains($pattern, $sourceFieldName)) {
+                    return $targetField;
+                }
+            }
+        }
+        
+        return null;
     }
 
 }

@@ -21,6 +21,7 @@ class KnowledgeBase extends Model
         'source_config',
         'file_type',
         'file_size',
+        'content_type',
         'total_records',
         'processed_records',
         'chunk_count',
