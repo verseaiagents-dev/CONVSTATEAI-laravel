@@ -133,11 +133,6 @@ class Project extends Model
             return false;
         }
 
-        // Sadece aktif projeler CORS'a izin verir
-        if ($this->status !== 'active') {
-            return false;
-        }
-
         // URL boş olamaz
         if (empty($this->url)) {
             return false;
