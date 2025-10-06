@@ -18,6 +18,7 @@ class Project extends Model
         'is_featured',
         'created_by',
         'knowledge_list',
+        'project_token'
     ];
 
     protected $casts = [

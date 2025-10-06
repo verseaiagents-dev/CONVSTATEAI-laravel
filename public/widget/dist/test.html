@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConvStateAI Widget Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #e8f5e8;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ConvStateAI Widget Test</h1>
+        <div class="status">
+            ✅ Eski API ile test - Otomatik yükleme
+        </div>
+        <p>Bu sayfa eski API yapısını kullanıyor ve otomatik yükleme yapıyor.</p>
+    </div>
+    
+    <!-- ConvStateAI Widget Script -->
+    <script src="build/convstateai.min.js"></script>
+    <script>
+        // Eski API kullanımı - window.convstateaiConfig ile otomatik yükleme
+        window.convstateaiConfig = {
+            projectId: "2",
+            customizationToken: "998fd8ef9373fd0892df7c0c3fe140dde2782b96ecdd49c0be4b7b7674780fae",
+            apiUrl: "http://127.0.0.1:8000" // Development server
+        };
+        
+        // Alternatif olarak manuel yükleme de yapabiliriz
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ConvStateAI: Test sayfası yüklendi');
+            
+            // Eğer otomatik yükleme çalışmazsa manuel yükle
+            setTimeout(() => {
+                if (window.convstateai && !window.convstateai.isLoaded()) {
+                    console.log('ConvStateAI: Manuel yükleme başlatılıyor...');
+                    if (window.convstateai.chat && window.convstateai.chat.load) {
+                        // Yeni API
+                        window.convstateai.chat.load(window.convstateaiConfig);
+                    } else if (window.convstateai.load) {
+                        // Eski API
+                        window.convstateai.load(window.convstateaiConfig);
+                    }
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
