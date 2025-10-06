@@ -227,6 +227,9 @@ Route::prefix('widget')->group(function () {
 // Widget Customization - Token check required
 Route::get('/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'getPublicCustomization'])->middleware('token.check');
 
+// URL Test endpoint
+Route::post('/test-url', [App\Http\Controllers\ProjectsController::class, 'testUrl']);
+
 // Protected API Routes (with Project Auth)
 Route::middleware(['project.auth'])->group(function () {
     Route::post('/chat', [App\Http\Controllers\ConvStateAPI::class, 'chat'])->name('api.chat');

@@ -191,7 +191,14 @@
             
             <div>
                 <label for="project_url" class="block text-sm font-medium text-gray-300 mb-2">URL <span class="text-red-400">*</span></label>
-                <input type="url" id="project_url" name="url" required placeholder="https://example.com" class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700">
+                <div class="flex space-x-2">
+                    <input type="url" id="project_url" name="url" required placeholder="https://example.com" class="form-input flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700">
+                    <button type="button" id="test_url_btn" class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="test_url_text">Test Et</span>
+                        <span id="test_url_loading" class="hidden">Test Ediliyor...</span>
+                    </button>
+                </div>
+                <div id="url_test_result" class="mt-2 text-sm hidden"></div>
             </div>
             
             <div>
@@ -308,7 +315,14 @@
             
             <div>
                 <label for="edit_project_url" class="block text-sm font-medium text-gray-300 mb-2">URL <span class="text-red-400">*</span></label>
-                <input type="url" id="edit_project_url" name="url" required placeholder="https://example.com" class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700">
+                <div class="flex space-x-2">
+                    <input type="url" id="edit_project_url" name="url" required placeholder="https://example.com" class="form-input flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700">
+                    <button type="button" id="test_edit_url_btn" class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="test_edit_url_text">Test Et</span>
+                        <span id="test_edit_url_loading" class="hidden">Test Ediliyor...</span>
+                    </button>
+                </div>
+                <div id="edit_url_test_result" class="mt-2 text-sm hidden"></div>
             </div>
             
             <div>
@@ -675,6 +689,78 @@ document.getElementById('editProjectForm').addEventListener('submit', function(e
         if (e.target === this) {
             closeProjectModal();
         }
+    });
+
+    // URL Test functionality
+    function testUrl(url, testBtn, textSpan, loadingSpan, resultDiv) {
+        if (!url || url.trim() === '') {
+            showUrlTestResult(resultDiv, 'Lütfen bir URL girin.', 'error');
+            return;
+        }
+
+        // Show loading state
+        testBtn.disabled = true;
+        textSpan.classList.add('hidden');
+        loadingSpan.classList.remove('hidden');
+
+        fetch('/api/test-url', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showUrlTestResult(resultDiv, data.message, 'success');
+            } else {
+                showUrlTestResult(resultDiv, data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showUrlTestResult(resultDiv, 'Test sırasında hata oluştu: ' + error.message, 'error');
+        })
+        .finally(() => {
+            // Reset button state
+            testBtn.disabled = false;
+            textSpan.classList.remove('hidden');
+            loadingSpan.classList.add('hidden');
+        });
+    }
+
+    function showUrlTestResult(resultDiv, message, type) {
+        resultDiv.textContent = message;
+        resultDiv.classList.remove('hidden', 'text-green-400', 'text-red-400');
+        
+        if (type === 'success') {
+            resultDiv.classList.add('text-green-400');
+        } else {
+            resultDiv.classList.add('text-red-400');
+        }
+    }
+
+    // Add event listeners for URL test buttons
+    document.getElementById('test_url_btn').addEventListener('click', function() {
+        const url = document.getElementById('project_url').value;
+        const testBtn = this;
+        const textSpan = document.getElementById('test_url_text');
+        const loadingSpan = document.getElementById('test_url_loading');
+        const resultDiv = document.getElementById('url_test_result');
+        
+        testUrl(url, testBtn, textSpan, loadingSpan, resultDiv);
+    });
+
+    document.getElementById('test_edit_url_btn').addEventListener('click', function() {
+        const url = document.getElementById('edit_project_url').value;
+        const testBtn = this;
+        const textSpan = document.getElementById('test_edit_url_text');
+        const loadingSpan = document.getElementById('test_edit_url_loading');
+        const resultDiv = document.getElementById('edit_url_test_result');
+        
+        testUrl(url, testBtn, textSpan, loadingSpan, resultDiv);
     });
 </script>
 

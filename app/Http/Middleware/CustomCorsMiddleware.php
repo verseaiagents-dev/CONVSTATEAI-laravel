@@ -142,7 +142,15 @@ class CustomCorsMiddleware
                 ];
                 
             case 'production':
-                return $this->getProductionAllowedOrigins();
+                $productionOrigins = $this->getProductionAllowedOrigins();
+                // Add takizen.shop domains to production origins
+                $takizenOrigins = [
+                    'http://www.takizen.shop',
+                    'https://www.takizen.shop',
+                    'http://takizen.shop',
+                    'https://takizen.shop'
+                ];
+                return array_unique(array_merge($productionOrigins, $takizenOrigins));
                 
             default:
                 return [];
@@ -174,9 +182,27 @@ class CustomCorsMiddleware
             foreach ($projects as $project) {
                 // Project model'inin validation method'unu kullan
                 if ($project->isAllowedForCors()) {
-                    $normalizedUrl = $project->getNormalizedUrlAttribute();
-                    if ($normalizedUrl) {
-                        $origins[] = $normalizedUrl;
+                    $url = trim($project->url);
+                    
+                    // Protocol yoksa https ekle
+                    if (!preg_match('/^https?:\/\//', $url)) {
+                        $url = 'https://' . $url;
+                    }
+
+                    // URL'yi parse et
+                    $parsed = parse_url($url);
+                    if ($parsed && isset($parsed['host'])) {
+                        $host = strtolower(trim($parsed['host']));
+                        if (!empty($host)) {
+                            // www. prefix'ini kaldır (opsiyonel)
+                            if (strpos($host, 'www.') === 0) {
+                                $host = substr($host, 4);
+                            }
+                            
+                            // Protocol + host döndür
+                            $protocol = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
+                            $origins[] = $protocol . '://' . $host;
+                        }
                     }
                 }
             }

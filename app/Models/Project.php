@@ -100,13 +100,14 @@ class Project extends Model
         };
     }
 
+
     /**
-     * Domain'i normalize et ve doğrula
+     * Domain'in geçerli olup olmadığını kontrol et
      */
-    public function getNormalizedUrlAttribute(): ?string
+    public function isValidDomain(): bool
     {
         if (empty($this->url)) {
-            return null;
+            return false;
         }
 
         $url = trim($this->url);
@@ -116,39 +117,7 @@ class Project extends Model
             $url = 'https://' . $url;
         }
 
-        // URL'yi parse et
         $parsed = parse_url($url);
-        if (!$parsed || !isset($parsed['host'])) {
-            return null;
-        }
-
-        // Host'u temizle
-        $host = strtolower(trim($parsed['host']));
-        if (empty($host)) {
-            return null;
-        }
-
-        // www. prefix'ini kaldır (opsiyonel)
-        if (strpos($host, 'www.') === 0) {
-            $host = substr($host, 4);
-        }
-
-        // Protocol + host döndür
-        $protocol = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
-        return $protocol . '://' . $host;
-    }
-
-    /**
-     * Domain'in geçerli olup olmadığını kontrol et
-     */
-    public function isValidDomain(): bool
-    {
-        $normalizedUrl = $this->getNormalizedUrlAttribute();
-        if (!$normalizedUrl) {
-            return false;
-        }
-
-        $parsed = parse_url($normalizedUrl);
         if (!$parsed || !isset($parsed['host'])) {
             return false;
         }

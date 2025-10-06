@@ -182,4 +182,79 @@ EOT;
             ]
         ]);
     }
+
+    /**
+     * Test URL accessibility
+     */
+    public function testUrl(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|string|max:500',
+        ]);
+
+        $url = trim($request->url);
+        
+        // Add protocol if missing
+        if (!preg_match('/^https?:\/\//', $url)) {
+            $url = 'https://' . $url;
+        }
+
+        try {
+            // Create a context with timeout and user agent
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 10,
+                    'user_agent' => 'ConvStateAI/1.0',
+                    'method' => 'GET',
+                    'header' => [
+                        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Accept-Language: en-US,en;q=0.5',
+                        'Accept-Encoding: gzip, deflate',
+                        'Connection: keep-alive',
+                    ]
+                ]
+            ]);
+
+            // Test the URL
+            $headers = @get_headers($url, 1, $context);
+            
+            if ($headers === false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'URL kullanılamaz.',
+                    'url' => $url
+                ], 400);
+            }
+
+            // Check if we got a 200 status code
+            $statusCode = null;
+            if (isset($headers[0])) {
+                preg_match('/HTTP\/\d\.\d\s+(\d+)/', $headers[0], $matches);
+                $statusCode = isset($matches[1]) ? (int)$matches[1] : null;
+            }
+
+            if ($statusCode === 200) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'URL kullanılabilir.',
+                    'url' => $url,
+                    'status_code' => $statusCode
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => "URL test edilemedi. HTTP durum kodu: {$statusCode}",
+                    'url' => $url,
+                    'status_code' => $statusCode
+                ], 400);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'URL test edilirken hata oluştu: ' . $e->getMessage(),
+                'url' => $url
+            ], 500);
+        }
+    }
 }
