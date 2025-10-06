@@ -143,7 +143,7 @@ class CustomCorsMiddleware
                 
             case 'production':
                 $productionOrigins = $this->getProductionAllowedOrigins();
-                // Add takizen.shop domains to production origins
+                // Add takizen.shop domains to production origins (both www and non-www)
                 $takizenOrigins = [
                     'http://www.takizen.shop',
                     'https://www.takizen.shop',
@@ -192,17 +192,8 @@ class CustomCorsMiddleware
                     // URL'yi parse et
                     $parsed = parse_url($url);
                     if ($parsed && isset($parsed['host'])) {
-                        $host = strtolower(trim($parsed['host']));
-                        if (!empty($host)) {
-                            // www. prefix'ini kaldır (opsiyonel)
-                            if (strpos($host, 'www.') === 0) {
-                                $host = substr($host, 4);
-                            }
-                            
-                            // Protocol + host döndür
-                            $protocol = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
-                            $origins[] = $protocol . '://' . $host;
-                        }
+                        // Kullanıcının girdiği URL'yi olduğu gibi kullan (normalize etme)
+                        $origins[] = $url;
                     }
                 }
             }

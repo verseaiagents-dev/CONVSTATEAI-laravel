@@ -192,7 +192,8 @@ EOT;
             'url' => 'required|string|max:500',
         ]);
 
-        $url = trim($request->url);
+        $originalUrl = trim($request->url);
+        $url = $originalUrl;
         
         // Add protocol if missing
         if (!preg_match('/^https?:\/\//', $url)) {
@@ -222,7 +223,7 @@ EOT;
                 return response()->json([
                     'success' => false,
                     'message' => 'URL kullanılamaz.',
-                    'url' => $url
+                    'url' => $originalUrl
                 ], 400);
             }
 
@@ -237,14 +238,14 @@ EOT;
                 return response()->json([
                     'success' => true,
                     'message' => 'URL kullanılabilir.',
-                    'url' => $url,
+                    'url' => $originalUrl,
                     'status_code' => $statusCode
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
                     'message' => "URL test edilemedi. HTTP durum kodu: {$statusCode}",
-                    'url' => $url,
+                    'url' => $originalUrl,
                     'status_code' => $statusCode
                 ], 400);
             }
@@ -253,7 +254,7 @@ EOT;
             return response()->json([
                 'success' => false,
                 'message' => 'URL test edilirken hata oluştu: ' . $e->getMessage(),
-                'url' => $url
+                'url' => $originalUrl
             ], 500);
         }
     }
