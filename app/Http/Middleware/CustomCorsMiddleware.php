@@ -60,7 +60,7 @@ class CustomCorsMiddleware
         }
 
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Origin, X-CSRF-TOKEN, X-Browser-UUID, X-Project-ID');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Origin, X-CSRF-TOKEN, X-Browser-UUID, X-Project-ID, X-IP-Based-Session, X-Session-ID, X-User-Agent');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
         $response->headers->set('Access-Control-Max-Age', '86400');
 
@@ -110,6 +110,8 @@ class CustomCorsMiddleware
                     'http://127.0.0.1:3001',
                     'http://localhost:8000',
                     'http://127.0.0.1:8000',
+                    'http://localhost:8001',
+                    'http://127.0.0.1:8001',
                     'http://localhost:8080',
                     'http://127.0.0.1:8080',
                     'https://localhost:3000',
@@ -121,6 +123,7 @@ class CustomCorsMiddleware
                     'https://localhost:8000',
                     'https://localhost:8080',
                     'https://127.0.0.1:8000',
+                    'https://127.0.0.1:8001',
                     'https://127.0.0.1:5500',
                     'https://127.0.0.1:8080'
                 ];

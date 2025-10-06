@@ -14,6 +14,8 @@ class EnhancedChatSession extends Model
 
     protected $fillable = [
         'session_id',
+        'ip_address',
+        'user_agent',
         'user_id',
         'project_id',
         'intent_history',
@@ -141,22 +143,80 @@ class EnhancedChatSession extends Model
     }
 
     /**
-     * Check if session can view more products today
+     * Session daha fazla ürün görüntüleyebilir mi kontrol et
      */
     public function canViewMore(): bool
     {
-        // Check if session is active
-        if ($this->status !== 'active') {
-            return false;
+        return $this->isActive() && 
+               $this->daily_view_count < $this->daily_view_limit;
+    }
+
+    /**
+     * Check if IP can view more products today (IP bazlı kontrol)
+     */
+    public static function canIPViewMore(string $ipAddress): bool
+    {
+        // Bugün aktif olan aynı IP'deki session'ları kontrol et
+        $todaySessions = self::where('ip_address', $ipAddress)
+            ->where('status', 'active')
+            ->whereDate('last_activity', today())
+            ->get();
+
+        // Toplam günlük görüntüleme sayısını hesapla
+        $totalDailyViews = $todaySessions->sum('daily_view_count');
+        $maxDailyViews = config('chat.session.ip_daily_limit', 50); // IP bazlı limit
+
+        return $totalDailyViews < $maxDailyViews;
+    }
+
+    /**
+     * Get total daily views for IP
+     */
+    public static function getIPDailyViewCount(string $ipAddress): int
+    {
+        return self::where('ip_address', $ipAddress)
+            ->where('status', 'active')
+            ->whereDate('last_activity', today())
+            ->sum('daily_view_count');
+    }
+
+    /**
+     * Get IP daily limit
+     */
+    public static function getIPDailyLimit(): int
+    {
+        return config('chat.session.ip_daily_limit', 50);
+    }
+
+    /**
+     * Find existing session for IP or create new one
+     */
+    public static function findOrCreateForIP(string $ipAddress, string $userAgent, int $projectId = 1): self
+    {
+        // Önce aynı IP'deki aktif session'ı ara
+        $existingSession = self::where('ip_address', $ipAddress)
+            ->where('status', 'active')
+            ->where('project_id', $projectId)
+            ->whereDate('last_activity', today())
+            ->first();
+
+        if ($existingSession) {
+            return $existingSession;
         }
 
-        // Check if session has expired
-        if ($this->isExpired()) {
-            return false;
-        }
-
-        // Check daily view count
-        return $this->daily_view_count < $this->daily_view_limit;
+        // Yeni session oluştur
+        return self::create([
+            'session_id' => 'ip_' . $ipAddress . '_' . time(),
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent,
+            'user_id' => 0,
+            'project_id' => $projectId,
+            'daily_view_limit' => 20,
+            'daily_view_count' => 0,
+            'status' => 'active',
+            'last_activity' => now(),
+            'expires_at' => now()->addHours(72)
+        ]);
     }
 
     /**

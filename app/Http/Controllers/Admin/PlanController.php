@@ -13,7 +13,7 @@ class PlanController extends Controller
      */
     public function index()
     {
-        $plans = Plan::with('usageTokens')->orderBy('price', 'asc')->get();
+        $plans = Plan::orderBy('price', 'asc')->get();
         return view('admin.plans.index', compact('plans'));
     }
 

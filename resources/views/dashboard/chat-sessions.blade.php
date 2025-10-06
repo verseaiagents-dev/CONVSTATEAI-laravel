@@ -201,57 +201,59 @@
                 @endif
             </div>
 
-            <!-- Knowledge Bases -->
-            @if(count($projectKnowledge['data']['knowledge_bases']) > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($projectKnowledge['data']['knowledge_bases'] as $kb)
-                        <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all duration-300">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-sm font-medium text-white">{{ $kb['name'] }}</h4>
-                                <span class="text-xs text-gray-400">{{ $kb['total_chunks'] }} chunk</span>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="text-xs text-gray-400">
-                                    <strong>Tip:</strong> {{ ucfirst($kb['source_type']) }}
-                                </div>
-                                <div class="text-xs text-gray-400">
-                                    <strong>İşlenen Kayıt:</strong> {{ $kb['processed_records'] }}
-                                </div>
-                                @if($kb['last_processed'])
-                                    <div class="text-xs text-gray-400">
-                                        <strong>Son İşlem:</strong> {{ \Carbon\Carbon::parse($kb['last_processed'])->diffForHumans() }}
-                                    </div>
-                                @endif
-                                @if($kb['description'])
-                                    <div class="text-xs text-gray-300 mt-2">
-                                        {{ Str::limit($kb['description'], 100) }}
-                                    </div>
-                                @endif
-                            </div>
-                            
-                            <!-- Sample Chunks -->
-                            @if(count($kb['chunks']) > 0)
-                                <div class="mt-3 pt-3 border-t border-gray-700">
-                                    <div class="text-xs text-gray-400 mb-2">Örnek İçerikler:</div>
-                                    <div class="space-y-1">
-                                        @foreach(array_slice($kb['chunks'], 0, 2) as $chunk)
-                                            <div class="text-xs text-gray-300 bg-gray-700/50 rounded p-2">
-                                                {{ Str::limit($chunk['content'], 80) }}
-                                            </div>
-                    @endforeach
+            <!-- Project Knowledge Base Info -->
+            <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <span class="text-lg">📚</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Proje Bilgi Tabanı</h3>
+                        <p class="text-sm text-gray-400">Test projesi için knowledge base bilgileri</p>
+                    </div>
                 </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <div class="text-sm text-gray-400 mb-1">Toplam Knowledge Base</div>
+                        <div class="text-2xl font-bold text-white">{{ count($projectKnowledge['data']['knowledge_bases']) }}</div>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <div class="text-sm text-gray-400 mb-1">Toplam Chunk</div>
+                        <div class="text-2xl font-bold text-white">
+                            {{ collect($projectKnowledge['data']['knowledge_bases'])->sum('total_chunks') }}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <div class="text-sm text-gray-400 mb-1">İşlenen Kayıt</div>
+                        <div class="text-2xl font-bold text-white">
+                            {{ collect($projectKnowledge['data']['knowledge_bases'])->sum('processed_records') }}
+                        </div>
+                    </div>
+                </div>
+                
+                @if(count($projectKnowledge['data']['knowledge_bases']) > 0)
+                    <div class="mt-4 p-4 bg-gray-700/30 rounded-lg">
+                        <div class="text-sm text-gray-300 mb-2">
+                            <strong>Proje Durumu:</strong> Knowledge base verileri başarıyla yüklenmiş ve işlenmeye hazır.
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            Tüm knowledge base verileri chat oturumlarında kullanılabilir durumda.
+                        </div>
+                    </div>
+                @else
+                    <div class="mt-4 p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                        <div class="text-sm text-yellow-300 mb-2">
+                            <strong>Uyarı:</strong> Bu proje için henüz knowledge base bulunmuyor.
+                        </div>
+                        <div class="text-xs text-yellow-400">
+                            Knowledge base eklemek için proje ayarlarını kontrol edin.
+                        </div>
+                    </div>
+                @endif
             </div>
-                            @endif
-        </div>
-                    @endforeach
-    </div>
-            @else
-                <div class="text-center py-8">
-                    <div class="text-gray-400 mb-2">📚</div>
-                    <div class="text-gray-400">Bu proje için henüz knowledge base bulunmuyor</div>
-                    <div class="text-sm text-gray-500 mt-1">Knowledge base eklemek için proje ayarlarını kontrol edin</div>
-                </div>
-            @endif
         </div>
     @endif
 

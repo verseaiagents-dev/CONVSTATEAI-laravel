@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Debug Test</title>
+     <style>
+         body { font-family: Arial, sans-serif; margin: 20px; }
+         .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+         button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+         button:hover { background: #0056b3; }
+         .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff; }
+         .error { border-left-color: #dc3545; background: #f8d7da; }
+     </style>
+</head>
+<body>
+     <h1>ConvStateAI Debug Test</h1>
+     
+     <div class="test-section">
+         <h2>API Test</h2>
+         <button onclick="testAPI('bana ne önerirsin')">Test: "bana ne önerirsin"</button>
+         <button onclick="testAPI('rastgele bir ürün öner')">Test: "rastgele bir ürün öner"</button>
+         <div id="api-result" class="result"></div>
+     </div>
+     
+     <div class="test-section">
+         <h2>Widget Test</h2>
+         <button onclick="testWidget('bana ne önerirsin')">Widget: "bana ne önerirsin"</button>
+         <button onclick="testWidget('rastgele bir ürün öner')">Widget: "rastgele bir ürün öner"</button>
+         <div id="widget-result" class="result"></div>
+     </div>
+
+     <script src="/build/convstateai.min.js"></script>
+     <script>
+      // Widget config
+      window.convstateaiConfig = {
+          projectId: "2",
+          customizationToken: "998fd8ef9373fd0892df7c0c3fe140dde2782b96ecdd49c0be4b7b7674780fae",
+          apiUrl: "http://127.0.0.1:8000"
+      };
+      
+      // API test function
+      async function testAPI(message) {
+          const resultDiv = document.getElementById('api-result');
+          resultDiv.innerHTML = 'Testing...';
+          
+          try {
+              const response = await fetch('http://127.0.0.1:8000/api/chat', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                      project_id: "2",
+                      message: message,
+                      customizationToken: "998fd8ef9373fd0892df7c0c3fe140dde2782b96ecdd49c0be4b7b7674780fae"
+                  })
+              });
+              
+              const data = await response.json();
+              resultDiv.innerHTML = `
+                  <h3>API Response for: "${message}"</h3>
+                  <p><strong>Type:</strong> ${data.type}</p>
+                  <p><strong>Intent:</strong> ${data.intent}</p>
+                  <p><strong>Message:</strong> ${data.message}</p>
+                  <p><strong>Products Count:</strong> ${data.products ? data.products.length : 0}</p>
+                  <p><strong>Data.Products Count:</strong> ${data.data && data.data.products ? data.data.products.length : 0}</p>
+                  <pre>${JSON.stringify(data, null, 2)}</pre>
+              `;
+          } catch (error) {
+              resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+          }
+      }
+      
+      // Widget test function
+      function testWidget(message) {
+          const resultDiv = document.getElementById('widget-result');
+          resultDiv.innerHTML = 'Testing widget...';
+          
+          // Widget'ın sendMessage fonksiyonunu çağır
+          if (window.convstateai && window.convstateai.sendMessage) {
+              window.convstateai.sendMessage(message);
+              resultDiv.innerHTML = `<p>Widget message sent: "${message}"</p><p>Check the widget UI for response.</p>`;
+          } else {
+              resultDiv.innerHTML = '<div class="error">Widget not loaded or sendMessage not available</div>';
+          }
+      }
+      </script>
+</body>
+</html>

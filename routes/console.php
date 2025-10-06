@@ -29,3 +29,9 @@ Schedule::call(function () {
 
 // Her gün saat 03:00'da cache'i temizle
 Schedule::command('cache:clear')->dailyAt('03:00');
+
+// Her gün saat 00:00'da günlük view limitlerini sıfırla
+Schedule::command('daily:reset-view-limits')
+    ->dailyAt('00:00')
+    ->withoutOverlapping()
+    ->runInBackground();

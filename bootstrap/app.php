@@ -14,9 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Sadece gerekli middleware'leri tanımla
         $middleware->web([
-            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\CustomCorsMiddleware::class,
         ]);
         
         // API middleware'leri - Custom CORS middleware ekle
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'project.auth' => \App\Http\Middleware\ProjectAuth::class,
             'usage.token' => \App\Http\Middleware\UsageTokenMiddleware::class,
             'api.key' => \App\Http\Middleware\ApiKeyMiddleware::class,
+            'token.check' => \App\Http\Middleware\TokenCheckMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -9,31 +9,24 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
-
+use App\Http\Controllers\Admin\KnowledgeBaseSettingsController;
+use App\Http\Controllers\Admin\KnowledgeBasePromptsController;
+use App\Http\Controllers\DemoRequestController;
+use App\Http\Controllers\GiftDataController;
 use App\Http\Controllers\HomeController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('/widget-customization', function () {
+    return view('public.widget-customization');
+})->name('widget-customization');
+
 // Public Plan Selection
 Route::get('/subscription/plans', [App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscription.plans');
 
-// Widget Customization Assets - Public Access
-Route::get('/widgetcust/imgs/{filename}', function ($filename) {
-    $filePath = public_path('widgetcust/imgs/' . $filename);
-    
-    if (!file_exists($filePath)) {
-        return response('File not found', 404);
-    }
-    
-    $mimeType = mime_content_type($filePath);
-    $fileContent = file_get_contents($filePath);
-    
-    return response($fileContent)
-        ->header('Content-Type', $mimeType)
-        ->header('Cache-Control', 'public, max-age=31536000');
-})->where('filename', '[^/]+');
+// Widget Customization Assets - Public Access (moved to API routes for CORS support)
 
 // Legal Pages
 Route::get('/privacy-policy', function () {
@@ -115,6 +108,12 @@ Route::middleware(['auth'])->group(function () {
     // FAQ Management
     Route::get('/dashboard/faqs', [App\Http\Controllers\FAQController::class, 'index'])->name('dashboard.faqs.index');
     
+    // Actions Management
+    Route::get('/dashboard/actions', [App\Http\Controllers\ActionsController::class, 'index'])->name('dashboard.actions.index');
+    Route::get('/dashboard/actions/load-content', [App\Http\Controllers\ActionsController::class, 'loadContent'])->name('dashboard.actions.load-content');
+    Route::post('/dashboard/actions/test-endpoint', [App\Http\Controllers\ActionsController::class, 'testEndpoint'])->name('dashboard.actions.test-endpoint');
+    Route::post('/dashboard/actions/save', [App\Http\Controllers\ActionsController::class, 'saveActions'])->name('dashboard.actions.save');
+    
     // Knowledge Base Routes
     Route::get('/dashboard/knowledge-base', [KnowledgeBaseController::class, 'index'])->name('dashboard.knowledge-base');
     Route::get('/dashboard/knowledge-base/load-content', [KnowledgeBaseController::class, 'loadContent'])->name('dashboard.knowledge-base.load-content');
@@ -157,7 +156,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
     // User Management Routes (Legacy - AdminController)
     Route::get('/admin/users/{id}', [AdminController::class, 'getUser'])->name('admin.users.get');
-    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update.legacy');
     Route::post('/admin/users/{id}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
     
@@ -191,6 +190,26 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
         'destroy' => 'admin.subscriptions.destroy',
     ]);
     
+    // Plan Request Routes
+    Route::post('/admin/subscriptions/requests/{planRequest}/approve', [\App\Http\Controllers\Admin\SubscriptionController::class, 'approveRequest'])->name('admin.subscriptions.requests.approve');
+    Route::post('/admin/subscriptions/requests/{planRequest}/reject', [\App\Http\Controllers\Admin\SubscriptionController::class, 'rejectRequest'])->name('admin.subscriptions.requests.reject');
+    
+    // User Plan History Route
+    Route::get('/admin/subscriptions/user/{user}/history', [\App\Http\Controllers\Admin\SubscriptionController::class, 'getUserPlanHistory'])->name('admin.subscriptions.user.history');
+    
+    // VIP Token Management Route
+    Route::post('/admin/subscriptions/vip-token', [\App\Http\Controllers\Admin\SubscriptionController::class, 'manageVipToken'])->name('admin.subscriptions.vip-token');
+    
+    // User Management with Subscriptions and Requests
+    Route::get('/admin/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users/subscriptions', [\App\Http\Controllers\Admin\UserController::class, 'storeSubscription'])->name('admin.users.subscriptions.store');
+    Route::put('/admin/users/subscriptions/{subscription}', [\App\Http\Controllers\Admin\UserController::class, 'updateSubscription'])->name('admin.users.subscriptions.update');
+    Route::delete('/admin/users/subscriptions/{subscription}', [\App\Http\Controllers\Admin\UserController::class, 'destroySubscription'])->name('admin.users.subscriptions.destroy');
+    Route::post('/admin/users/requests/{planRequest}/approve', [\App\Http\Controllers\Admin\UserController::class, 'approveRequest'])->name('admin.users.requests.approve');
+    Route::post('/admin/users/requests/{planRequest}/reject', [\App\Http\Controllers\Admin\UserController::class, 'rejectRequest'])->name('admin.users.requests.reject');
+    Route::get('/admin/users/{user}/plan-history', [\App\Http\Controllers\Admin\UserController::class, 'getUserPlanHistory'])->name('admin.users.plan-history');
+    Route::get('/admin/users/{user}/plan-request-history', [\App\Http\Controllers\Admin\UserController::class, 'getUserPlanRequestHistory'])->name('admin.users.plan-request-history');
+    
     // Mail Templates Management
     Route::resource('admin/mail-templates', \App\Http\Controllers\Admin\MailTemplateController::class)->names([
         'index' => 'admin.mail-templates.index',
@@ -221,17 +240,49 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
     // API Settings Additional Routes
     Route::post('/admin/api-settings/{apiSetting}/toggle-active', [\App\Http\Controllers\Admin\ApiSettingsController::class, 'toggleActive'])->name('admin.api-settings.toggle-active');
     
+    // Knowledge Base Settings
+    Route::get('/admin/knowledge-base-settings', [\App\Http\Controllers\Admin\KnowledgeBaseSettingsController::class, 'index'])->name('admin.knowledge-base-settings');
+    
+    // Knowledge Base Prompts
+    Route::get('/admin/knowledge-base-prompts', [\App\Http\Controllers\Admin\KnowledgeBasePromptsController::class, 'index'])->name('admin.knowledge-base-prompts');
+    
 });
 
+Route::get('/admin/demo-requests', [\App\Http\Controllers\Admin\DemoRequestController::class, 'index'])->name('admin.demo-requests.index');
+Route::get('/admin/demo-requests/{demoRequest}', [\App\Http\Controllers\Admin\DemoRequestController::class, 'show'])->name('admin.demo-requests.show');
+Route::post('/admin/demo-requests/{demoRequest}/status', [\App\Http\Controllers\Admin\DemoRequestController::class, 'updateStatus'])->name('admin.demo-requests.update-status');
+// // Demo Request Routes
+Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo-request.storee');
 
+    // Test route for payment integration
+    Route::get('/test-payment/{plan}', function($planId) {
+     $plan = \App\Models\Plan::find($planId);
+     if (!$plan) {
+         return 'Plan bulunamadı';
+     }
+     return view('test-payment', compact('plan'));
+ })->name('test.payment');
+ 
+ // Test route for manual plan assignment (development only)
+ Route::post('/test-assign-plan/{orderId}', [App\Http\Controllers\PaymentController::class, 'testAssignPlan'])
+     ->name('test.assign-plan');
 
-
+  // Payment Routes - PayTR geçici olarak kapatıldı
+  Route::middleware(['auth'])->group(function () {
+     Route::get('/billing-form/{plan}', [App\Http\Controllers\PaymentController::class, 'billingForm'])->name('payment.billing-form');
+     Route::post('/checkout/{plan}', [App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+     Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+     Route::get('/payment/fail', [App\Http\Controllers\PaymentController::class, 'fail'])->name('payment.fail');
+ });
 
 
 
 
 // Public Widget Customization API (for React app)
 Route::get('/api/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'getPublicCustomization'])->name('api.widget-customization');
+
+// Test ortamı için rastgele proje seçimi
+Route::get('/api/random-project', [App\Http\Controllers\WidgetCustomizationController::class, 'getRandomProjectForTesting'])->name('api.random-project');
 
 // Public Cargo Tracking API (for React app)
 Route::get('/api/cargo/track/{trackingNumber}', [App\Http\Controllers\CargoTrackingController::class, 'trackCargo'])->name('api.cargo.track');
@@ -265,4 +316,25 @@ Route::post('/api/cargo/track', [App\Http\Controllers\CargoTrackingController::c
 // Widget dosyaları artık public dizininden direkt servis ediliyor
 
 
-
+Route::get('/gift', function () {
+     return redirect('/');
+ })->name('gift-data.index');
+ Route::get('/gift/fashion', [GiftDataController::class, 'fashionSector'])->name('gift-data.fashion-sector');
+ Route::get('/gift/furniture', [GiftDataController::class, 'furnitureSector'])->name('gift-data.furniture-sector');
+ Route::get('/gift/home', [GiftDataController::class, 'homeAppliancesSector'])->name('gift-data.home-appliances-sector');
+ Route::get('/gift/health', [GiftDataController::class, 'healthBeautySector'])->name('gift-data.health-beauty-sector');
+ Route::get('/gift/electronics', [GiftDataController::class, 'electronicsSector'])->name('gift-data.electronics-sector');
+ 
+ // Gift Data Sector POST Routes
+ Route::post('/gift/fashion', action: [GiftDataController::class, 'storeFashionSector'])->name('gift-data.fashion-sector.store');
+ Route::post('/gift/furniture', [GiftDataController::class, 'storeFurnitureSector'])->name('gift-data.furniture-sector.store');
+ Route::post('/gift/home', [GiftDataController::class, 'storeHomeAppliancesSector'])->name('gift-data.home-appliances-sector.store');
+ Route::post('/gift/health', [GiftDataController::class, 'storeHealthBeautySector'])->name('gift-data.health-beauty-sector.store');
+ Route::post('/gift/electronics', [GiftDataController::class, 'storeElectronicsSector'])->name('gift-data.electronics-sector.store');
+     // Giftbox Data Management
+  Route::prefix('admin/giftbox-data')->name('admin.giftbox-data.')->group(function () {
+         Route::get('/', [\App\Http\Controllers\GiftDataController::class, 'adminIndex'])->name('index');
+         Route::get('/{giftboxUser}', [\App\Http\Controllers\GiftDataController::class, 'adminShow'])->name('show');
+         Route::delete('/{giftboxUser}', [\App\Http\Controllers\GiftDataController::class, 'adminDestroy'])->name('destroy');
+         Route::get('/export', [\App\Http\Controllers\GiftDataController::class, 'adminExport'])->name('export');
+     });

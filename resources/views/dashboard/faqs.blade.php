@@ -54,7 +54,6 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Soru</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Kategori</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Kısa Cevap</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Durum</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Sıralama</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">İşlemler</th>
@@ -133,11 +132,6 @@
                         <label for="project_id" class="block text-sm font-medium text-gray-300 mb-2">Proje ID</label>
                         <input type="number" id="project_id" name="project_id" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Opsiyonel">
                     </div>
-                </div>
-
-                <div>
-                    <label for="short_answer" class="block text-sm font-medium text-gray-300 mb-2">Kısa Cevap *</label>
-                    <input type="text" id="short_answer" name="short_answer" required class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
                 </div>
 
                 <div>
@@ -326,9 +320,6 @@ function displayFAQs() {
                     ${faq.category || 'Genel'}
                 </span>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-300">
-                ${faq.short_answer}
-            </td>
             <td class="px-6 py-4">
                 <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full ${faq.is_active ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
                     ${faq.is_active ? 'Aktif' : 'Pasif'}
@@ -367,7 +358,6 @@ function editFAQ(id) {
     document.getElementById('title').value = faq.title || '';
     document.getElementById('category').value = faq.category || '';
     document.getElementById('description').value = faq.description || '';
-    document.getElementById('short_answer').value = faq.short_answer || '';
     document.getElementById('answer').value = faq.answer || '';
     document.getElementById('project_id').value = faq.project_id || '';
     document.getElementById('sort_order').value = faq.sort_order || 0;

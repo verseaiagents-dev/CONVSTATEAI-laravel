@@ -31,7 +31,6 @@
                             <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Fiyat</th>
                             <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Döngü</th>
                             <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Usage Tokens</th>
-                            <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Kalan Tokens</th>
                             <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Deneme Süresi</th>
                             <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Durum</th>
                             <th class="text-left py-3 px-4 text-sm font-medium text-gray-300">Abonelik Sayısı</th>
@@ -58,16 +57,6 @@
                                     <span class="text-green-400 font-medium">Sınırsız</span>
                                 @else
                                     {{ number_format($plan->usage_tokens) }}
-                                @endif
-                            </td>
-                            <td class="py-4 px-4 text-gray-300">
-                                @php
-                                    $totalRemainingTokens = $plan->usageTokens()->sum('tokens_remaining');
-                                @endphp
-                                @if($plan->usage_tokens == -1)
-                                    <span class="text-green-400 font-medium">Sınırsız</span>
-                                @else
-                                    <span class="text-blue-400 font-medium">{{ number_format($totalRemainingTokens) }}</span>
                                 @endif
                             </td>
                             <td class="py-4 px-4 text-gray-300">
@@ -111,7 +100,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="py-8 px-4 text-center text-gray-400">
+                            <td colspan="8" class="py-8 px-4 text-center text-gray-400">
                                 Henüz plan bulunmuyor
                             </td>
                         </tr>

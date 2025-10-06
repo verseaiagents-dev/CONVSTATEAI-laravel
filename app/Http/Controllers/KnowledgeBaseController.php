@@ -14,6 +14,9 @@ use App\Models\KnowledgeChunk;
 use App\Models\FieldMapping;
 use App\Models\Project;
 use App\Models\QueryLog;
+use App\Models\Campaign;
+use App\Models\FAQ;
+use App\Models\WidgetActions;
 use App\Services\KnowledgeBase\ContentChunker;
 use App\Services\KnowledgeBase\AIService;
 use App\Services\KnowledgeBase\FAQOptimizationService;
@@ -77,12 +80,23 @@ class KnowledgeBaseController extends Controller
                 $project = Project::find($projectId);
             }
             
+            // Get stats data
+            $stats = [
+                'campaign_count' => Campaign::where('project_id', $projectId ?: 1)->where('is_active', true)->count(),
+                'faq_count' => FAQ::where('project_id', $projectId ?: 1)->where('is_active', true)->count(),
+                'active_actions' => WidgetActions::where('is_active', true)->count(),
+                'total_actions' => WidgetActions::count(),
+                'siparis_endpoints' => WidgetActions::where('type', 'siparis_durumu_endpoint')->where('is_active', true)->count(),
+                'kargo_endpoints' => WidgetActions::where('type', 'kargo_durumu_endpoint')->where('is_active', true)->count()
+            ];
+            
             return response()->json([
                 'success' => true,
                 'data' => [
                     'knowledgeBases' => $knowledgeBases,
                     'projects' => $projects,
-                    'project' => $project
+                    'project' => $project,
+                    'stats' => $stats
                 ]
             ]);
             
@@ -95,25 +109,60 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
-     * Handle file upload
+     * Bilgi tabanı adı çakışmasını kontrol eder ve benzersiz isim oluşturur
+     */
+    private function generateUniqueKnowledgeBaseName(string $baseName, int $userId = null): string
+    {
+        // İlk olarak temel ismi kontrol et
+        $query = KnowledgeBase::where('name', $baseName);
+        
+        // Eğer userId verilmişse, sadece o kullanıcının bilgi tabanlarını kontrol et
+        if ($userId) {
+            $query->whereHas('project', function($q) use ($userId) {
+                $q->where('created_by', $userId);
+            });
+        }
+        
+        if (!$query->exists()) {
+            return $baseName;
+        }
+        
+        // Çakışma varsa benzersiz isim oluştur
+        $counter = 1;
+        $uniqueName = $baseName;
+        
+        do {
+            $uniqueName = $baseName . '_' . $counter;
+            $query = KnowledgeBase::where('name', $uniqueName);
+            
+            if ($userId) {
+                $query->whereHas('project', function($q) use ($userId) {
+                    $q->where('created_by', $userId);
+                });
+            }
+            
+            $counter++;
+        } while ($query->exists());
+        
+        return $uniqueName;
+    }
+
+    /**
+     * Handle file upload - Sadece JSON dosyaları desteklenir
      */
     public function uploadFile(Request $request)
     {
         try {
-            // Validation
+            // Validation - Sadece JSON dosyaları
             $validator = \Validator::make($request->all(), [
-                'file' => 'required|file|mimes:csv,txt,xml,json,xlsx,xls|max:10240', // 10MB max
-                'name' => 'required|string|max:255',
+                'file' => 'required|file|mimes:json|max:10240', // 10MB max, sadece JSON
                 'description' => 'nullable|string|max:1000',
                 'project_id' => 'nullable|exists:projects,id',
             ], [
                 'file.required' => 'Dosya seçilmedi',
                 'file.file' => 'Geçersiz dosya',
-                'file.mimes' => 'Desteklenmeyen dosya formatı. Desteklenen: CSV, TXT, XML, JSON, Excel',
+                'file.mimes' => 'Sadece JSON dosyaları desteklenir',
                 'file.max' => 'Dosya boyutu çok büyük. Maksimum 10MB olmalı',
-                'name.required' => 'Knowledge base adı gerekli',
-                'name.string' => 'Knowledge base adı metin olmalı',
-                'name.max' => 'Knowledge base adı çok uzun (maksimum 255 karakter)',
             ]);
 
             if ($validator->fails()) {
@@ -128,17 +177,25 @@ class KnowledgeBaseController extends Controller
 
             $file = $request->file('file');
             $extension = strtolower($file->getClientOriginalExtension());
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            $originalFileName = $file->getClientOriginalName();
+            $fileName = time() . '_' . $originalFileName;
+            
+            // Dosya adından bilgi tabanı adını oluştur (uzantıyı kaldır)
+            $baseName = pathinfo($originalFileName, PATHINFO_FILENAME);
+            
+            // Çakışma kontrolü yap ve benzersiz isim oluştur
+            $userId = Auth::id();
+            $knowledgeBaseName = $this->generateUniqueKnowledgeBaseName($baseName, $userId);
             
             // File size check
             if ($file->getSize() > 10 * 1024 * 1024) {
                 throw new \Exception('Dosya boyutu 10MB\'dan büyük olamaz');
             }
 
-            // File extension check
-            $allowedExtensions = ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'];
+            // File extension check - Sadece JSON
+            $allowedExtensions = ['json'];
             if (!in_array($extension, $allowedExtensions)) {
-                throw new \Exception("Desteklenmeyen dosya formatı: {$extension}. Desteklenen: " . implode(', ', $allowedExtensions));
+                throw new \Exception("Desteklenmeyen dosya formatı: {$extension}. Sadece JSON dosyaları desteklenir.");
             }
             
             // Store file
@@ -148,58 +205,72 @@ class KnowledgeBaseController extends Controller
             $knowledgeBase = KnowledgeBase::create([
                 'site_id' => 1, // Default site
                 'project_id' => $request->input('project_id'),
-                'name' => $request->input('name'),
+                'name' => $knowledgeBaseName, // Otomatik dosya adından oluşturulan isim
                 'description' => $request->input('description'),
                 'source_type' => 'file',
                 'source_path' => $path,
                 'file_type' => $extension,
                 'file_size' => $this->contentChunker->countTokens(file_get_contents($file->getPathname())),
-                'processing_status' => 'pending',
-                'is_processing' => false,
+                'processing_status' => 'processing',
+                'is_processing' => true,
             ]);
 
             DB::commit();
 
-            // Dispatch background job for file processing with error handling
+            // Process file immediately (sync processing)
             try {
-                ProcessKnowledgeBaseFile::dispatch($knowledgeBase, $path, $extension)
-                    ->onQueue('knowledge-base-processing')
-                    ->delay(now()->addSeconds(5)); // 5 saniye gecikme
+                // Process file and create chunks immediately
+                $chunks = $this->processFileAndCreateChunks($file, $extension, $knowledgeBase);
                 
-                \Log::info('Knowledge base file job dispatched successfully', [
+                // Update knowledge base with results
+                $knowledgeBase->update([
+                    'chunk_count' => count($chunks),
+                    'total_records' => $this->getTotalRecords($file, $extension),
+                    'processed_records' => count($chunks),
+                    'processing_status' => 'completed',
+                    'is_processing' => false,
+                    'last_processed_at' => Carbon::now(),
+                ]);
+                
+                \Log::info('Knowledge base file processed successfully', [
                     'knowledge_base_id' => $knowledgeBase->id,
                     'file_path' => $path,
-                    'file_type' => $extension
+                    'file_type' => $extension,
+                    'knowledge_base_name' => $knowledgeBaseName,
+                    'original_name' => $baseName,
+                    'name_conflict_resolved' => $baseName !== $knowledgeBaseName,
+                    'chunks_created' => count($chunks)
                 ]);
             } catch (\Exception $jobException) {
-                \Log::error('Failed to dispatch knowledge base file job', [
+                \Log::error('Failed to process knowledge base file', [
                     'knowledge_base_id' => $knowledgeBase->id,
                     'error' => $jobException->getMessage(),
                     'trace' => $jobException->getTraceAsString()
                 ]);
                 
-                // Mark as failed if job dispatch fails
+                // Mark as failed if processing fails
                 $knowledgeBase->update([
                     'processing_status' => 'failed',
                     'is_processing' => false,
-                    'error_message' => 'Job dispatch failed: ' . $jobException->getMessage()
+                    'error_message' => 'Processing failed: ' . $jobException->getMessage()
                 ]);
                 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dosya yüklendi ancak işleme kuyruğa alınamadı: ' . $jobException->getMessage()
+                    'message' => 'Dosya yüklendi ancak işlenemedi: ' . $jobException->getMessage()
                 ], 500);
             }
         
             return response()->json([
                 'success' => true,
-                'message' => 'Dosya başarıyla yüklendi. İşleme kuyruğa alındı.',
+                'message' => 'Dosya başarıyla yüklendi ve işlendi.',
                 'knowledge_base_id' => $knowledgeBase->id,
                 'file_name' => $fileName,
                 'file_size' => $this->contentChunker->countTokens(file_get_contents($file->getPathname())),
                 'extension' => $extension,
-                'processing_status' => 'pending',
-                'is_processing' => false
+                'processing_status' => 'completed',
+                'is_processing' => false,
+                'chunk_count' => count($chunks)
             ]);
 
         } catch (\Exception $e) {
@@ -215,7 +286,8 @@ class KnowledgeBaseController extends Controller
 
             \Log::error('Knowledge base upload error: ' . $e->getMessage(), [
                 'file' => $request->file('file') ? $request->file('file')->getClientOriginalName() : 'N/A',
-                'name' => $request->input('name'),
+                'knowledge_base_name' => $knowledgeBaseName ?? 'N/A',
+                'original_name' => $baseName ?? 'N/A',
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -228,13 +300,12 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
-     * Handle URL content fetch
+     * Handle URL content fetch - Sadece JSON URL'leri desteklenir
      */
     public function fetchFromUrl(Request $request)
     {
         $request->validate([
             'url' => 'required|url|max:500',
-            'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'project_id' => 'nullable|exists:projects,id',
         ]);
@@ -274,66 +345,128 @@ class KnowledgeBaseController extends Controller
                 }
             }
             
-            // Determine file type from content type or URL
-            $extension = $this->determineExtensionFromUrl($url, $contentType);
+            // JSON URL kontrolü
+            $extension = 'json';
+            
+            // URL'nin JSON içerik döndürdüğünü kontrol et
+            if (!str_contains($contentType, 'json') && !str_contains($contentType, 'application/json')) {
+                // URL'den gelen içeriğin JSON olup olmadığını kontrol et
+                $decodedContent = json_decode($content, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'URL\'den alınan içerik JSON formatında değil. Sadece JSON URL\'leri desteklenir.'
+                    ], 400);
+                }
+            }
+            
+            // URL'den bilgi tabanı adını oluştur
+            $parsedUrl = parse_url($url);
+            $host = $parsedUrl['host'] ?? 'unknown';
+            $path = $parsedUrl['path'] ?? '';
+            
+            // Domain adından ve path'den bilgi tabanı adını oluştur
+            $baseName = $host;
+            if ($path) {
+                $pathParts = explode('/', trim($path, '/'));
+                $lastPart = end($pathParts);
+                if ($lastPart && !empty($lastPart)) {
+                    // Uzantıyı kaldır
+                    $baseName = pathinfo($lastPart, PATHINFO_FILENAME) ?: $host;
+                }
+            }
+            
+            // Çakışma kontrolü yap ve benzersiz isim oluştur
+            $userId = Auth::id();
+            $knowledgeBaseName = $this->generateUniqueKnowledgeBaseName($baseName, $userId);
             
             // Create knowledge base record
             $knowledgeBase = KnowledgeBase::create([
                 'site_id' => 1, // Default site
                 'project_id' => $request->input('project_id'),
-                'name' => $request->input('name'),
+                'name' => $knowledgeBaseName, // Otomatik URL'den oluşturulan isim
                 'description' => $request->input('description') . ' | URL: ' . $url, // URL'yi description'a ekle
                 'source_type' => 'url',
                 'source_path' => $url,
                 'file_type' => $extension,
                 'file_size' => $this->contentChunker->countTokens($content),
-                'processing_status' => 'pending',
-                'is_processing' => false,
+                'processing_status' => 'processing',
+                'is_processing' => true,
             ]);
             
             DB::commit();
 
-            // Dispatch background job for URL processing with error handling
+            // Process URL content immediately (sync processing)
             try {
-                ProcessKnowledgeBaseUrl::dispatch($knowledgeBase, $url)
-                    ->onQueue('knowledge-base-processing')
-                    ->delay(now()->addSeconds(5)); // 5 saniye gecikme
+                // Create temporary file for processing
+                $tempFile = tempnam(sys_get_temp_dir(), 'kb_url_');
+                file_put_contents($tempFile, $content);
                 
-                \Log::info('Knowledge base URL job dispatched successfully', [
+                // Create a file object for processing
+                $file = new \Illuminate\Http\UploadedFile(
+                    $tempFile,
+                    basename($url),
+                    $this->getMimeType($extension),
+                    null,
+                    true
+                );
+                
+                // Process content and create chunks immediately
+                $chunks = $this->processFileAndCreateChunks($file, $extension, $knowledgeBase);
+                
+                // Update knowledge base with results
+                $knowledgeBase->update([
+                    'chunk_count' => count($chunks),
+                    'total_records' => $this->getTotalRecords($file, $extension),
+                    'processed_records' => count($chunks),
+                    'processing_status' => 'completed',
+                    'is_processing' => false,
+                    'last_processed_at' => Carbon::now(),
+                ]);
+                
+                // Clean up temp file
+                unlink($tempFile);
+                
+                \Log::info('Knowledge base URL processed successfully', [
                     'knowledge_base_id' => $knowledgeBase->id,
-                    'url' => $url
+                    'url' => $url,
+                    'knowledge_base_name' => $knowledgeBaseName,
+                    'original_name' => $baseName,
+                    'name_conflict_resolved' => $baseName !== $knowledgeBaseName,
+                    'chunks_created' => count($chunks)
                 ]);
             } catch (\Exception $jobException) {
-                \Log::error('Failed to dispatch knowledge base URL job', [
+                \Log::error('Failed to process knowledge base URL', [
                     'knowledge_base_id' => $knowledgeBase->id,
                     'url' => $url,
                     'error' => $jobException->getMessage(),
                     'trace' => $jobException->getTraceAsString()
                 ]);
                 
-                // Mark as failed if job dispatch fails
+                // Mark as failed if processing fails
                 $knowledgeBase->update([
                     'processing_status' => 'failed',
                     'is_processing' => false,
-                    'error_message' => 'Job dispatch failed: ' . $jobException->getMessage()
+                    'error_message' => 'Processing failed: ' . $jobException->getMessage()
                 ]);
                 
                 return response()->json([
                     'success' => false,
-                    'message' => 'URL alındı ancak işleme kuyruğa alınamadı: ' . $jobException->getMessage()
+                    'message' => 'URL alındı ancak işlenemedi: ' . $jobException->getMessage()
                 ], 500);
             }
             
             return response()->json([
                 'success' => true,
-                'message' => 'URL başarıyla alındı. İşleme kuyruğa alındı.',
+                'message' => 'URL başarıyla alındı ve işlendi.',
                 'knowledge_base_id' => $knowledgeBase->id,
                 'file_name' => basename($url),
                 'file_size' => $this->contentChunker->countTokens($content),
                 'extension' => $extension,
                 'url' => $url,
-                'processing_status' => 'pending',
-                'is_processing' => false
+                'processing_status' => 'completed',
+                'is_processing' => false,
+                'chunk_count' => count($chunks)
             ]);
             
         } catch (\Exception $e) {
@@ -346,6 +479,14 @@ class KnowledgeBaseController extends Controller
                     'error_message' => $e->getMessage()
                 ]);
             }
+
+            \Log::error('Knowledge base URL fetch error: ' . $e->getMessage(), [
+                'url' => $url ?? 'N/A',
+                'knowledge_base_name' => $knowledgeBaseName ?? 'N/A',
+                'original_name' => $baseName ?? 'N/A',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'success' => false,
@@ -1341,6 +1482,94 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
+     * Analyze JSON content and determine its type
+     */
+    private function analyzeJsonContent(string $content): string
+    {
+        // FAQ detection patterns
+        $faqPatterns = [
+            '"soru":', '"cevap":', '"sorular":', '"cevaplar":',
+            '"question":', '"answer":', '"questions":', '"answers":',
+            '"faq":', '"frequently":', '"asked":'
+        ];
+        
+        foreach ($faqPatterns as $pattern) {
+            if (str_contains($content, $pattern)) {
+                return 'faq';
+            }
+        }
+        
+        // Product detection patterns - more comprehensive
+        $productPatterns = [
+            // Basic product structure
+            ['"id":', ['"name":', '"title":'], ['"price":', '"category":', '"description":']],
+            // Flexible product structure
+            ['"id":', ['"name":', '"title":'], ['"brand":', '"category":', '"price":']],
+            // Title-based product
+            ['"title":', '"price":', '"category":'],
+            // Plan/Package detection
+            ['"name":', ['plan', 'package', 'starter', 'professional', 'enterprise', 'premium', 'basic']]
+        ];
+        
+        foreach ($productPatterns as $pattern) {
+            if ($this->matchesProductPattern($content, $pattern)) {
+                return 'product';
+            }
+        }
+        
+        // Default to general if no specific pattern is found
+        return 'general';
+    }
+    
+    /**
+     * Check if content matches a product pattern
+     */
+    private function matchesProductPattern(string $content, array $pattern): bool
+    {
+        if (count($pattern) === 3 && is_array($pattern[1]) && is_array($pattern[2])) {
+            // Pattern: ["id":, ["name":, "title":], ["price":, "category":]]
+            if (!str_contains($content, $pattern[0])) return false;
+            
+            $hasNameOrTitle = false;
+            foreach ($pattern[1] as $namePattern) {
+                if (str_contains($content, $namePattern)) {
+                    $hasNameOrTitle = true;
+                    break;
+                }
+            }
+            if (!$hasNameOrTitle) return false;
+            
+            $hasProperty = false;
+            foreach ($pattern[2] as $propPattern) {
+                if (str_contains($content, $propPattern)) {
+                    $hasProperty = true;
+                    break;
+                }
+            }
+            return $hasProperty;
+            
+        } elseif (count($pattern) === 3 && is_string($pattern[0]) && is_string($pattern[1]) && is_string($pattern[2])) {
+            // Pattern: ["title":, "price":, "category":]
+            return str_contains($content, $pattern[0]) && 
+                   str_contains($content, $pattern[1]) && 
+                   str_contains($content, $pattern[2]);
+                   
+        } elseif (count($pattern) === 2 && is_string($pattern[0]) && is_array($pattern[1])) {
+            // Pattern: ["name":, ["plan", "package", ...]]
+            if (!str_contains($content, $pattern[0])) return false;
+            
+            foreach ($pattern[1] as $keyword) {
+                if (str_contains($content, $keyword)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        return false;
+    }
+
+    /**
      * Determine content type of a chunk
      */
     private function determineContentType(string $content, string $extension): string
@@ -1369,20 +1598,7 @@ class KnowledgeBaseController extends Controller
         }
 
         if ($extension === 'json') {
-            // Look for specific JSON keys or patterns
-            if (str_contains($content, '"soru":') || str_contains($content, '"cevap":') || str_contains($content, '"sorular":') || str_contains($content, '"cevaplar":')) {
-                return 'faq';
-            }
-            
-            // Product catalog detection
-            if (str_contains($content, '"title":') && str_contains($content, '"price":') && str_contains($content, '"category":')) {
-                return 'product';
-            }
-            
-            // Product listing detection
-            if (str_contains($content, '"id":') && str_contains($content, '"name":') && str_contains($content, '"brand":')) {
-                return 'product';
-            }
+            return $this->analyzeJsonContent($content);
         }
 
         if ($extension === 'xml') {
@@ -1397,162 +1613,110 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
-     * Detect fields from uploaded file
+     * AI-powered field mapping - JSON verilerini analiz ederek otomatik field mapping yapar
+     */
+    public function performAIFieldMapping(Request $request)
+    {
+        try {
+            $request->validate([
+                'json_data' => 'required|array',
+                'content_type' => 'nullable|string|in:auto,product,faq,general',
+                'project_id' => 'nullable|exists:projects,id'
+            ]);
+
+            $jsonData = $request->input('json_data');
+            $contentType = $request->input('content_type', 'auto');
+            $projectId = $request->input('project_id');
+
+            Log::info('AI Field Mapping request received', [
+                'data_count' => count($jsonData),
+                'content_type' => $contentType,
+                'project_id' => $projectId
+            ]);
+
+            // AI Service ile field mapping yap
+            $mappingResult = $this->aiService->performAIFieldMapping($jsonData, $contentType);
+
+            if (!$mappingResult['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'AI Field Mapping başarısız: ' . $mappingResult['error']
+                ], 500);
+            }
+
+            // Mapping sonuçlarını logla
+            Log::info('AI Field Mapping completed', [
+                'original_fields' => $mappingResult['analysis']['detected_fields'] ?? [],
+                'mapped_fields' => array_keys($mappingResult['field_mapping']['field_mapping'] ?? []),
+                'content_type' => $mappingResult['content_type'],
+                'confidence_score' => $mappingResult['confidence_score']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'AI Field Mapping başarıyla tamamlandı',
+                'data' => [
+                    'original_data' => $mappingResult['original_data'],
+                    'mapped_data' => $mappingResult['mapped_data'],
+                    'field_mapping' => $mappingResult['field_mapping'],
+                    'analysis' => $mappingResult['analysis'],
+                    'content_type' => $mappingResult['content_type'],
+                    'confidence_score' => $mappingResult['confidence_score']
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('AI Field Mapping error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'AI Field Mapping hatası: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Detect fields from uploaded file - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function detectFields(Request $request, $id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            
-            if (!$knowledgeBase->source_path) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Knowledge base dosyası bulunamadı'
-                ], 404);
-            }
-
-            $detectedFields = $this->fieldMappingService->detectFields(
-                $knowledgeBase->source_path,
-                $knowledgeBase->file_type
-            );
-
-            $suggestedMappings = $this->fieldMappingService->suggestMappings($detectedFields);
-
-            return response()->json([
-                'success' => true,
-                'detected_fields' => $detectedFields,
-                'suggested_mappings' => $suggestedMappings,
-                'standard_fields' => FieldMapping::getStandardFields(),
-                'field_types' => FieldMapping::getFieldTypes()
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Field detection error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Field detection hatası: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
-     * Save field mappings
+     * Save field mappings - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function saveFieldMappings(Request $request, $id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            
-            $request->validate([
-                'mappings' => 'required|array|min:1',
-                'mappings.*.source_field' => 'required|string',
-                'mappings.*.target_field' => 'required|string',
-                'mappings.*.field_type' => 'required|string',
-                'mappings.*.is_required' => 'boolean',
-                'mappings.*.default_value' => 'nullable|string',
-                'mappings.*.transformation' => 'nullable|array',
-                'mappings.*.validation_rules' => 'nullable|array'
-            ]);
-
-            $mappings = $request->input('mappings');
-            
-            // Validate mappings
-            $errors = $this->fieldMappingService->validateMappings($mappings);
-            if (!empty($errors)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Mapping validation hatası',
-                    'errors' => $errors
-                ], 422);
-            }
-
-            // Save mappings
-            $success = $this->fieldMappingService->createMappings($knowledgeBase->id, $mappings);
-            
-            if (!$success) {
-                throw new \Exception('Field mappings kaydedilemedi');
-            }
-
-            // Update knowledge base status
-            $knowledgeBase->update([
-                'processing_status' => 'completed',
-                'metadata' => array_merge($knowledgeBase->metadata ?? [], [
-                    'field_mappings_created_at' => Carbon::now(),
-                    'field_mappings_count' => count($mappings)
-                ])
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Field mappings başarıyla kaydedildi',
-                'mappings_count' => count($mappings)
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Save field mappings error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Field mappings kaydedilemedi: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
-     * Get field mappings for knowledge base
+     * Get field mappings for knowledge base - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function getFieldMappings($id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            $mappings = $knowledgeBase->fieldMappings()->orderBy('mapping_order')->get();
-
-            return response()->json([
-                'success' => true,
-                'mappings' => $mappings
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Get field mappings error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Field mappings alınamadı: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
-     * Preview transformed data
+     * Preview transformed data - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function previewTransformedData(Request $request, $id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            
-            $request->validate([
-                'mappings' => 'required|array|min:1'
-            ]);
-
-            $mappings = $request->input('mappings');
-            
-            // Get sample data from file
-            $sampleData = $this->getSampleDataFromFile($knowledgeBase->source_path, $knowledgeBase->file_type, 5);
-            
-            // Transform data using mappings
-            $transformedData = $this->fieldMappingService->transformData($sampleData, $mappings);
-
-            return response()->json([
-                'success' => true,
-                'original_data' => $sampleData,
-                'transformed_data' => $transformedData
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Preview transformed data error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Data preview hatası: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
@@ -1564,184 +1728,47 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
-     * Validate data against field mappings
+     * Validate data against field mappings - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function validateData(Request $request, $id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            $mappings = $request->input('mappings', []);
-            $data = $request->input('data', []);
-
-            if (empty($mappings) || empty($data)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Mappings and data are required'
-                ], 400);
-            }
-
-            $validationResults = [];
-            $totalErrors = 0;
-
-            foreach ($data as $rowIndex => $row) {
-                $rowErrors = [];
-                
-                foreach ($mappings as $mapping) {
-                    $sourceField = $mapping['source_field'];
-                    $value = $row[$sourceField] ?? null;
-                    $validationRules = $mapping['validation_rules'] ?? [];
-
-                    if (!empty($validationRules)) {
-                        $errors = $this->fieldMappingService->validateData($value, $validationRules);
-                        if (!empty($errors)) {
-                            $rowErrors[$sourceField] = $errors;
-                            $totalErrors++;
-                        }
-                    }
-                }
-
-                if (!empty($rowErrors)) {
-                    $validationResults[$rowIndex] = $rowErrors;
-                }
-            }
-
-            return response()->json([
-                'success' => true,
-                'validation_results' => $validationResults,
-                'total_errors' => $totalErrors,
-                'total_rows' => count($data),
-                'valid_rows' => count($data) - count($validationResults)
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Data validation error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Data validation failed: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
-     * Process data in batches
+     * Process data in batches - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function processBatchData(Request $request, $id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            $mappings = $request->input('mappings', []);
-            $chunkSize = $request->input('chunk_size', 100);
-
-            if (empty($mappings)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Field mappings are required'
-                ], 400);
-            }
-
-            // Get sample data for processing
-            $sampleData = $this->getSampleDataFromFile($knowledgeBase->source_path, $knowledgeBase->file_type, 1000);
-            
-            // Process data in batches
-            $results = $this->fieldMappingService->processBatchData($sampleData, $mappings, $chunkSize);
-            
-            // Get processing statistics
-            $stats = $this->fieldMappingService->getProcessingStats($sampleData, $mappings);
-
-            return response()->json([
-                'success' => true,
-                'results' => $results,
-                'statistics' => $stats,
-                'message' => 'Batch processing completed successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Batch processing error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Batch processing failed: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
-     * Get field mapping statistics
+     * Get field mapping statistics - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function getMappingStats($id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            $mappings = $knowledgeBase->fieldMappings()->get();
-
-            $stats = [
-                'total_mappings' => $mappings->count(),
-                'active_mappings' => $mappings->where('is_active', true)->count(),
-                'required_mappings' => $mappings->where('is_required', true)->count(),
-                'field_types' => $mappings->groupBy('field_type')->map->count(),
-                'transformation_rules' => $mappings->whereNotNull('transformation')->count(),
-                'validation_rules' => $mappings->whereNotNull('validation_rules')->count()
-            ];
-
-            return response()->json([
-                'success' => true,
-                'statistics' => $stats
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Mapping stats error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to get mapping statistics: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**
-     * Export transformed data
+     * Export transformed data - GEÇİCİ OLARAK DEVRE DIŞI
      */
     public function exportTransformedData(Request $request, $id)
     {
-        try {
-            $knowledgeBase = KnowledgeBase::findOrFail($id);
-            $mappings = $request->input('mappings', []);
-            $format = $request->input('format', 'csv');
-
-            if (empty($mappings)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Field mappings are required'
-                ], 400);
-            }
-
-            // Get sample data
-            $sampleData = $this->getSampleDataFromFile($knowledgeBase->source_path, $knowledgeBase->file_type, 1000);
-            
-            // Transform data
-            $transformedData = $this->fieldMappingService->transformData($sampleData, $mappings);
-
-            // Export based on format
-            switch ($format) {
-                case 'csv':
-                    return $this->exportToCsv($transformedData, $knowledgeBase->name);
-                case 'json':
-                    return response()->json([
-                        'success' => true,
-                        'data' => $transformedData
-                    ]);
-                default:
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Unsupported export format'
-                    ], 400);
-            }
-
-        } catch (\Exception $e) {
-            Log::error('Export error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Export failed: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Field mapping sistemi geçici olarak devre dışı bırakıldı. Sadece JSON dosya ve URL desteği aktif.'
+        ], 503);
     }
 
     /**

@@ -17,6 +17,8 @@ return [
 
     'session' => [
         'default_daily_limit' => env('CHAT_SESSION_DAILY_LIMIT', 20),
+        'ip_daily_limit' => env('CHAT_IP_DAILY_LIMIT', 50),
+        'use_ip_based_sessions' => env('CHAT_USE_IP_BASED_SESSIONS', true),
         'expiration_days' => env('CHAT_SESSION_EXPIRATION_DAYS', 7),
         'max_concurrent_sessions' => env('CHAT_MAX_CONCURRENT_SESSIONS', 5),
     ],

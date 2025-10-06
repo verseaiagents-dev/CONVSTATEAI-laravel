@@ -13,7 +13,6 @@ class FAQ extends Model
         'title',
         'description',
         'answer',
-        'short_answer',
         'category',
         'is_active',
         'site_id',

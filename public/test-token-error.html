@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Error Test - ConvState AI Widget</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Token Error Test</h1>
+        <p>Bu sayfa token error mesajlarını test etmek için oluşturulmuştur.</p>
+        
+        <button class="test-button" onclick="testTokenError()">Token Error Test Et</button>
+        <button class="test-button" onclick="testInsufficientTokens()">Yetersiz Token Test Et</button>
+        <button class="test-button" onclick="testExpiredTokens()">Süresi Dolmuş Token Test Et</button>
+        <button class="test-button" onclick="testNoActivePlan()">Aktif Plan Yok Test Et</button>
+    </div>
+
+    <!-- Widget Script -->
+    <script src="http://127.0.0.1:8000/widget/convstateai.min.js"></script>
+    
+    <script>
+        // Sayfa yüklendiğinde widget'ı başlat
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.convstateai && window.convstateai.chat) {
+                window.convstateai.chat.load({
+                    projectId: "1",
+                    siteId: "1"
+                }).catch(error => {
+                    console.error('Widget yükleme hatası:', error);
+                });
+            }
+        });
+
+        // Token error test fonksiyonları
+        function testTokenError() {
+            if (window.convstateai && window.convstateai.chat) {
+                // Simüle edilmiş token error mesajı
+                const mockMessage = {
+                    type: 'token_error',
+                    message: 'Yetersiz kullanım token\'ı. Lütfen daha fazla token satın alın.',
+                    data: {
+                        error: 'INSUFFICIENT_TOKENS',
+                        tokens_remaining: 5,
+                        tokens_used: 95,
+                        tokens_total: 100,
+                        usage_percentage: 95,
+                        redirect: 'http://127.0.0.1:8000/subscription/plans'
+                    }
+                };
+                
+                // Widget'a mesaj gönder
+                window.convstateai.chat.sendMessage('test token error');
+            }
+        }
+
+        function testInsufficientTokens() {
+            if (window.convstateai && window.convstateai.chat) {
+                const mockMessage = {
+                    type: 'token_error',
+                    message: 'Yetersiz kullanım token\'ı. Lütfen daha fazla token satın alın.',
+                    data: {
+                        error: 'INSUFFICIENT_TOKENS',
+                        tokens_remaining: 0,
+                        tokens_used: 100,
+                        tokens_total: 100,
+                        usage_percentage: 100,
+                        redirect: 'http://127.0.0.1:8000/subscription/plans'
+                    }
+                };
+                
+                window.convstateai.chat.sendMessage('test insufficient tokens');
+            }
+        }
+
+        function testExpiredTokens() {
+            if (window.convstateai && window.convstateai.chat) {
+                const mockMessage = {
+                    type: 'token_error',
+                    message: 'Kullanım token\'larınızın süresi dolmuş. Lütfen planınızı yenileyin.',
+                    data: {
+                        error: 'USAGE_TOKENS_EXPIRED',
+                        tokens_remaining: 50,
+                        tokens_used: 50,
+                        tokens_total: 100,
+                        usage_percentage: 50,
+                        reset_date: '2024-01-01',
+                        redirect: 'http://127.0.0.1:8000/subscription/plans'
+                    }
+                };
+                
+                window.convstateai.chat.sendMessage('test expired tokens');
+            }
+        }
+
+        function testNoActivePlan() {
+            if (window.convstateai && window.convstateai.chat) {
+                const mockMessage = {
+                    type: 'token_error',
+                    message: 'Aktif planınız bulunmuyor. Lütfen bir plan satın alın.',
+                    data: {
+                        error: 'NO_ACTIVE_PLAN',
+                        redirect: 'http://127.0.0.1:8000/subscription/plans'
+                    }
+                };
+                
+                window.convstateai.chat.sendMessage('test no active plan');
+            }
+        }
+    </script>
+</body>
+</html>

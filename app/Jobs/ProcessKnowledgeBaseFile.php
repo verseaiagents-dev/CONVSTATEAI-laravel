@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\KnowledgeBase;
 use App\Models\KnowledgeChunk;
 use App\Services\ContentChunkerService;
+use App\Services\KnowledgeBase\AIService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -23,6 +24,7 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
     protected $filePath;
     protected $fileType;
     protected $contentChunker;
+    protected $aiService;
 
     /**
      * The number of times the job may be attempted.
@@ -43,6 +45,7 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
         $this->filePath = $filePath;
         $this->fileType = $fileType;
         $this->contentChunker = app(\App\Services\KnowledgeBase\ContentChunker::class);
+        $this->aiService = app(AIService::class);
     }
 
     /**
@@ -142,26 +145,13 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
         $chunks = [];
         
         try {
-            // Parse file content based on type
+            // Parse file content based on type - Sadece JSON desteklenir
             switch ($extension) {
-                case 'csv':
-                    $chunks = $this->processCsvFile($file);
-                    break;
                 case 'json':
                     $chunks = $this->processJsonFile($file);
                     break;
-                case 'txt':
-                    $chunks = $this->processTextFile($file);
-                    break;
-                case 'xml':
-                    $chunks = $this->processXmlFile($file);
-                    break;
-                case 'xlsx':
-                case 'xls':
-                    $chunks = $this->processExcelFile($file);
-                    break;
                 default:
-                    throw new \Exception("Unsupported file type: {$extension}");
+                    throw new \Exception("Desteklenmeyen dosya formatı: {$extension}. Sadece JSON dosyaları desteklenir.");
             }
 
             // Create chunk models
@@ -241,7 +231,7 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
     }
 
     /**
-     * Process JSON file
+     * Process JSON file with AI Field Mapping
      */
     private function processJsonFile($file)
     {
@@ -260,8 +250,56 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
         
         $chunks = [];
         
-        if (is_array($data)) {
-            foreach ($data as $index => $item) {
+        // Veriyi array formatına çevir (tek obje ise array'e sar)
+        $dataArray = is_array($data) ? $data : [$data];
+        
+        // AI Field Mapping uygula
+        $mappingResult = $this->performAIFieldMapping($dataArray);
+        
+        if ($mappingResult['success']) {
+            $mappedData = $mappingResult['mapped_data'];
+            $contentType = $mappingResult['content_type'];
+            $fieldMapping = $mappingResult['field_mapping'];
+            
+            Log::info('AI Field Mapping applied successfully', [
+                'knowledge_base_id' => $this->knowledgeBase->id,
+                'original_fields' => $mappingResult['analysis']['detected_fields'] ?? [],
+                'mapped_fields' => array_keys($fieldMapping['field_mapping'] ?? []),
+                'content_type' => $contentType,
+                'confidence_score' => $mappingResult['confidence_score'],
+                'data_count' => count($dataArray)
+            ]);
+            
+            // Mapped data ile chunk'ları oluştur
+            foreach ($mappedData as $index => $item) {
+                $itemContent = is_array($item) ? json_encode($item, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : (string)$item;
+                
+                // UTF-8 güvenli karakter sayımı
+                $chunkSize = mb_strlen($itemContent, 'UTF-8');
+                $wordCount = $this->countWordsUtf8($itemContent);
+                
+                $chunks[] = [
+                    'content' => $itemContent,
+                    'content_hash' => hash('sha256', $itemContent),
+                    'chunk_size' => $chunkSize,
+                    'word_count' => $wordCount,
+                    'content_type' => $contentType,
+                    'metadata' => [
+                        'item_index' => $index,
+                        'ai_field_mapping' => $fieldMapping,
+                        'original_data' => $dataArray[$index] ?? null,
+                        'mapping_confidence' => $mappingResult['confidence_score']
+                    ]
+                ];
+            }
+        } else {
+            // AI mapping başarısız olursa fallback olarak orijinal veriyi kullan
+            Log::warning('AI Field Mapping failed, using original data', [
+                'knowledge_base_id' => $this->knowledgeBase->id,
+                'error' => $mappingResult['error'] ?? 'Unknown error'
+            ]);
+            
+            foreach ($dataArray as $index => $item) {
                 $itemContent = is_array($item) ? json_encode($item, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : (string)$item;
                 
                 // UTF-8 güvenli karakter sayımı
@@ -274,25 +312,39 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
                     'chunk_size' => $chunkSize,
                     'word_count' => $wordCount,
                     'content_type' => 'json_item',
-                    'metadata' => ['item_index' => $index]
+                    'metadata' => [
+                        'item_index' => $index,
+                        'ai_mapping_failed' => true,
+                        'fallback_used' => true
+                    ]
                 ];
             }
-        } else {
-            // UTF-8 güvenli karakter sayımı
-            $chunkSize = mb_strlen($content, 'UTF-8');
-            $wordCount = $this->countWordsUtf8($content);
-            
-            $chunks[] = [
-                'content' => $content,
-                'content_hash' => hash('sha256', $content),
-                'chunk_size' => $chunkSize,
-                'word_count' => $wordCount,
-                'content_type' => 'json_document',
-                'metadata' => []
-            ];
         }
         
         return $chunks;
+    }
+
+    /**
+     * AI Field Mapping uygula
+     */
+    private function performAIFieldMapping(array $jsonData): array
+    {
+        try {
+            return $this->aiService->performAIFieldMapping($jsonData, 'auto');
+        } catch (\Exception $e) {
+            Log::error('AI Field Mapping error in job: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'original_data' => $jsonData,
+                'mapped_data' => $jsonData,
+                'field_mapping' => [],
+                'analysis' => [],
+                'content_type' => 'auto',
+                'confidence_score' => 0.0
+            ];
+        }
     }
 
     /**
@@ -392,21 +444,15 @@ class ProcessKnowledgeBaseFile implements ShouldQueue
     }
 
     /**
-     * Get total records count
+     * Get total records count - Sadece JSON desteklenir
      */
     private function getTotalRecords($file, $extension)
     {
         switch ($extension) {
-            case 'csv':
-                $content = $this->readFileSafely($file->getPathname());
-                return count(str_getcsv($content, "\n"));
             case 'json':
                 $content = $this->readFileSafely($file->getPathname());
                 $data = json_decode($content, true);
                 return is_array($data) ? count($data) : 1;
-            case 'txt':
-                $content = $this->readFileSafely($file->getPathname());
-                return ceil(mb_strlen($content, 'UTF-8') / 1000);
             default:
                 return 1;
         }

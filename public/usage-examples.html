@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConvState AI - Kullanım Örnekleri</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 20px;
+        }
+        .example {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .example h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ConvState AI - Kullanım Örnekleri</h1>
+            <p>Widget'ı sitenize entegre etmek için farklı yöntemler</p>
+        </div>
+
+        <div class="example">
+            <h3>1. Yeni API - Önerilen Yöntem</h3>
+            <p>Modern ve esnek kullanım için önerilen yöntem:</p>
+            <div class="code">
+&lt;script src="build/convstateai.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    // Widget konfigürasyonu
+    const config = {
+        projectId: '1',
+        apiUrl: 'http://127.0.0.1:8000', // Development server
+        customization: {
+            colors: {
+                primary: '#667eea',
+                secondary: '#764ba2'
+            },
+            position: 'bottom-right'
+        }
+    };
+    
+    // Widget'ı yükle
+    window.convstateai.chat.load(config).then(() => {
+        console.log('Widget yüklendi!');
+    }).catch(error => {
+        console.error('Widget yükleme hatası:', error);
+    });
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="example">
+            <h3>2. Eski API - Geriye Uyumluluk</h3>
+            <p>Mevcut siteleriniz için geriye uyumlu yöntem:</p>
+            <div class="code">
+&lt;script src="build/convstateai.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    // Eski API kullanımı
+    window.convstateai.load({
+        projectId: '1',
+        apiUrl: 'http://127.0.0.1:8000',
+        customization: {
+            colors: {
+                primary: '#667eea',
+                secondary: '#764ba2'
+            },
+            position: 'bottom-right'
+        }
+    });
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="example">
+            <h3>3. Otomatik Yükleme - window.convstateaiConfig</h3>
+            <p>Script yüklendikten sonra otomatik olarak widget'ı başlatır:</p>
+            <div class="code">
+&lt;script src="build/convstateai.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    // Otomatik yükleme için konfigürasyon
+    window.convstateaiConfig = {
+        projectId: '1',
+        apiUrl: 'http://127.0.0.1:8000',
+        customization: {
+            colors: {
+                primary: '#667eea',
+                secondary: '#764ba2'
+            },
+            position: 'bottom-right'
+        }
+    };
+    // Widget otomatik olarak yüklenecek
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="example">
+            <h3>4. Gelişmiş Kullanım - API Metodları</h3>
+            <p>Widget'ı programatik olarak kontrol etmek için:</p>
+            <div class="code">
+&lt;script&gt;
+    // Widget'ı yükle
+    const config = {
+        projectId: '1',
+        apiUrl: 'http://127.0.0.1:8000'
+    };
+    
+    window.convstateai.chat.load(config).then(() => {
+        console.log('Widget yüklendi!');
+        
+        // Widget durumunu kontrol et
+        console.log('Widget yüklü mü?', window.convstateai.chat.isLoaded());
+        
+        // Mesaj gönder
+        window.convstateai.chat.sendMessage('Merhaba!');
+        
+        // Auth bilgilerini set et
+        window.convstateai.chat.setAuth('token123', 'user456');
+        
+        // Widget'ı yok et
+        // window.convstateai.chat.destroy();
+    });
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="example">
+            <h3>5. Production Kullanımı</h3>
+            <p>Production ortamında kullanım için:</p>
+            <div class="code">
+&lt;script src="https://convstateai.com/build/convstateai.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    window.convstateaiConfig = {
+        projectId: 'YOUR_PROJECT_ID',
+        // apiUrl belirtmezseniz otomatik olarak production URL kullanılır
+        customization: {
+            colors: {
+                primary: '#667eea',
+                secondary: '#764ba2'
+            },
+            position: 'bottom-right'
+        }
+    };
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>Not:</strong> Tüm yöntemler aynı widget'ı yükler. Yeni API daha esnek ve hata yönetimi sağlar.
+        </div>
+
+        <div class="success">
+            <strong>Başarılı!</strong> Widget artık hem eski hem yeni API'yi destekliyor ve Laravel development server ile uyumlu çalışıyor.
+        </div>
+    </div>
+
+    <!-- Test için widget'ı yükle -->
+    <script src="build/convstateai.min.js"></script>
+    <script>
+        // Bu sayfada widget'ı görmek için
+        window.convstateaiConfig = {
+            projectId: '1',
+            apiUrl: 'http://127.0.0.1:8000',
+            customization: {
+                colors: {
+                    primary: '#667eea',
+                    secondary: '#764ba2'
+                },
+                position: 'bottom-right'
+            }
+        };
+    </script>
+</body>
+</html>

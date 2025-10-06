@@ -32,7 +32,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <!-- Total Users -->
         <div class="glass-effect rounded-xl p-6 border border-gray-700 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10">
             <div class="flex items-center justify-between">
@@ -105,10 +105,33 @@
                 <span class="text-gray-400">↗️ +22% from last week</span>
             </div>
         </div>
+
+        <!-- Demo Requests -->
+        <div class="glass-effect rounded-xl p-6 border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Demo Talepleri</p>
+                    <p class="mt-2 text-3xl font-bold text-white">{{ $stats['total_demo_requests'] }}</p>
+                    @if($stats['pending_demo_requests'] > 0)
+                        <p class="text-sm text-orange-400 font-medium">{{ $stats['pending_demo_requests'] }} bekleyen</p>
+                    @endif
+                </div>
+                <div class="p-3 bg-orange-500/20 rounded-full">
+                    <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-sm">
+                <a href="{{ route('admin.demo-requests.index') }}" class="text-orange-400 hover:text-orange-300 transition-colors">
+                    Demo taleplerini görüntüle →
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Recent Activity -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Recent Users -->
         <div class="glass-effect rounded-xl p-6">
             <h3 class="text-xl font-semibold text-white mb-4">Son Kayıt Olan Kullanıcılar</h3>
@@ -149,6 +172,46 @@
                 </div>
                 @empty
                 <p class="text-gray-400 text-center py-4">Henüz kampanya yok</p>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Recent Demo Requests -->
+        <div class="glass-effect rounded-xl p-6">
+            <h3 class="text-xl font-semibold text-white mb-4">Son Demo Talepleri</h3>
+            <div class="space-y-3">
+                @forelse($stats['recent_demo_requests'] as $demoRequest)
+                <div class="flex items-center space-x-3 p-3 bg-gray-800/30 rounded-lg">
+                    <div class="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                        <span class="text-orange-400 font-medium">{{ substr($demoRequest->first_name, 0, 1) }}</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-white font-medium">{{ $demoRequest->full_name }}</p>
+                        <p class="text-gray-400 text-sm">{{ $demoRequest->email }}</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                            @php
+                                $statusColors = [
+                                    'pending' => 'bg-yellow-500/20 text-yellow-400',
+                                    'contacted' => 'bg-blue-500/20 text-blue-400',
+                                    'completed' => 'bg-green-500/20 text-green-400',
+                                    'cancelled' => 'bg-red-500/20 text-red-400'
+                                ];
+                                $statusLabels = [
+                                    'pending' => 'Bekleyen',
+                                    'contacted' => 'İletişim Kuruldu',
+                                    'completed' => 'Tamamlandı',
+                                    'cancelled' => 'İptal Edildi'
+                                ];
+                            @endphp
+                            <span class="px-2 py-1 text-xs rounded-full {{ $statusColors[$demoRequest->status] }}">
+                                {{ $statusLabels[$demoRequest->status] }}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ $demoRequest->created_at->diffForHumans() }}</span>
+                </div>
+                @empty
+                <p class="text-gray-400 text-center py-4">Henüz demo talebi yok</p>
                 @endforelse
             </div>
         </div>

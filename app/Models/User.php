@@ -31,6 +31,17 @@ class User extends Authenticatable
         'language',
         'address',
         'phone',
+        'tokens_total',
+        'tokens_used',
+        'tokens_remaining',
+        'token_reset_date',
+        'current_plan_id',
+        'usage_token',
+        'max_projects',
+        'priority_support',
+        'advanced_analytics',
+        'custom_branding',
+        'api_access',
     ];
 
     /**
@@ -56,6 +67,10 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'last_login_at' => 'datetime',
             'token_expires_at' => 'datetime',
+            'token_reset_date' => 'date',
+            'tokens_total' => 'integer',
+            'tokens_used' => 'integer',
+            'tokens_remaining' => 'integer',
         ];
     }
 
@@ -169,6 +184,18 @@ class User extends Authenticatable
                $this->token_expires_at->isFuture();
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * SubscriptionInvoices ile ilişki
+     */
+    public function subscriptionInvoices()
+    {
+        return $this->hasMany(SubscriptionInvoice::class);
+    }
     /**
      * Revoke personal token
      */
@@ -190,28 +217,176 @@ class User extends Authenticatable
                     ->first();
     }
 
+    // UsageToken ilişkileri kaldırıldı - artık User tablosunda token bilgileri tutuluyor
+
     /**
-     * Usage token ile ilişki
+     * Current plan ile ilişki
      */
-    public function usageTokens()
+    public function currentPlan()
     {
-        return $this->hasMany(UsageToken::class);
+        return $this->belongsTo(Plan::class, 'current_plan_id');
     }
 
     /**
-     * Aktif usage token ile ilişki
+     * Token kullan
      */
-    public function activeUsageToken()
+    public function useToken(int $amount = 1): bool
     {
-        return $this->hasOne(UsageToken::class)->where('is_active', true);
+        if ($this->tokens_remaining < $amount) {
+            return false;
+        }
+
+        $this->increment('tokens_used', $amount);
+        $this->decrement('tokens_remaining', $amount);
+        
+        return true;
     }
 
     /**
-     * Usage token ile ilişki (tekil - en son aktif olan)
+     * Token ekle (plan atama sonrası)
+     */
+    public function addTokens(int $amount): void
+    {
+        $this->increment('tokens_total', $amount);
+        $this->increment('tokens_remaining', $amount);
+    }
+
+    /**
+     * Token'ları yenile (aylık/yıllık reset)
+     */
+    public function resetTokens(): void
+    {
+        $plan = $this->currentPlan;
+        $tokenResetDate = $plan ? $this->calculateTokenResetDate($plan) : now()->addMonth();
+        
+        $this->update([
+            'tokens_remaining' => $this->tokens_total,
+            'tokens_used' => 0,
+            'token_reset_date' => $tokenResetDate
+        ]);
+    }
+
+    /**
+     * Token'ları yenileme tarihini hesapla
+     */
+    public function getNextTokenResetDate(): \Carbon\Carbon
+    {
+        $plan = $this->currentPlan;
+        if (!$plan) {
+            return now()->addMonth();
+        }
+
+        return $this->calculateTokenResetDate($plan);
+    }
+
+    /**
+     * Plan parametresi ile token reset tarihini hesapla
+     */
+    public function calculateTokenResetDate(Plan $plan): \Carbon\Carbon
+    {
+        $period = $plan->token_reset_period ?? 'monthly';
+        
+        return match($period) {
+            'yearly' => now()->addYear(),
+            'monthly' => now()->addMonth(),
+            default => now()->addMonth()
+        };
+    }
+
+    /**
+     * Token'ların süresi dolmuş mu?
+     */
+    public function isTokenExpired(): bool
+    {
+        return $this->token_reset_date && $this->token_reset_date->isPast();
+    }
+
+    /**
+     * Token kullanılabilir mi?
+     */
+    public function canUseToken(int $amount = 1): bool
+    {
+        return $this->tokens_remaining >= $amount && !$this->isTokenExpired();
+    }
+
+    /**
+     * Kullanım yüzdesi
+     */
+    public function getTokenUsagePercentageAttribute(): float
+    {
+        if ($this->tokens_total == 0) {
+            return 0;
+        }
+
+        return round(($this->tokens_used / $this->tokens_total) * 100, 2);
+    }
+
+    /**
+     * Kullanım yüzdesi (view uyumluluğu için)
+     */
+    public function getUsagePercentageAttribute(): float
+    {
+        return $this->token_usage_percentage;
+    }
+
+    /**
+     * Kalan gün sayısı
+     */
+    public function getDaysUntilTokenResetAttribute(): int
+    {
+        if (!$this->token_reset_date) {
+            return 0;
+        }
+
+        return max(0, (int) now()->diffInDays($this->token_reset_date, false));
+    }
+
+    /**
+     * Kalan gün sayısı (view uyumluluğu için)
+     */
+    public function getDaysUntilResetAttribute(): int
+    {
+        return $this->days_until_token_reset;
+    }
+
+    /**
+     * Reset tarihi (view uyumluluğu için)
+     */
+    public function getResetDateAttribute()
+    {
+        return $this->token_reset_date;
+    }
+
+    /**
+     * Plan atama ve token ekleme
+     */
+    public function assignPlan(Plan $plan, int $subscriptionId = null): void
+    {
+        $tokens = $plan->calculateUsageTokens();
+        
+        // Token reset tarihini hesapla (plan parametresini kullan)
+        $tokenResetDate = $this->calculateTokenResetDate($plan);
+        
+        $this->update([
+            'current_plan_id' => $plan->id,
+            'tokens_total' => $tokens,
+            'tokens_remaining' => $tokens,
+            'tokens_used' => 0,
+            'token_reset_date' => $tokenResetDate
+        ]);
+    }
+
+    /**
+     * Usage token ile uyumluluk için (API arayüzünü korumak için)
      */
     public function usageToken()
     {
-        return $this->hasOne(UsageToken::class)->where('is_active', true)->latest();
+        return $this; // User'ın kendisi token bilgilerini tutar
+    }
+
+    public function planRequests()
+    {
+        return $this->hasMany(PlanRequest::class);
     }
 
 }

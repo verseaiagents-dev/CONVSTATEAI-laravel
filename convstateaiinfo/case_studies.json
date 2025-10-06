@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "title": "TechStore E-ticaret: %45 Dönüşüm Artışı",
+    "company": "TechStore E-ticaret",
+    "industry": "Elektronik",
+    "company_size": "Orta Ölçekli",
+    "challenge": "Elektronik ürünlerde müşteri rehberliği eksikliği ve düşük dönüşüm oranları",
+    "solution": "ConvStateAI Professional plan ile akıllı ürün öneri sistemi ve 7/24 müşteri desteği",
+    "results": {
+      "conversion_increase": "45%",
+      "customer_satisfaction": "92%",
+      "average_response_time": "1.2 saniye",
+      "revenue_increase": "60%",
+      "customer_retention": "78%"
+    },
+    "implementation_time": "2 hafta",
+    "roi": "340%",
+    "key_metrics": [
+      "Aylık dönüşüm oranı %2.1'den %3.1'e yükseldi",
+      "Müşteri memnuniyet skoru 7.2'den 9.1'e çıktı",
+      "Ortalama sepet değeri %25 arttı",
+      "Müşteri hizmetleri maliyeti %40 azaldı"
+    ],
+    "testimonial": "ConvStateAI sayesinde müşterilerimiz doğru ürünleri buluyor ve satışlarımız önemli ölçüde arttı.",
+    "tags": ["elektronik", "dönüşüm", "ürün önerisi", "müşteri memnuniyeti"],
+    "date": "2024-01-15",
+    "featured": true
+  },
+  {
+    "id": 2,
+    "title": "FashionHub: Mobil Deneyim Optimizasyonu",
+    "company": "FashionHub",
+    "industry": "Moda",
+    "company_size": "Büyük Ölçekli",
+    "challenge": "Mobil kullanıcılarda düşük dönüşüm oranları ve yüksek terk etme oranları",
+    "solution": "ConvStateAI Enterprise plan ile mobil-optimized AI chat widget ve kişiselleştirilmiş moda önerileri",
+    "results": {
+      "mobile_conversion_increase": "65%",
+      "bounce_rate_reduction": "40%",
+      "mobile_user_satisfaction": "94%",
+      "average_session_duration": "3.2 dakika artış",
+      "mobile_revenue_increase": "80%"
+    },
+    "implementation_time": "3 hafta",
+    "roi": "420%",
+    "key_metrics": [
+      "Mobil dönüşüm oranı %1.8'den %3.0'a yükseldi",
+      "Mobil terk etme oranı %68'den %41'e düştü",
+      "Mobil ortalama sepet değeri %35 arttı",
+      "Mobil müşteri memnuniyeti %94'e çıktı"
+    ],
+    "testimonial": "Mobil kullanıcı deneyimimiz ConvStateAI ile tamamen dönüştü. Satışlarımız ikiye katlandı.",
+    "tags": ["moda", "mobil", "dönüşüm", "kişiselleştirme"],
+    "date": "2024-01-22",
+    "featured": true
+  },
+  {
+    "id": 3,
+    "title": "HealthCare Store: Güven ve Uzman Rehberlik",
+    "company": "HealthCare Store",
+    "industry": "Sağlık",
+    "company_size": "Küçük Ölçekli",
+    "challenge": "Sağlık ürünlerinde müşteri güveni ve doğru ürün seçimi konularında zorluklar",
+    "solution": "ConvStateAI Professional plan ile uzman bilgi tabanı ve kişiselleştirilmiş sağlık ürün önerileri",
+    "results": {
+      "customer_trust_increase": "78%",
+      "product_recommendation_accuracy": "92%",
+      "customer_retention": "85%",
+      "expert_consultation_satisfaction": "96%",
+      "repeat_purchase_rate": "70%"
+    },
+    "implementation_time": "1 hafta",
+    "roi": "280%",
+    "key_metrics": [
+      "Müşteri güven skoru 6.5'ten 9.2'ye yükseldi",
+      "Yanlış ürün iade oranı %15'ten %3'e düştü",
+      "Müşteri tekrar satın alma oranı %45'ten %70'e çıktı",
+      "Uzman danışmanlık memnuniyeti %96'ya ulaştı"
+    ],
+    "testimonial": "Müşterilerimiz artık güvenle alışveriş yapıyor ve doğru ürünleri seçiyor.",
+    "tags": ["sağlık", "güven", "uzman rehberlik", "doğru öneri"],
+    "date": "2024-01-29",
+    "featured": false
+  },
+  {
+    "id": 4,
+    "title": "BookWorld Online: Kişiselleştirilmiş Kitap Önerileri",
+    "company": "BookWorld Online",
+    "industry": "Kitap & Medya",
+    "company_size": "Orta Ölçekli",
+    "challenge": "Kitap önerilerinde kişiselleştirme eksikliği ve düşük müşteri etkileşimi",
+    "solution": "ConvStateAI Starter plan ile okuma tercihlerine göre kişiselleştirilmiş kitap öneri sistemi",
+    "results": {
+      "personalization_accuracy": "88%",
+      "customer_engagement": "65% artış",
+      "book_recommendation_success": "82%",
+      "average_order_value": "30% artış",
+      "customer_lifetime_value": "45% artış"
+    },
+    "implementation_time": "1 hafta",
+    "roi": "320%",
+    "key_metrics": [
+      "Kitap öneri başarı oranı %82'ye çıktı",
+      "Müşteri etkileşim süresi %65 arttı",
+      "Ortalama sipariş değeri %30 yükseldi",
+      "Müşteri yaşam boyu değeri %45 arttı"
+    ],
+    "testimonial": "Müşterilerimiz artık kendilerine uygun kitapları kolayca buluyor ve daha sık alışveriş yapıyor.",
+    "tags": ["kitap", "kişiselleştirme", "öneri sistemi", "müşteri etkileşimi"],
+    "date": "2024-02-05",
+    "featured": false
+  },
+  {
+    "id": 5,
+    "title": "BeautyBox: Kozmetik Kişiselleştirmesi",
+    "company": "BeautyBox",
+    "industry": "Kozmetik",
+    "company_size": "Büyük Ölçekli",
+    "challenge": "Kozmetik ürünlerde cilt tipi ve tercih analizi eksikliği",
+    "solution": "ConvStateAI Enterprise plan ile cilt analizi ve kişiselleştirilmiş kozmetik öneri sistemi",
+    "results": {
+      "skin_type_analysis_accuracy": "95%",
+      "product_match_success": "90%",
+      "customer_satisfaction": "94%",
+      "repeat_purchase": "60% artış",
+      "brand_loyalty": "85%"
+    },
+    "implementation_time": "4 hafta",
+    "roi": "380%",
+    "key_metrics": [
+      "Cilt tipi analiz doğruluğu %95'e ulaştı",
+      "Ürün uyum başarı oranı %90'a çıktı",
+      "Müşteri memnuniyeti %94'e yükseldi",
+      "Marka bağlılığı %85'e ulaştı"
+    ],
+    "testimonial": "Müşterilerimiz artık cilt tipine uygun ürünleri buluyor ve çok memnunlar.",
+    "tags": ["kozmetik", "cilt analizi", "kişiselleştirme", "marka bağlılığı"],
+    "date": "2024-02-12",
+    "featured": true
+  },
+  {
+    "id": 6,
+    "title": "SportsGear Pro: Uzman Spor Rehberliği",
+    "company": "SportsGear Pro",
+    "industry": "Spor",
+    "company_size": "Orta Ölçekli",
+    "challenge": "Spor ekipmanlarında uzman rehberlik eksikliği ve yanlış ürün seçimleri",
+    "solution": "ConvStateAI Professional plan ile spor uzmanı AI asistanı ve kişiselleştirilmiş ekipman önerileri",
+    "results": {
+      "expert_guidance_accuracy": "95%",
+      "correct_product_selection": "92%",
+      "customer_satisfaction": "91%",
+      "return_rate_reduction": "60%",
+      "sports_consultation_success": "88%"
+    },
+    "implementation_time": "2 hafta",
+    "roi": "290%",
+    "key_metrics": [
+      "Uzman rehberlik doğruluğu %95'e ulaştı",
+      "Doğru ürün seçim oranı %92'ye çıktı",
+      "Ürün iade oranı %60 azaldı",
+      "Spor danışmanlık başarı oranı %88'e yükseldi"
+    ],
+    "testimonial": "Müşterilerimiz artık spor hedeflerine uygun ekipmanları seçiyor ve çok memnunlar.",
+    "tags": ["spor", "uzman rehberlik", "doğru ürün", "danışmanlık"],
+    "date": "2024-02-19",
+    "featured": false
+  }
+]

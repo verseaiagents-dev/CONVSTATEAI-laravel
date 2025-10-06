@@ -1,0 +1,512 @@
+[
+  {
+    "id": 1,
+    "name": "ConvStateAI Starter Plan",
+    "description": "E-ticaret siteniz için temel AI chat widget çözümü. Müşteri deneyimini artırın ve dönüşüm oranlarınızı yükseltin.",
+    "price": 99.99,
+    "currency": "TRY",
+    "category": "AI Chat Widget",
+    "subcategory": "Temel Plan",
+    "brand": "ConvStateAI",
+    "sku": "CSAI-STARTER-001",
+    "features": [
+      "Temel AI chat widget",
+      "5 farklı widget teması",
+      "Temel müşteri analizi",
+      "Email desteği",
+      "Aylık 1000 konuşma limiti",
+      "Temel ürün öneri sistemi",
+      "Mobil uyumlu tasarım",
+      "Temel raporlama"
+    ],
+    "target_audience": "Küçük ve orta ölçekli e-ticaret siteleri",
+    "benefits": [
+      "Müşteri memnuniyetinde %40 artış",
+      "Dönüşüm oranında %25 iyileşme",
+      "7/24 müşteri desteği",
+      "Kolay entegrasyon",
+      "Hızlı kurulum",
+      "Maliyet tasarrufu"
+    ],
+    "technical_specs": {
+      "setup_time": "15 dakika",
+      "integration": "JavaScript SDK",
+      "browser_support": "Tüm modern tarayıcılar",
+      "mobile_responsive": true,
+      "api_access": false,
+      "customization_level": "Temel",
+      "data_retention": "3 ay"
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "14 gün ücretsiz deneme",
+    "is_active": true,
+    "is_featured": true,
+    "is_bestseller": true,
+    "is_new": false,
+    "is_on_sale": false,
+    "rating_average": 4.5,
+    "rating_count": 127,
+    "view_count": 1250,
+    "sold_count": 89,
+    "tags": ["ai", "chat widget", "e-ticaret", "müşteri hizmetleri", "başlangıç", "temel"],
+    "meta_title": "ConvStateAI Starter Plan - E-ticaret AI Chat Widget",
+    "meta_description": "E-ticaret siteniz için temel AI chat widget çözümü. 14 gün ücretsiz deneme ile başlayın.",
+    "seo_url": "convstateai-starter-plan",
+    "images": {
+      "main_image": "/imgs/products/starter-plan.jpg",
+      "gallery": [
+        "/imgs/products/starter-dashboard.jpg",
+        "/imgs/products/starter-widget.jpg",
+        "/imgs/products/starter-analytics.jpg"
+      ]
+    },
+    "documents": [
+      {
+        "name": "Kurulum Rehberi",
+        "url": "/docs/starter-setup-guide.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "API Dokümantasyonu",
+        "url": "/docs/starter-api-docs.pdf",
+        "type": "PDF"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "ConvStateAI Professional",
+    "description": "Gelişmiş AI özellikleri ve detaylı analitik raporlarla e-ticaret sitenizi bir üst seviyeye taşıyın.",
+    "price": 199.99,
+    "currency": "TRY",
+    "category": "AI Chat Widget",
+    "subcategory": "Profesyonel Plan",
+    "brand": "ConvStateAI",
+    "sku": "CSAI-PROFESSIONAL-002",
+    "features": [
+      "Gelişmiş AI chat widget",
+      "15+ widget teması",
+      "Detaylı müşteri analizi",
+      "Özel entegrasyonlar",
+      "Aylık 5000 konuşma limiti",
+      "Öncelikli destek",
+      "A/B test özellikleri",
+      "Gelişmiş ürün öneri sistemi",
+      "Çoklu dil desteği",
+      "Gelişmiş raporlama",
+      "API erişimi",
+      "Webhook desteği"
+    ],
+    "target_audience": "Büyük e-ticaret siteleri ve kurumsal müşteriler",
+    "benefits": [
+      "Müşteri memnuniyetinde %60 artış",
+      "Dönüşüm oranında %40 iyileşme",
+      "Detaylı performans raporları",
+      "Özelleştirilebilir AI yanıtları",
+      "Gelişmiş analitik",
+      "Öncelikli teknik destek"
+    ],
+    "technical_specs": {
+      "setup_time": "30 dakika",
+      "integration": "JavaScript SDK + API",
+      "browser_support": "Tüm modern tarayıcılar",
+      "mobile_responsive": true,
+      "api_access": true,
+      "customization_level": "Gelişmiş",
+      "data_retention": "6 ay",
+      "languages_supported": 25,
+      "webhook_support": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "14 gün ücretsiz deneme",
+    "is_active": true,
+    "is_featured": true,
+    "is_bestseller": false,
+    "is_new": false,
+    "is_on_sale": false,
+    "rating_average": 4.7,
+    "rating_count": 89,
+    "view_count": 980,
+    "sold_count": 67,
+    "tags": ["ai", "chat widget", "e-ticaret", "profesyonel", "analitik", "api"],
+    "meta_title": "ConvStateAI Professional - Gelişmiş AI Chat Widget",
+    "meta_description": "Gelişmiş AI özellikleri ve detaylı analitik raporlarla e-ticaret sitenizi optimize edin.",
+    "seo_url": "convstateai-professional",
+    "images": {
+      "main_image": "/imgs/products/professional-plan.jpg",
+      "gallery": [
+        "/imgs/products/professional-dashboard.jpg",
+        "/imgs/products/professional-widget.jpg",
+        "/imgs/products/professional-analytics.jpg",
+        "/imgs/products/professional-api.jpg"
+      ]
+    },
+    "documents": [
+      {
+        "name": "Profesyonel Kurulum Rehberi",
+        "url": "/docs/professional-setup-guide.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "API Dokümantasyonu",
+        "url": "/docs/professional-api-docs.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "Analitik Raporlama Rehberi",
+        "url": "/docs/analytics-guide.pdf",
+        "type": "PDF"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "ConvStateAI Enterprise",
+    "description": "Kurumsal seviye AI chat çözümü ile sınırsız özelleştirme ve 7/24 öncelikli destek.",
+    "price": 499.99,
+    "currency": "TRY",
+    "category": "AI Chat Widget",
+    "subcategory": "Kurumsal Plan",
+    "brand": "ConvStateAI",
+    "sku": "CSAI-ENTERPRISE-003",
+    "features": [
+      "Kurumsal AI chat widget",
+      "Sınırsız widget teması",
+      "Gelişmiş müşteri analizi",
+      "Özel entegrasyonlar",
+      "Sınırsız konuşma",
+      "7/24 öncelikli destek",
+      "A/B test özellikleri",
+      "Özel AI model eğitimi",
+      "White-label çözüm",
+      "Çoklu site desteği",
+      "Özel güvenlik protokolleri",
+      "Dedicated account manager",
+      "Özel API endpoints",
+      "Gelişmiş webhook'lar",
+      "Sınırsız dil desteği"
+    ],
+    "target_audience": "Büyük kurumsal müşteriler ve çoklu site sahipleri",
+    "benefits": [
+      "Müşteri memnuniyetinde %80 artış",
+      "Dönüşüm oranında %60 iyileşme",
+      "Özel AI model eğitimi",
+      "Dedicated account manager",
+      "Sınırsız özelleştirme",
+      "Kurumsal güvenlik",
+      "7/24 öncelikli destek"
+    ],
+    "technical_specs": {
+      "setup_time": "1-2 gün",
+      "integration": "JavaScript SDK + API + Custom",
+      "browser_support": "Tüm modern tarayıcılar",
+      "mobile_responsive": true,
+      "api_access": true,
+      "customization_level": "Sınırsız",
+      "data_retention": "12 ay",
+      "languages_supported": 50,
+      "webhook_support": true,
+      "custom_ai_training": true,
+      "white_label": true,
+      "multi_site": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "30 gün ücretsiz deneme",
+    "is_active": true,
+    "is_featured": true,
+    "is_bestseller": false,
+    "is_new": false,
+    "is_on_sale": false,
+    "rating_average": 4.9,
+    "rating_count": 45,
+    "view_count": 750,
+    "sold_count": 23,
+    "tags": ["ai", "chat widget", "e-ticaret", "kurumsal", "white-label", "özel"],
+    "meta_title": "ConvStateAI Enterprise - Kurumsal AI Chat Widget",
+    "meta_description": "Kurumsal seviye AI chat çözümü ile sınırsız özelleştirme ve 7/24 destek.",
+    "seo_url": "convstateai-enterprise",
+    "images": {
+      "main_image": "/imgs/products/enterprise-plan.jpg",
+      "gallery": [
+        "/imgs/products/enterprise-dashboard.jpg",
+        "/imgs/products/enterprise-widget.jpg",
+        "/imgs/products/enterprise-analytics.jpg",
+        "/imgs/products/enterprise-customization.jpg",
+        "/imgs/products/enterprise-security.jpg"
+      ]
+    },
+    "documents": [
+      {
+        "name": "Kurumsal Kurulum Rehberi",
+        "url": "/docs/enterprise-setup-guide.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "Kurumsal API Dokümantasyonu",
+        "url": "/docs/enterprise-api-docs.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "Güvenlik Protokolleri",
+        "url": "/docs/security-protocols.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "White-label Rehberi",
+        "url": "/docs/white-label-guide.pdf",
+        "type": "PDF"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "ConvStateAI Analytics Pro",
+    "description": "Detaylı müşteri analizi ve dönüşüm raporları ile e-ticaret performansınızı optimize edin.",
+    "price": 149.99,
+    "currency": "TRY",
+    "category": "Analytics",
+    "subcategory": "Raporlama",
+    "brand": "ConvStateAI",
+    "sku": "CSAI-ANALYTICS-004",
+    "features": [
+      "Detaylı konuşma analizi",
+      "Müşteri davranış raporları",
+      "Dönüşüm funnel analizi",
+      "Gerçek zamanlı dashboard",
+      "Özel rapor oluşturma",
+      "Email raporları",
+      "API erişimi",
+      "Veri görselleştirme",
+      "Trend analizi",
+      "ROI hesaplama",
+      "A/B test sonuçları",
+      "Müşteri segmentasyonu"
+    ],
+    "target_audience": "Veri odaklı e-ticaret yöneticileri",
+    "benefits": [
+      "Müşteri davranışlarını anlama",
+      "Dönüşüm noktalarını tespit etme",
+      "ROI hesaplama",
+      "Stratejik karar verme",
+      "Performans optimizasyonu",
+      "Rekabet avantajı"
+    ],
+    "technical_specs": {
+      "setup_time": "10 dakika",
+      "integration": "Dashboard + API",
+      "data_retention": "12 ay",
+      "export_formats": ["PDF", "Excel", "CSV", "JSON"],
+      "real_time_updates": true,
+      "custom_metrics": true,
+      "api_access": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "7 gün ücretsiz deneme",
+    "is_active": true,
+    "is_featured": false,
+    "is_bestseller": false,
+    "is_new": true,
+    "is_on_sale": false,
+    "rating_average": 4.6,
+    "rating_count": 34,
+    "view_count": 420,
+    "sold_count": 28,
+    "tags": ["analitik", "raporlama", "veri", "dashboard", "performans", "roi"],
+    "meta_title": "ConvStateAI Analytics Pro - E-ticaret Analitik Çözümü",
+    "meta_description": "Detaylı müşteri analizi ve dönüşüm raporları ile e-ticaret performansınızı optimize edin.",
+    "seo_url": "convstateai-analytics-pro",
+    "images": {
+      "main_image": "/imgs/products/analytics-pro.jpg",
+      "gallery": [
+        "/imgs/products/analytics-dashboard.jpg",
+        "/imgs/products/analytics-reports.jpg",
+        "/imgs/products/analytics-funnel.jpg",
+        "/imgs/products/analytics-roi.jpg"
+      ]
+    },
+    "documents": [
+      {
+        "name": "Analytics Kurulum Rehberi",
+        "url": "/docs/analytics-setup-guide.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "Raporlama Rehberi",
+        "url": "/docs/reporting-guide.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "API Dokümantasyonu",
+        "url": "/docs/analytics-api-docs.pdf",
+        "type": "PDF"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "ConvStateAI Custom Integration",
+    "description": "Mevcut sistemlerinize özel entegrasyon hizmeti. CRM, ERP ve diğer araçlarla sorunsuz bağlantı.",
+    "price": 299.99,
+    "currency": "TRY",
+    "category": "Integration Services",
+    "subcategory": "Özel Entegrasyon",
+    "brand": "ConvStateAI",
+    "sku": "CSAI-INTEGRATION-005",
+    "features": [
+      "Özel API entegrasyonu",
+      "CRM bağlantısı",
+      "ERP entegrasyonu",
+      "Özel webhook'lar",
+      "Veri senkronizasyonu",
+      "Teknik destek",
+      "Dokümantasyon",
+      "Test ve doğrulama",
+      "Sürekli bakım",
+      "Performans optimizasyonu",
+      "Güvenlik testleri",
+      "Yedekleme çözümleri"
+    ],
+    "target_audience": "Karmaşık sistem mimarisi olan işletmeler",
+    "benefits": [
+      "Mevcut sistemlerle uyum",
+      "Veri tutarlılığı",
+      "İş süreçlerinde optimizasyon",
+      "Teknik uzmanlık",
+      "Özelleştirilmiş çözüm",
+      "Sürekli destek"
+    ],
+    "technical_specs": {
+      "setup_time": "1-3 gün",
+      "integration": "Custom API",
+      "supported_systems": ["Salesforce", "HubSpot", "SAP", "Magento", "Shopify", "WooCommerce", "PrestaShop"],
+      "maintenance": "6 ay ücretsiz",
+      "custom_development": true,
+      "testing_included": true,
+      "documentation": true
+    },
+    "pricing_model": "Tek seferlik + aylık bakım",
+    "trial_period": "Ücretsiz danışmanlık",
+    "is_active": true,
+    "is_featured": false,
+    "is_bestseller": false,
+    "is_new": false,
+    "is_on_sale": false,
+    "rating_average": 4.8,
+    "rating_count": 18,
+    "view_count": 320,
+    "sold_count": 15,
+    "tags": ["entegrasyon", "api", "crm", "erp", "özel", "teknik"],
+    "meta_title": "ConvStateAI Custom Integration - Özel Sistem Entegrasyonu",
+    "meta_description": "Mevcut sistemlerinize özel entegrasyon hizmeti ile ConvStateAI'ı sorunsuz bağlayın.",
+    "seo_url": "convstateai-custom-integration",
+    "images": {
+      "main_image": "/imgs/products/custom-integration.jpg",
+      "gallery": [
+        "/imgs/products/integration-crm.jpg",
+        "/imgs/products/integration-erp.jpg",
+        "/imgs/products/integration-api.jpg",
+        "/imgs/products/integration-testing.jpg"
+      ]
+    },
+    "documents": [
+      {
+        "name": "Entegrasyon Rehberi",
+        "url": "/docs/integration-guide.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "API Dokümantasyonu",
+        "url": "/docs/integration-api-docs.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "Test Senaryoları",
+        "url": "/docs/integration-tests.pdf",
+        "type": "PDF"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "ConvStateAI Training & Support",
+    "description": "Ekip eğitimi ve sürekli destek hizmetleri ile ConvStateAI'ı maksimum verimlilikle kullanın.",
+    "price": 199.99,
+    "currency": "TRY",
+    "category": "Training & Support",
+    "subcategory": "Eğitim ve Destek",
+    "brand": "ConvStateAI",
+    "sku": "CSAI-TRAINING-006",
+    "features": [
+      "Ekip eğitimi (2 saat)",
+      "Özel dokümantasyon",
+      "Video eğitim serisi",
+      "Aylık check-in toplantıları",
+      "Öncelikli destek",
+      "Best practices rehberi",
+      "Sürekli güncellemeler",
+      "Uzman danışmanlık",
+      "Performans değerlendirmesi",
+      "Özelleştirilmiş eğitim programı",
+      "Sertifika programı",
+      "Online topluluk erişimi"
+    ],
+    "target_audience": "ConvStateAI kullanıcıları ve ekipleri",
+    "benefits": [
+      "Hızlı öğrenme",
+      "Maksimum verimlilik",
+      "Sürekli gelişim",
+      "Uzman desteği",
+      "Ekip koordinasyonu",
+      "En iyi uygulamalar"
+    ],
+    "technical_specs": {
+      "training_duration": "2 saat",
+      "delivery_method": "Online + On-site",
+      "materials": "Video + Dokümantasyon + Sertifika",
+      "support_level": "Öncelikli",
+      "follow_up_sessions": "Aylık",
+      "certification": true
+    },
+    "pricing_model": "Aylık abonelik",
+    "trial_period": "Ücretsiz ilk eğitim",
+    "is_active": true,
+    "is_featured": false,
+    "is_bestseller": false,
+    "is_new": false,
+    "is_on_sale": false,
+    "rating_average": 4.7,
+    "rating_count": 42,
+    "view_count": 580,
+    "sold_count": 35,
+    "tags": ["eğitim", "destek", "danışmanlık", "sertifika", "ekip", "öğrenme"],
+    "meta_title": "ConvStateAI Training & Support - Eğitim ve Destek Hizmetleri",
+    "meta_description": "Ekip eğitimi ve sürekli destek hizmetleri ile ConvStateAI'ı maksimum verimlilikle kullanın.",
+    "seo_url": "convstateai-training-support",
+    "images": {
+      "main_image": "/imgs/products/training-support.jpg",
+      "gallery": [
+        "/imgs/products/training-session.jpg",
+        "/imgs/products/training-materials.jpg",
+        "/imgs/products/training-certificate.jpg",
+        "/imgs/products/training-community.jpg"
+      ]
+    },
+    "documents": [
+      {
+        "name": "Eğitim Programı",
+        "url": "/docs/training-program.pdf",
+        "type": "PDF"
+      },
+      {
+        "name": "Video Eğitim Serisi",
+        "url": "/videos/training-series/",
+        "type": "Video"
+      },
+      {
+        "name": "Sertifika Programı",
+        "url": "/docs/certification-program.pdf",
+        "type": "PDF"
+      }
+    ]
+  }
+]

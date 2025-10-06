@@ -8,6 +8,43 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '24557115803931045');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=24557115803931045&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYZ8FQ8JV2"></script>
+
+
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PYZ8FQ8JV2');
+</script>
+                  <script src="https://convstateai.com/embed/convstateai.min.js"></script>
+<script>
+window.convstateaiConfig = {
+ projectId: "1",
+ customizationToken: "7ad7f50cafe54fa113a60425fd7abeef257b6194ef18e65d71db0e65d40d2dea"
+};
+</script>
     <script>
         tailwind.config = {
             theme: {
@@ -48,6 +85,100 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
+        /* Landing Page Chat Bubble Styles */
+        .landing-notification-widget {
+            position: absolute;
+            bottom: 20px;
+            right: 80px; /* Logo için daha fazla alan bırak */
+            z-index: 1000;
+            animation: slideInFromRight 0.5s ease-out;
+        }
+        
+        .landing-notification-widget-slide-in {
+            animation: slideInFromRight 0.5s ease-out;
+        }
+        
+        .landing-notification-speech-bubble {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-width: 280px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .landing-notification-content {
+            padding: 12px 16px;
+            position: relative;
+        }
+        
+        .landing-notification-header {
+            margin-bottom: 4px;
+        }
+        
+        .landing-notification-sender {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8B5CF6;
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .landing-notification-message {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.4;
+        }
+        
+        .landing-notification-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #9CA3AF;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .landing-notification-close-btn:hover {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+        
+        /* Speech bubble tail */
+        .landing-notification-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+        
+        @keyframes slideInFromRight {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body class="bg-black text-white">
@@ -57,7 +188,7 @@
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center">
                                             <img src="{{ asset('imgs/ai-conversion-logo.svg') }}" alt="ConvStateAI Logo" class="w-10 h-10">
-                        <span class="ml-3 text-xl font-bold">ConvStateAI</span>
+                        <span class="ml-3 text-xl font-bold ">ConvState AI</span>
                 </div>
              
                 <div class="flex items-center space-x-4">
@@ -87,7 +218,7 @@
                 <!-- Left Content -->
                 <div class="text-center lg:text-left">
             <h2 class="text-5xl sm:text-5xl md:text-7xl font-bold mb-6">
-                        <span class="gradient-text">Conv State AI</span><div class="h-3 sm:h-5"></div>  
+                        <span class="gradient-text">ConvState AI</span><div class="h-3 sm:h-5"></div>  
                         ile Müşteri Sayını
                         Çoğalt
             </h2>
@@ -96,11 +227,10 @@
                         Kampanyalar, ürün önerileri ve anında destek ile satışlarınızı artırın.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-8">
-                     
-                        <button onclick="scrollToDemo()" class="px-8 py-4 glass-effect rounded-xl text-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                            Demo
-                </button>
-            </div>
+                        <a href="{{ route('register') }}" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 animate-glow inline-block">
+                            Hemen Başla
+                        </a>
+                    </div>
              
                 </div>
                 
@@ -134,10 +264,16 @@
                                 </div>
                                 
                                 <!-- Chat Bubble -->
-                                <div class="absolute bottom-20 right-4 bg-white text-gray-800 p-3 rounded-lg shadow-lg max-w-xs">
-                                    <div class="text-xs font-semibold mb-1 gradient-text ">ConvState AI</div>
-                                    <div class="text-sm ">Sizin için en uygun ürünleri öneririm 🛍️</div>
-                                    <div class="absolute bottom-0 right-0 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white transform translate-y-full"></div>
+                                <div class="landing-notification-widget landing-notification-widget-slide-in">
+                                    <div class="landing-notification-speech-bubble">
+                                        <div class="landing-notification-content">
+                                            <div class="landing-notification-header">
+                                                <span class="landing-notification-sender">ConvState AI</span>
+                                            </div>
+                                            <div class="landing-notification-message">Sizin için ürün seçebilirim 🛍️</div>
+                                        </div>
+                                        <button class="landing-notification-close-btn" title="Kapat">×</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -167,7 +303,7 @@
                     Neden <span class="gradient-text">ConvStateAI</span>?
                 </h2>
                 <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    E-ticaret sitenize güçlü Conv State AI'ı entegre edin, müşteri deneyimini dönüştürün
+                    E-ticaret sitenize güçlü ConvState AI'ı entegre edin, müşteri deneyimini dönüştürün
                 </p>
             </div>
             
@@ -246,7 +382,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                    <span class="gradient-text">Canlı Demo İzleyin </span>
+                    <span class="gradient-text">E-ticaret sitenize entegre edin </span>
                 </h2>
                 <p class="text-xl text-gray-300 max-w-3xl mx-auto">
                     ConvStateAI widget'ının nasıl çalıştığını görün ve müşteri deneyimini keşfedin
@@ -289,20 +425,7 @@
                                     </svg>
                                 </div>
                                 
-                                <!-- Chat Messages -->
-                                <div class="absolute bottom-24 right-4 space-y-2 max-w-xs">
-                                    <div class="bg-white text-gray-800 p-3 rounded-lg shadow-lg">
-                                        <div class="text-xs font-semibold mb-1 ">ConvState AI</div>
-                                        <div class="text-sm">Merhaba! Size nasıl yardımcı olabilirim? 🛍️</div>
-                                    </div>
-                                    <div class="bg-gray-100 text-gray-800 p-3 rounded-lg ml-8">
-                                        <div class="text-sm">Telefon modelleri hakkında bilgi alabilir miyim?</div>
-                                    </div>
-                                    <div class="bg-white text-gray-800 p-3 rounded-lg shadow-lg">
-                                        <div class="text-xs font-semibold mb-1">ConvState AI</div>
-                                        <div class="text-sm">Tabii! Size en uygun telefon modellerini önerebilirim. Hangi bütçe aralığında düşünüyorsunuz? 📱</div>
-                                    </div>
-                                </div>
+                                <!-- Chat Messages - Removed for cleaner demo -->
                             </div>
                         </div>
                     </div>
@@ -351,7 +474,7 @@
     <section class="py-16 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold mb-4">Binlerce E-ticaret Sitesi Bizi Tercih Ediyor</h2>
+                <h2 class="text-3xl font-bold mb-4">Yüzlerce E-ticaret Sitesi Bizi Tercih Ediyor</h2>
                 <p class="text-gray-400 text-lg">Türkiye'nin önde gelen e-ticaret platformları güveniyor</p>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-5 gap-8 items-center opacity-60">
@@ -383,14 +506,7 @@
     <!-- Testimonials Section -->
     <section class="py-20 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                    Müşterilerimiz <span class="gradient-text">Ne Diyor?</span>
-                </h2>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    ConvStateAI ile müşteri deneyimini dönüştüren e-ticaret sitelerinin deneyimleri
-                </p>
-            </div>
+            
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Testimonial 1 -->
@@ -405,7 +521,7 @@
                         </div>
                     </div>
                     <p class="text-gray-300 mb-4">
-                        "ConvStateAI sayesinde müşteri hizmetlerimiz %300 arttı. Conv State AI'ı ile 7/24 müşteri desteği sağlıyoruz."
+                        "ConvStateAI sayesinde müşteri hizmetlerimiz %300 arttı. ConvState AI'ı ile 7/24 müşteri desteği sağlıyoruz."
                     </p>
                     <div class="flex text-yellow-400">
                         ⭐⭐⭐⭐⭐
@@ -472,13 +588,12 @@
                          ConvStateAI'ın gücünü keşfedin ve e-ticaret sitenizi dönüştürün
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-                        <a href="{{ route('register') }}" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300 transform hover:scale-105 animate-glow">
-                          Talep Oluştur
-                        </a>
-                        <button onclick="scrollToDemo()" class="px-8 py-4 glass-effect rounded-xl text-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                            Demo İzle
-                        </button>
+                         <a href="{{ route('register') }}" class="px-8 py-4 bg-gradient-to-r from-purple-glow to-neon-purple rounded-xl text-lg font-semibold hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 animate-glow inline-block">
+                              Hemen Başla
+                          </a>
                     </div>
+
+               
                  {{--    <div class="flex flex-wrap items-center justify-center space-x-8 text-sm text-gray-400">
                         <div class="flex items-center">
                             <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
@@ -534,7 +649,7 @@
                     <h4 class="text-lg font-semibold mb-4">Ürün</h4>
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="#features" class="hover:text-purple-glow transition-colors">Özellikler</a></li>
-                        <li><a href="#demo" class="hover:text-purple-glow transition-colors">Demo</a></li>
+
                         <li><a href="#pricing" class="hover:text-purple-glow transition-colors">Fiyatlandırma</a></li>
                     </ul>
                 </div>
@@ -542,7 +657,6 @@
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Şirket</h4>
                     <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-purple-glow transition-colors">Hakkımızda</a></li>
                         <li><a href="#" class="hover:text-purple-glow transition-colors">Kariyer</a></li>
                         <li><a href="#" class="hover:text-purple-glow transition-colors">Blog</a></li>
                     </ul>
@@ -552,22 +666,44 @@
                     <h4 class="text-lg font-semibold mb-4">Destek</h4>
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="#" class="hover:text-purple-glow transition-colors">Yardım Merkezi</a></li>
-                        <li><a href="#" class="hover:text-purple-glow transition-colors">Dokümantasyon</a></li>
-                        <li><a href="#" class="hover:text-purple-glow transition-colors">İletişim</a></li>
                     </ul>
+                          <!-- Address Information -->
+                <div class="mt-10 text-center md:text-right">
+                    <div class="inline-block text-sm text-gray-400">
+                        <div class="flex items-center justify-center md:justify-end mb-1">
+                            <svg class="w-4 h-4 mr-2 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                       
+                        <p class="text-gray-400 mb-1">Osmaniye Mah. Sevgi Sokak No:5 Alpu / Eskişehir</p>
+                        </div> <p class="text-gray-400">
+                            <svg class="w-4 h-4 inline mr-1 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                            +90 545 852 76 93
+                        </p>
+                    </div>
                 </div>
+                </div>
+                
             </div>
             
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm mb-4 md:mb-0">
-                    © <span id="current-year"></span> ConvStateAI. Tüm hakları saklıdır.
-                </p>
-             
-                <div class="flex space-x-6 text-sm text-gray-400">
-                    <a href="{{ route('privacy-policy') }}" class="hover:text-purple-glow transition-colors">Gizlilik Politikası</a>
-                    <a href="{{ route('terms-of-service') }}" class="hover:text-purple-glow transition-colors">Kullanım Şartları</a>
-                    <a href="{{ route('cookies') }}" class="hover:text-purple-glow transition-colors">Çerezler</a>
+            <div class="border-t border-gray-800 pt-8">
+                <!-- Copyright and Links -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                        © <span id="current-year"></span> ConvStateAI. Tüm hakları saklıdır.
+                    </p>
+                 
+                    <div class="flex space-x-6 text-sm text-gray-400">
+                        <a href="{{ route('privacy-policy') }}" class="hover:text-purple-glow transition-colors">Gizlilik Politikası</a>
+                        <a href="{{ route('terms-of-service') }}" class="hover:text-purple-glow transition-colors">Kullanım Şartları</a>
+                        <a href="{{ route('cookies') }}" class="hover:text-purple-glow transition-colors">Çerezler</a>
+                    </div>
                 </div>
+                
+          
             </div>
         </div>
     </footer>
@@ -621,15 +757,182 @@
             });
         }
 
+        // Landing page chat bubble close functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeButtons = document.querySelectorAll('.landing-notification-close-btn');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const widget = this.closest('.landing-notification-widget');
+                    if (widget) {
+                        widget.style.animation = 'slideOutToRight 0.3s ease-in forwards';
+                        setTimeout(() => {
+                            widget.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Add slide out animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOutToRight {
+                0% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
     </script>
 
-    <!-- ConvStateAI Widget -->
-    <script src="{{ url('/embed/convstateai.min.js') }}"></script>
-    <script>
-        window.convstateaiConfig = {
-            projectId: "1",
-            customizationToken: "dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246"
-        };
-    </script>
+
+    <!-- Demo Request Modal -->
+    <div id="demoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900 rounded-2xl p-8 max-w-md w-full glass-effect">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold gradient-text">Demo Talebi Oluştur</h3>
+                    <button onclick="closeDemoModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-gray-300 mb-4 text-center">Yapay zekanın gücüyle gelen ziyaretçi trafiğini müşteriye dönüştürün.</p>
+                <form id="demoForm" class="space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Ad</label>
+                            <input type="text" name="first_name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Soyad</label>
+                            <input type="text" name="last_name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">E-posta</label>
+                        <input type="email" name="email" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Şifre</label>
+                        <input type="password" name="password" required minlength="8" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Telefon Numarası</label>
+                        <input type="tel" name="phone" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Site Ziyaretçi Sayısı (Aylık)</label>
+                        <select name="site_visitor_count" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-glow focus:outline-none transition-colors">
+                            <option value="">Seçiniz</option>
+                            <option value="1000">1.000'den az</option>
+                            <option value="5000">1.000 - 5.000</option>
+                            <option value="10000">5.000 - 10.000</option>
+                            <option value="25000">10.000 - 25.000</option>
+                            <option value="50000">25.000 - 50.000</option>
+                            <option value="100000">50.000 - 100.000</option>
+                            <option value="250000">100.000'den fazla</option>
+                        </select>
+                    </div>
+                    
+                    <div id="demoFormMessage" class="hidden p-4 rounded-lg mb-4"></div>
+                    
+                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg font-semibold text-white hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105">
+                        Demo Talebi Gönder
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Demo Modal Functions
+    function openDemoModal() {
+        document.getElementById('demoModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeDemoModal() {
+        document.getElementById('demoModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        resetDemoForm();
+    }
+    
+    function resetDemoForm() {
+        document.getElementById('demoForm').reset();
+        document.getElementById('demoFormMessage').classList.add('hidden');
+    }
+    
+    // Demo Form Submission
+    document.getElementById('demoForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const messageDiv = document.getElementById('demoFormMessage');
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Gönderiliyor...';
+        
+        try {
+            const response = await fetch('{{ route("demo-request.storee") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                messageDiv.className = 'p-4 rounded-lg mb-4 bg-green-900/20 border border-green-500/30 text-green-300';
+                messageDiv.textContent = data.message;
+                messageDiv.classList.remove('hidden');
+                
+                // Reset form after success
+                setTimeout(() => {
+                    resetDemoForm();
+                    closeDemoModal();
+                }, 2000);
+            } else {
+                messageDiv.className = 'p-4 rounded-lg mb-4 bg-red-900/20 border border-red-500/30 text-red-300';
+                messageDiv.textContent = data.message;
+                messageDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            messageDiv.className = 'p-4 rounded-lg mb-4 bg-red-900/20 border border-red-500/30 text-red-300';
+            messageDiv.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            messageDiv.classList.remove('hidden');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Demo Talebi Gönder';
+        }
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('demoModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDemoModal();
+        }
+    });
+
+ 
+</script>
+
+
 </body>
 </html>

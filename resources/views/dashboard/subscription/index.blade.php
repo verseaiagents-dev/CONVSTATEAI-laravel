@@ -16,13 +16,37 @@
             <p class="text-xl text-gray-300 mb-6">
                 Planınızı yönetin, kullanım durumunuzu takip edin ve token satın alın
             </p>
-            <div class="flex flex-wrap gap-4">
+            <div class="flex flex-wrap gap-4 items-center">
                 <a href="{{ route('subscription.plans') }}" class="px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300 transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Plan Seç
                 </a>
+                
+                @if($currentSubscription)
+                <div class="flex items-center space-x-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-sm text-gray-300">Mevcut Plan:</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-white font-semibold">{{ $currentSubscription->plan->name }}</span>
+                        <span class="text-gray-400 text-sm">{{ number_format($currentSubscription->plan->price, 2) }} ₺/{{ $currentSubscription->plan->billing_cycle_text }}</span>
+                    </div>
+                </div>
+                @else
+                <div class="flex items-center space-x-3 px-4 py-2 bg-red-900/20 rounded-lg border border-red-600/50">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <span class="text-sm text-red-300">Aktif Plan Yok</span>
+                    </div>
+                </div>
+                @endif
                 {{-- <a href="{{ route('subscription.billing-history') }}" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>

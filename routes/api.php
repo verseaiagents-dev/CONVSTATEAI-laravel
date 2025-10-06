@@ -5,6 +5,22 @@ use App\Http\Controllers\AIController;
 use App\Http\Controllers\ConvStateAPI;
 use App\Http\Controllers\KnowledgeBaseController;
 
+// Widget Customization Assets - Public Access with CORS support
+Route::get('/widgetcust/imgs/{filename}', function ($filename) {
+    $filePath = public_path('widgetcust/imgs/' . $filename);
+    
+    if (!file_exists($filePath)) {
+        return response('File not found', 404);
+    }
+    
+    $mimeType = mime_content_type($filePath);
+    $fileContent = file_get_contents($filePath);
+    
+    return response($fileContent)
+        ->header('Content-Type', $mimeType)
+        ->header('Cache-Control', 'public, max-age=31536000');
+})->where('filename', '[^/]+');
+
 // AI Helper API Routes
 Route::prefix('ai')->group(function () {
     Route::post('/response', [AIController::class, 'response']);
@@ -16,10 +32,9 @@ Route::prefix('ai')->group(function () {
 
 
 
-// Chat Routes
-Route::post('/chat', [App\Http\Controllers\ConvStateAPI::class, 'chat'])->name('api.chat');
+// Chat Routes - Moved to protected routes section below
 
-// Test Routes
+// Test Routes (Yeni User tablosu sistemi)
 Route::post('/add-token', function() {
     $userId = request('user_id');
     $tokens = request('tokens', 100);
@@ -29,47 +44,40 @@ Route::post('/add-token', function() {
         return response()->json(['error' => 'User not found'], 404);
     }
     
-    $usageToken = \App\Models\UsageToken::getActiveForUser($userId);
-    if ($usageToken) {
-        $usageToken->tokens_remaining += $tokens;
-        $usageToken->tokens_total += $tokens;
-        $usageToken->save();
-    } else {
-        $usageToken = new \App\Models\UsageToken();
-        $usageToken->user_id = $userId;
-        $usageToken->tokens_total = $tokens;
-        $usageToken->tokens_remaining = $tokens;
-        $usageToken->tokens_used = 0;
-        $usageToken->reset_date = now()->addMonth();
-        $usageToken->is_active = true;
-        $usageToken->save();
-    }
+    // Yeni User tablosundaki token sistemi
+    $user->addTokens($tokens);
     
     return response()->json([
         'success' => true,
         'message' => 'Token added successfully',
-        'tokens_remaining' => $usageToken->tokens_remaining,
-        'tokens_total' => $usageToken->tokens_total
+        'tokens_remaining' => $user->tokens_remaining,
+        'tokens_total' => $user->tokens_total,
+        'tokens_used' => $user->tokens_used,
+        'usage_percentage' => $user->token_usage_percentage
     ]);
 });
 
 Route::post('/exhaust-token', function() {
     $userId = request('user_id');
     
-    $usageToken = \App\Models\UsageToken::getActiveForUser($userId);
-    if (!$usageToken) {
-        return response()->json(['error' => 'No usage token found'], 404);
+    $user = \App\Models\User::find($userId);
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
     }
     
-    $usageToken->tokens_remaining = 0;
-    $usageToken->tokens_used = $usageToken->tokens_total;
-    $usageToken->save();
+    // Yeni User tablosundaki token sistemi
+    $user->update([
+        'tokens_remaining' => 0,
+        'tokens_used' => $user->tokens_total
+    ]);
     
     return response()->json([
         'success' => true,
         'message' => 'Token exhausted successfully',
-        'tokens_remaining' => $usageToken->tokens_remaining,
-        'tokens_used' => $usageToken->tokens_used
+        'tokens_remaining' => $user->tokens_remaining,
+        'tokens_used' => $user->tokens_used,
+        'tokens_total' => $user->tokens_total,
+        'usage_percentage' => $user->token_usage_percentage
     ]);
 });
 Route::get('/chat/{session_id}',  [ConvStateAPI::class, 'getChatSession']);
@@ -92,7 +100,10 @@ Route::post('/cargo-tracking', [ConvStateAPI::class, 'handleCargoTracking']);
 Route::post('/order-tracking', [ConvStateAPI::class, 'handleOrderTracking']);
 
 // Enhanced Chat Session & Product Interaction Routes
+Route::get('/check-daily-limit', [ConvStateAPI::class, 'checkDailyViewLimit']);
 Route::post('/product-interaction', [ConvStateAPI::class, 'handleProductInteraction']);
+Route::post('/product-details', [ConvStateAPI::class, 'getProductDetails']);
+Route::post('/price-comparison', [ConvStateAPI::class, 'getPriceComparison']);
 Route::get('/chat-session/{session_id}/analytics', [ConvStateAPI::class, 'getSessionAnalytics']);
 
 Route::get('/intents/ai-generated',  [ConvStateAPI::class, 'getAIGeneratedIntents']);
@@ -113,6 +124,9 @@ Route::prefix('knowledge-base')->middleware(['web'])->group(function () {
     Route::post('/{id}/refresh-chunks', [KnowledgeBaseController::class, 'refreshChunks']);
     Route::delete('/{id}', [KnowledgeBaseController::class, 'destroy']);
     Route::post('/{id}/optimize-faq', [KnowledgeBaseController::class, 'optimizeFAQ']);
+    
+    // AI Field Mapping Route
+    Route::post('/ai-field-mapping', [KnowledgeBaseController::class, 'performAIFieldMapping']);
     
     // Field Mapping Routes
     Route::get('/{id}/detect-fields', [KnowledgeBaseController::class, 'detectFields']);
@@ -136,7 +150,7 @@ Route::prefix('knowledge-base')->middleware(['web'])->group(function () {
 Route::prefix('campaigns')->group(function () {
     Route::get('/', [App\Http\Controllers\CampaignController::class, 'index']);
     Route::post('/', [App\Http\Controllers\CampaignController::class, 'store']);
-    Route::get('/check-availability', [App\Http\Controllers\CampaignController::class, 'checkAvailability']);
+    Route::get('/check-availability', [App\Http\Controllers\CampaignController::class, 'checkAvailability'])->middleware('token.check');
     Route::get('/count/active', [App\Http\Controllers\CampaignController::class, 'getActiveCount']);
     Route::get('/category/{category}', [App\Http\Controllers\CampaignController::class, 'getByCategory']);
     Route::get('/{id}', [App\Http\Controllers\CampaignController::class, 'show']);
@@ -148,7 +162,7 @@ Route::prefix('campaigns')->group(function () {
 Route::prefix('faqs')->group(function () {
     Route::get('/', [App\Http\Controllers\FAQController::class, 'index']);
     Route::post('/', [App\Http\Controllers\FAQController::class, 'store']);
-    Route::get('/check-availability', [App\Http\Controllers\FAQController::class, 'checkAvailability']);
+    Route::get('/check-availability', [App\Http\Controllers\FAQController::class, 'checkAvailability'])->middleware('token.check');
     Route::get('/search', [App\Http\Controllers\FAQController::class, 'search']);
     Route::get('/popular', [App\Http\Controllers\FAQController::class, 'getPopular']);
     Route::get('/category/{category}', [App\Http\Controllers\FAQController::class, 'getByCategory']);
@@ -187,6 +201,9 @@ Route::prefix('analytics')->group(function () {
 // Product Interaction Tracking
 Route::post('/product-interaction', [ConvStateAPI::class, 'handleProductInteraction']);
 
+// Widget konfigürasyonu kaydetme
+Route::post('/save-widget-config', [App\Http\Controllers\WidgetCustomizationController::class, 'saveWidgetConfig']);
+
 // GDPR Compliance Routes
 Route::prefix('gdpr')->group(function () {
     Route::get('/export/{sessionId}', [App\Http\Controllers\ConvStateAPI::class, 'exportUserData'])->name('gdpr.export');
@@ -207,12 +224,12 @@ Route::prefix('widget')->group(function () {
     Route::get('/project/{projectId}', [App\Http\Controllers\WidgetEmbedController::class, 'getProjectInfo']);
 });
 
-// Widget Customization - Public endpoint (no auth required)
-Route::get('/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'getPublicCustomization']);
+// Widget Customization - Token check required
+Route::get('/widget-customization', [App\Http\Controllers\WidgetCustomizationController::class, 'getPublicCustomization'])->middleware('token.check');
 
 // Protected API Routes (with Project Auth)
 Route::middleware(['project.auth'])->group(function () {
-    Route::post('/chat', [App\Http\Controllers\ConvStateAPI::class, 'chat']);
+    Route::post('/chat', [App\Http\Controllers\ConvStateAPI::class, 'chat'])->name('api.chat');
     Route::post('/cargo/track', [App\Http\Controllers\CargoTrackingController::class, 'trackCargoPost']);
 });
 
@@ -244,8 +261,15 @@ Route::prefix('subscription')->middleware(['auth:web'])->group(function () {
 // Notification Widget API Routes
 Route::prefix('notification-widget')->group(function () {
     Route::get('/settings', [App\Http\Controllers\NotificationWidgetController::class, 'getSettings']);
-    Route::get('/check-availability', [App\Http\Controllers\NotificationWidgetController::class, 'checkAvailability']);
+    Route::get('/check-availability', [App\Http\Controllers\NotificationWidgetController::class, 'checkAvailability'])->middleware('token.check');
     Route::post('/settings', [App\Http\Controllers\NotificationWidgetController::class, 'updateSettings']);
 });
 
 
+Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])
+->middleware('throttle:60,1') // Dakikada maksimum 60 istek
+->name('payment.callback');
+
+Route::get('/payment/status/{merchantOid}', [App\Http\Controllers\PaymentController::class, 'checkPaymentStatus'])
+->middleware('throttle:30,1') // Dakikada maksimum 30 istek
+->name('payment.status');

@@ -11,6 +11,7 @@ class SubscriptionInvoice extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'subscription_id',
         'amount',
         'status',
@@ -29,6 +30,14 @@ class SubscriptionInvoice extends Model
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);
+    }
+
+    /**
+     * User ile ilişki
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

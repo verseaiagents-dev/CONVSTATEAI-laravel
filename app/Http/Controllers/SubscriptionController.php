@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Plan;
 use App\Models\Subscription;
-use App\Models\UsageToken;
+use App\Models\PlanRequest;
+// UsageToken modeli kaldırıldı - artık User tablosunda token bilgileri tutuluyor
 use App\Events\UserSubscriptionActivated;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,47 +21,66 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
         $currentSubscription = $user->activeSubscription;
-        $usageToken = UsageToken::getActiveForUser($user->id);
+        // Token bilgileri artık User tablosunda tutuluyor
         $plans = Plan::active()->get();
+        
+        // UsageToken için uyumluluk - User'ın kendisi token bilgilerini tutar
+        $usageToken = $user->tokens_total > 0 ? $user : null;
         
         return view('dashboard.subscription.index', compact(
             'currentSubscription', 
             'user', 
-            'usageToken', 
-            'plans'
+            'plans',
+            'usageToken'
         ));
     }
 
+
+    
     /**
      * Plan seçim sayfasını göster
      */
     public function plans()
     {
-        $plans = Plan::active()->get();
+        // Free planları hariç tut (price > 0 olan planlar)
+        $plans = Plan::active()->where('price', '>', 0)->get();
         $user = Auth::user();
         $currentSubscription = $user ? $user->activeSubscription : null;
         
         return view('subscription.plans', compact('plans', 'user', 'currentSubscription'));
     }
 
-    /**
-     * Plan satın alma
-     */
     public function subscribe(Request $request)
     {
+        $request->validate([
+            'plan_id' => 'required|exists:plans,id'
+        ]);
+
         $user = Auth::user();
-        
-        // Kullanıcının aktif aboneliği var mı kontrol et
-        $activeSubscription = $user->subscriptions()->where('status', 'active')->first();
-        
-        if ($activeSubscription) {
-            return redirect()->route('dashboard.subscription.index')
-                ->with('info', 'You already have an active subscription. Please contact admin to change your plan.');
+        $plan = Plan::findOrFail($request->plan_id);
+
+        // Aynı plan için bekleyen talep var mı kontrol et
+        $existingRequest = $user->planRequests()
+            ->where('plan_id', $plan->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingRequest) {
+            return redirect()->route('subscription.plans')
+                ->with('error', 'Bu plan için zaten bekleyen bir talebiniz bulunuyor.');
         }
 
-        return redirect()->route('dashboard.subscription.index')
-            ->with('info', 'Plan assignment is managed by administrators. Please contact support to get a plan assigned.');
+        // Plan talebi oluştur
+        PlanRequest::create([
+            'user_id' => $user->id,
+            'plan_id' => $plan->id,
+            'status' => 'pending'
+        ]);
+
+        return redirect()->route('subscription.plans')
+            ->with('success', 'Plan talebiniz başarıyla oluşturuldu! Yöneticiler tarafından incelendikten sonra size bilgi verilecektir.');
     }
+
 
     /**
      * Ücretsiz planı aktif et
@@ -84,8 +104,8 @@ class SubscriptionController extends Controller
                 'trial_ends_at' => $plan->trial_days ? now()->addDays($plan->trial_days) : null
             ]);
 
-            // Usage token oluştur
-            $plan->createUsageTokenForUser($user->id, $subscription->id);
+            // Plan ve token'ları user'a ata
+            $user->assignPlan($plan, $subscription->id);
 
             // Event fire et
             event(new UserSubscriptionActivated($user, $subscription));
@@ -137,25 +157,17 @@ class SubscriptionController extends Controller
     public function getUsage(Request $request)
     {
         $user = Auth::user();
-        $usageToken = UsageToken::getActiveForUser($user->id);
-
-        if (!$usageToken) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usage token bulunamadı'
-            ], 404);
-        }
 
         return response()->json([
             'success' => true,
             'data' => [
-                'tokens_remaining' => $usageToken->tokens_remaining,
-                'tokens_used' => $usageToken->tokens_used,
-                'tokens_total' => $usageToken->tokens_total,
-                'usage_percentage' => $usageToken->usage_percentage,
-                'days_until_reset' => $usageToken->days_until_reset,
-                'reset_date' => $usageToken->reset_date ? $usageToken->reset_date->format('Y-m-d') : null,
-                'is_expired' => $usageToken->isExpired()
+                'tokens_remaining' => $user->tokens_remaining,
+                'tokens_used' => $user->tokens_used,
+                'tokens_total' => $user->tokens_total,
+                'usage_percentage' => $user->token_usage_percentage,
+                'days_until_reset' => $user->days_until_token_reset,
+                'reset_date' => $user->token_reset_date ? $user->token_reset_date->format('Y-m-d') : null,
+                'is_expired' => $user->isTokenExpired()
             ]
         ]);
     }

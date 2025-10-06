@@ -14,9 +14,9 @@ class NotificationWidgetController extends Controller
      */
     public function getSettings(Request $request): JsonResponse
     {
-        $siteId = $request->get('site_id', 1);
+        $projectId = $request->get('project_id', 1);
         
-        $settings = NotificationWidgetSetting::where('site_id', $siteId)
+        $settings = NotificationWidgetSetting::where('project_id', $projectId)
             ->active()
             ->first();
 
@@ -58,7 +58,7 @@ class NotificationWidgetController extends Controller
         ]);
 
         $settings = NotificationWidgetSetting::updateOrCreate(
-            ['site_id' => $request->site_id],
+            ['project_id' => $request->project_id],
             $request->only([
                 'message_text',
                 'is_active',

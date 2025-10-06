@@ -262,7 +262,7 @@ class ContentChunker
     /**
      * Chunk oluşturur
      */
-    private function createChunk(string $content, int $index, $knowledgeBaseId = null): array
+    private function createChunk(string $content, int $index, ?int $knowledgeBaseId = null): array
     {
         // Resim analizi yap
         $imageAnalysis = $this->analyzeImagesInContent($content);
@@ -1030,6 +1030,8 @@ class ContentChunker
             // URL pattern'leri bul
             $urlPatterns = [
                 '/https?:\/\/[^\s<>"]+\.(jpg|jpeg|png|gif|webp|svg)/i',
+                '/https?:\/\/images\.unsplash\.com\/[^\s<>"]+/i', // Unsplash images
+                '/https?:\/\/[^\s<>"]*\.(jpg|jpeg|png|gif|webp|svg)(\?[^\s<>"]*)?/i', // Images with query params
                 '/<img[^>]+src=["\']([^"\']+)["\'][^>]*>/i',
                 '/!\[([^\]]*)\]\(([^)]+)\)/i' // Markdown image syntax
             ];
@@ -1055,12 +1057,34 @@ class ContentChunker
                 ];
             }
             
-            // Resim analizi devre dışı - sadece resim varlığını kontrol et
+            // Resim analizi aktif - OpenAI Vision API kullan
+            if (!empty($imageUrls)) {
+                try {
+                    $aiService = app(\App\Services\KnowledgeBase\AIService::class);
+                    $imageAnalysis = $aiService->processChunkImages($content, '');
+                    
+                    return [
+                        'has_images' => true,
+                        'processed_images' => count($imageUrls),
+                        'image_vision' => $imageAnalysis['image_vision'],
+                        'image_urls' => $imageUrls
+                    ];
+                } catch (\Exception $e) {
+                    \Log::warning('Image analysis failed: ' . $e->getMessage());
+                    return [
+                        'has_images' => !empty($imageUrls),
+                        'processed_images' => count($imageUrls),
+                        'image_vision' => null,
+                        'image_urls' => $imageUrls
+                    ];
+                }
+            }
+            
             return [
-                'has_images' => !empty($imageUrls),
-                'processed_images' => count($imageUrls),
+                'has_images' => false,
+                'processed_images' => 0,
                 'image_vision' => null,
-                'image_urls' => $imageUrls
+                'image_urls' => []
             ];
             
         } catch (\Exception $e) {

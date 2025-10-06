@@ -184,22 +184,6 @@
                     </p>
                 </div>
                 
-                <!-- Yönetim Butonları -->
-                <div class="flex items-center space-x-3">
-                    <a href="{{ route('dashboard.campaigns.index') }}" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                        </svg>
-                        <span>Kampanya Yönetimi</span>
-                    </a>
-                    
-                    <a href="{{ route('dashboard.faqs.index') }}" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span>SSS Yönetimi</span>
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -275,6 +259,82 @@
 
     <!-- Content Container (Hidden initially) -->
     <div id="contentContainer" class="hidden space-y-6 slide-in-up">
+        <!-- Stats Overview Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Kampanya Yönetimi -->
+            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.campaigns.index') }}'">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-white" id="campaign-count">-</div>
+                        <div class="text-sm text-gray-400">Kampanya</div>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">Kampanya Yönetimi</h3>
+                <p class="text-sm text-gray-400">Aktif kampanyalarınızı yönetin</p>
+            </div>
+
+            <!-- SSS Yönetimi -->
+            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.faqs.index') }}'">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-white" id="faq-count">-</div>
+                        <div class="text-sm text-gray-400">SSS</div>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">SSS Yönetimi</h3>
+                <p class="text-sm text-gray-400">Sık sorulan soruları yönetin</p>
+            </div>
+
+            <!-- Eylemler -->
+            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.actions.index') }}'">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-white" id="active-actions-count">-</div>
+                        <div class="text-sm text-gray-400">Aktif</div>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">Eylemler</h3>
+                <div class="space-y-1">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Aktif Eylem:</span>
+                        <span class="text-white" id="active-actions">-</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Toplam Eylem:</span>
+                        <span class="text-white" id="total-actions">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Genel Durum -->
+            <div class="glass-effect rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gray-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">Genel Durum</h3>
+                <p class="text-sm text-gray-400">Sistem durumu ve istatistikler</p>
+            </div>
+        </div>
+
         <!-- New Bilgi Tabanı Creation Container -->
         <div class="glass-effect rounded-2xl p-8">
             <h2 class="text-2xl font-bold mb-6 text-white">Yeni Bilgi Tabanı Oluştur</h2>
@@ -282,22 +342,22 @@
             <!-- Method Selection Guide -->
             <div class="mb-8 p-6 bg-gray-800/30 rounded-lg border border-gray-700">
                 <div class="text-center mb-4">
-                    <h3 class="text-lg font-semibold text-white mb-2">📋 Bilgi Tabanı Oluşturma Yöntemi Seçin</h3>
-                    <p class="text-gray-300">Aşağıdaki iki yöntemden birini kullanarak yeni bilgi tabanı oluşturabilirsiniz:</p>
+                    <h3 class="text-lg font-semibold text-white mb-2">📋 JSON Bilgi Tabanı Oluşturma Yöntemi Seçin</h3>
+                    <p class="text-gray-300">Aşağıdaki iki yöntemden birini kullanarak yeni JSON bilgi tabanı oluşturabilirsiniz:</p>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div class="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg text-center hover:bg-purple-500/20 transition-colors duration-300 cursor-pointer" onclick="scrollToSection('file-upload')">
                         <div class="text-2xl mb-2">📁</div>
-                        <h4 class="font-semibold text-white mb-2">Dosya Yükleme</h4>
-                        <p class="text-sm text-gray-300">Bilgisayarınızdan dosya seçin ve yükleyin</p>
+                        <h4 class="font-semibold text-white mb-2">JSON Dosya Yükleme</h4>
+                        <p class="text-sm text-gray-300">Bilgisayarınızdan JSON dosyası seçin ve yükleyin</p>
                         <div class="mt-3 text-xs text-purple-300">→ Tıklayın</div>
                     </div>
                     
                     <div class="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg text-center hover:bg-blue-500/20 transition-colors duration-300 cursor-pointer" onclick="scrollToSection('url-fetch')">
                         <div class="text-2xl mb-2">🌐</div>
-                        <h4 class="font-semibold text-white mb-2">URL ile İçerik Çekme</h4>
-                        <p class="text-sm text-gray-300">Web'den dosya URL'si ile içerik çekin</p>
+                        <h4 class="font-semibold text-white mb-2">JSON URL ile İçerik Çekme</h4>
+                        <p class="text-sm text-gray-300">Web'den JSON URL'si ile içerik çekin</p>
                         <div class="mt-3 text-xs text-blue-300">→ Tıklayın</div>
                     </div>
                 </div>
@@ -315,7 +375,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- File Upload Section -->
                 <div id="file-upload" class="lg:col-span-1">
-                    <h3 class="text-lg font-semibold mb-4 text-white">Dosya Yükleme</h3>
+                    <h3 class="text-lg font-semibold mb-4 text-white">JSON Dosya Yükleme</h3>
 
                     <!-- Upload Area -->
                     <div id="upload-area" class="border-2 border-dashed border-gray-600 rounded-2xl p-8 text-center hover:border-purple-glow transition-colors duration-300 cursor-pointer">
@@ -325,7 +385,7 @@
                             </svg>
                             <div>
                                 <p class="text-lg font-semibold text-white mb-2">Dosya seçin veya sürükleyin</p>
-                                <p class="text-gray-400 mb-4">Desteklenen formatlar: CSV, TXT, XML, JSON, Excel</p>
+                                <p class="text-gray-400 mb-4">Desteklenen format: JSON</p>
                                 <p class="text-sm text-gray-500">Maksimum dosya boyutu: 10MB</p>
                             </div>
                             <button id="select-file-btn" class="px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300 transform hover:scale-105">
@@ -334,8 +394,8 @@
                         </div>
                     </div>
 
-                    <!-- Hidden File Input -->
-                    <input type="file" id="file-input" accept=".csv,.txt,.xml,.json,.xlsx,.xls" class="hidden">
+                    <!-- Hidden File Input - Sadece JSON dosyaları -->
+                    <input type="file" id="file-input" accept=".json" class="hidden">
                     
                     <!-- Upload Progress -->
                     <div id="upload-progress" class="hidden mt-6">
@@ -352,19 +412,18 @@
                 <!-- URL Fetch Section -->
                 <div id="url-fetch" class="lg:col-span-2 flex items-center justify-center">
                     <div class="w-full max-w-2xl">
-                        <h3 class="text-lg font-semibold mb-4 text-white text-center">URL ile İçerik Çekme</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-white text-center">JSON URL ile İçerik Çekme</h3>
                         
                         <div class="space-y-4">
                             <div class="flex flex-col space-y-3">
-                                <input type="text" id="kb-name" placeholder="Bilgi Tabanı Adı" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20 text-center">
-                                <input type="url" id="url-input" placeholder="https://example.com/data.csv" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20 text-center">
+                                <input type="url" id="url-input" placeholder="https://example.com/data.json" class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20 text-center">
                                 <button id="fetch-url-btn" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-white font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105">
                                     İçerik Çek
                                 </button>
                             </div>
                             
                             <p class="text-sm text-gray-400 text-center">
-                                CSV, TXT, XML, JSON veya Excel dosyalarının URL'lerini girin. İçerik otomatik olarak chunk'lara bölünecek ve AI ile işlenecektir.
+                                JSON dosyalarının URL'lerini girin. Bilgi tabanı adı otomatik olarak URL'den oluşturulacaktır.
                             </p>
                         </div>
                         
@@ -515,6 +574,7 @@ let loadingProgress = 0;
 let loadingInterval;
 let knowledgeBases = [];
 let projects = [];
+let stats = {};
 
 // Define all functions first to ensure they're available globally
 
@@ -688,9 +748,11 @@ async function loadContent() {
             // Store data globally
             knowledgeBases = result.data.knowledgeBases || [];
             projects = result.data.projects || [];
+            stats = result.data.stats || {};
             
             console.log('Knowledge bases count:', knowledgeBases.length);
             console.log('Projects count:', projects.length);
+            console.log('Stats:', stats);
             
             completeLoading();
         } else {
@@ -711,8 +773,49 @@ async function loadContent() {
     }
 }
 
+// Populate stats data
+function populateStats() {
+    if (stats) {
+        // Campaign count
+        const campaignCountEl = document.getElementById('campaign-count');
+        if (campaignCountEl) {
+            campaignCountEl.textContent = stats.campaign_count || 0;
+        }
+        
+        // FAQ count
+        const faqCountEl = document.getElementById('faq-count');
+        if (faqCountEl) {
+            faqCountEl.textContent = stats.faq_count || 0;
+        }
+        
+        // Active actions count (main display)
+        const activeActionsCountEl = document.getElementById('active-actions-count');
+        if (activeActionsCountEl) {
+            activeActionsCountEl.textContent = stats.active_actions || 0;
+        }
+        
+        // Active actions detail (in the breakdown)
+        const activeActionsEl = document.getElementById('active-actions');
+        if (activeActionsEl) {
+            activeActionsEl.textContent = stats.active_actions || 0;
+        }
+        
+        // Total actions
+        const totalActionsEl = document.getElementById('total-actions');
+        if (totalActionsEl) {
+            totalActionsEl.textContent = stats.total_actions || 0;
+        }
+        
+        // Debug: Log the stats to see what we're getting
+        console.log('Stats loaded:', stats);
+    }
+}
+
 // Populate content with loaded data
 function populateContent() {
+    // Populate stats
+    populateStats();
+    
     // Populate projects dropdown
         const projectSelect = document.getElementById('global-project');
     if (projectSelect) {
@@ -763,6 +866,9 @@ function populateContent() {
 
 // Populate content with default values (when loading fails)
 function populateContentWithDefaults() {
+    // Populate stats with default values
+    populateStats();
+    
     // Projects dropdown'ı boş bırak
         const projectSelect = document.getElementById('global-project');
     if (projectSelect) {
@@ -864,21 +970,21 @@ function populateKnowledgeBasesList() {
                         </div>
                     ` : ''}
                     
-                    ${kb.processing_status === 'pending' || kb.processing_status === 'processing' ? `
+                    ${kb.processing_status === 'processing' ? `
                         <div class="mt-4" id="progress-${kb.id}" data-knowledge-base-id="${kb.id}">
                             <div class="progress-container">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-sm font-medium text-gray-300">İşleme Durumu</span>
                                     <span class="text-sm text-gray-400">
-                                        <span class="chunk-count">0</span> chunk
+                                        <span class="chunk-count">${kb.chunk_count || 0}</span> chunk
                                     </span>
                                 </div>
                                 <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: 5%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar" role="progressbar" style="width: ${kb.progress_percentage || 10}%" aria-valuenow="${kb.progress_percentage || 10}" aria-valuemin="0" aria-valuemax="100">
                                         <span class="processing-indicator"></span>
                                     </div>
                                 </div>
-                                <div class="status-text text-center mt-2">İşleme bekleniyor...</div>
+                                <div class="status-text text-center mt-2">İşleniyor...</div>
                             </div>
                         </div>
                     ` : ''}
@@ -1565,23 +1671,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function handleFileUpload(file) {
     // Validate file type
-    const allowedTypes = ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'];
+    const allowedTypes = ['json'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
     
     if (!allowedTypes.includes(fileExtension)) {
-        alert('Desteklenmeyen dosya formatı. Lütfen CSV, TXT, XML, JSON veya Excel dosyası seçin.');
+        alert('Desteklenmeyen dosya formatı. Lütfen JSON dosyası seçin.');
         return;
     }
 
     // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
         alert('Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.');
-        return;
-    }
-
-    // Get bilgi tabanı name
-    const kbName = prompt('Bilgi Tabanı için bir isim girin:');
-    if (!kbName) {
         return;
     }
 
@@ -1605,7 +1705,6 @@ function handleFileUpload(file) {
     // Create FormData
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('name', kbName);
     
     // CSRF token'ı güvenli şekilde al
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -1634,6 +1733,7 @@ function handleFileUpload(file) {
             }
             if (data.success) {
                 showResults(data);
+                showSuccessMessage('Dosya başarıyla yüklendi ve işlendi!');
                 // Reload page to show new knowledge base
                 setTimeout(() => location.reload(), 2000);
             } else {
@@ -1654,7 +1754,6 @@ function handleFileUpload(file) {
 document.addEventListener('DOMContentLoaded', function() {
     const fetchUrlBtn = document.getElementById('fetch-url-btn');
     const urlInput = document.getElementById('url-input');
-    const kbNameInput = document.getElementById('kb-name');
     
     if (fetchUrlBtn) {
         fetchUrlBtn.addEventListener('click', function() {
@@ -1669,32 +1768,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    if (kbNameInput) {
-        kbNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                handleUrlFetch();
-            }
-        });
-    }
 });
 
 function handleUrlFetch() {
-    const kbNameInput = document.getElementById('kb-name');
     const urlInput = document.getElementById('url-input');
     
-    if (!kbNameInput || !urlInput) {
+    if (!urlInput) {
         alert('URL işlemi için gerekli elementler bulunamadı');
         return;
     }
     
-    const name = kbNameInput.value.trim();
     const url = urlInput.value.trim();
-    
-    if (!name) {
-        alert('Lütfen bilgi tabanı adı girin');
-        return;
-    }
     
     if (!url) {
         alert('Lütfen geçerli bir URL girin');
@@ -1702,7 +1786,7 @@ function handleUrlFetch() {
     }
 
     if (!isValidUrl(url)) {
-        alert('Lütfen geçerli bir URL formatı girin (örn: https://example.com/data.csv)');
+        alert('Lütfen geçerli bir JSON URL formatı girin (örn: https://example.com/data.json)');
         return;
     }
 
@@ -1725,7 +1809,6 @@ function handleUrlFetch() {
 
     // Create form data
     const formData = new FormData();
-    formData.append('name', name);
     formData.append('url', url);
     
     // CSRF token'ı güvenli şekilde al
@@ -1755,6 +1838,7 @@ function handleUrlFetch() {
             }
             if (data.success) {
                 showResults(data);
+                showSuccessMessage('URL başarıyla alındı ve işlendi!');
                 // Reload page to show new knowledge base
                 setTimeout(() => location.reload(), 2000);
             } else {

@@ -22,12 +22,12 @@ return new class extends Migration
             // $table->index(['knowledge_base_id', 'transformation'], 'idx_kb_transformation');
             // $table->index(['knowledge_base_id', 'validation_rules'], 'idx_kb_validation');
             
-            // Full-text search index for source and target fields
-            $table->fullText(['source_field', 'target_field'], 'idx_fields_fulltext');
+            // Full-text search index for source and target fields (commented out for SQLite compatibility)
+            // $table->fullText(['source_field', 'target_field'], 'idx_fields_fulltext');
             
-            // Partial indexes for better performance
-            $table->index(['is_active'], 'idx_active_partial')->where('is_active', true);
-            $table->index(['is_required'], 'idx_required_partial')->where('is_required', true);
+            // Partial indexes for better performance (commented out for SQLite compatibility)
+            // $table->index(['is_active'], 'idx_active_partial')->where('is_active', true);
+            // $table->index(['is_required'], 'idx_required_partial')->where('is_required', true);
         });
     }
 

@@ -10,6 +10,8 @@ class WidgetCustomization extends Model
 {
     protected $fillable = [
         'user_id',
+        'project_id',
+        'customization_token',
         'ai_name',
         'welcome_message',
         'welcome_message_custom',

@@ -11,6 +11,7 @@ use App\Models\Campaign;
 use App\Models\FAQ;
 use App\Models\KnowledgeBase;
 use App\Models\EnhancedChatSession;
+use App\Models\DemoRequest;
 
 class AdminController extends Controller
 {
@@ -28,8 +29,11 @@ class AdminController extends Controller
             'total_faqs' => FAQ::count(),
             'total_knowledge_bases' => KnowledgeBase::count(),
             'total_chat_sessions' => EnhancedChatSession::count(),
+            'total_demo_requests' => DemoRequest::count(),
+            'pending_demo_requests' => DemoRequest::where('status', 'pending')->count(),
             'recent_users' => User::latest()->take(5)->get(),
             'recent_campaigns' => Campaign::latest()->take(5)->get(),
+            'recent_demo_requests' => DemoRequest::latest()->take(5)->get(),
         ];
         
         return view('admin.dashboard', compact('admin', 'stats'));
@@ -165,7 +169,10 @@ class AdminController extends Controller
                 'total_faqs' => FAQ::count(),
                 'total_knowledge_bases' => KnowledgeBase::count(),
                 'total_chat_sessions' => EnhancedChatSession::count(),
+                'total_demo_requests' => DemoRequest::count(),
+                'pending_demo_requests' => DemoRequest::where('status', 'pending')->count(),
                 'recent_chat_sessions' => EnhancedChatSession::with('user')->latest()->take(10)->get(),
+                'recent_demo_requests' => DemoRequest::latest()->take(10)->get(),
             ];
             
             return response()->json([

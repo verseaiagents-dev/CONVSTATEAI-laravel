@@ -535,23 +535,23 @@ class IntentDetectionService {
         $bestIntent = null;
         $highestConfidence = 0;
         
-        // Check for random product recommendation first (special case)
-        $randomKeywords = ['rastgele', 'random', 'herhangi bir', 'ne olursa olsun', 'fark etmez'];
-        $hasRandomKeyword = false;
-        foreach ($randomKeywords as $keyword) {
-            if (mb_strpos($message, $keyword) !== false) {
-                $hasRandomKeyword = true;
-                break;
-            }
-        }
+        // Check for product recommendation patterns first (special case)
+        $recommendationPatterns = [
+            'ne önerirsin', 'ne tavsiye edersin', 'ne öneriyorsun', 'ne tavsiye ediyorsun',
+            'bana ne önerirsin', 'bana ne tavsiye edersin', 'bana ne öneriyorsun', 'bana ne tavsiye ediyorsun',
+            'rastgele', 'random', 'herhangi bir', 'ne olursa olsun', 'fark etmez',
+            'hangi ürünü önerirsin', 'hangi ürünü tavsiye edersin', 'hangi ürünü öneriyorsun'
+        ];
         
-        if ($hasRandomKeyword) {
-            return [
-                'intent' => 'product_recommendation',
-                'confidence' => 0.95,
-                'message' => $message,
-                'threshold_met' => true
-            ];
+        foreach ($recommendationPatterns as $pattern) {
+            if (mb_strpos($message, $pattern) !== false) {
+                return [
+                    'intent' => 'product_recommendation',
+                    'confidence' => 0.95,
+                    'message' => $message,
+                    'threshold_met' => true
+                ];
+            }
         }
         
         // Check for customer service keywords first (special case)

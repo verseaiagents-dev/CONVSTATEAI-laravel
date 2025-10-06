@@ -299,6 +299,105 @@ class WidgetCustomizationController extends Controller
     }
 
     /**
+     * Test ortamı için rastgele proje seçimi
+     */
+    public function getRandomProjectForTesting()
+    {
+        try {
+            // Admin kullanıcının projelerini al
+            $adminUser = \App\Models\User::where('is_admin', true)->first();
+            
+            if (!$adminUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Admin kullanıcı bulunamadı'
+                ], 404);
+            }
+            
+            // Admin'in projelerini al
+            $projects = \App\Models\Project::where('created_by', $adminUser->id)
+                ->where('status', 'active')
+                ->get();
+            
+            if ($projects->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Admin kullanıcının aktif projesi bulunamadı'
+                ], 404);
+            }
+            
+            // Rastgele proje seç
+            $randomProject = $projects->random();
+            
+            // Customization token oluştur (basit hash)
+            $customizationToken = hash('sha256', $randomProject->id . $randomProject->name . time());
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'projectId' => $randomProject->id,
+                    'projectName' => $randomProject->name,
+                    'customizationToken' => $customizationToken,
+                    'projectDescription' => $randomProject->description,
+                    'projectUrl' => $randomProject->url,
+                    'totalProjects' => $projects->count(),
+                    'adminName' => $adminUser->name
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Rastgele proje seçilirken hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function saveWidgetConfig(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'projectId' => 'required|integer',
+                'customizationToken' => 'required|string',
+                'config' => 'required|array'
+            ]);
+
+            // Admin kullanıcıyı bul
+            $adminUser = \App\Models\User::where('is_admin', true)->first();
+            if (!$adminUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Admin kullanıcı bulunamadı'
+                ], 404);
+            }
+
+            // Widget konfigürasyonunu veritabanına kaydet
+            $widgetConfig = \App\Models\WidgetCustomization::updateOrCreate(
+                [
+                    'user_id' => $adminUser->id,
+                    'project_id' => $validated['projectId']
+                ],
+                [
+                    'customization_token' => $validated['customizationToken'],
+                    'customization_data' => $validated['config'],
+                    'updated_at' => now()
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Widget konfigürasyonu kaydedildi',
+                'data' => $widgetConfig
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Konfigürasyon kaydedilemedi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Mesajlardaki placeholder'ları gerçek değerlerle değiştir
      */
     private function replacePlaceholders(string $message, string $aiName): string

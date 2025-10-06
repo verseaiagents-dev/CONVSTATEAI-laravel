@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\UsageToken;
 use App\Models\User;
 use App\Models\Plan;
 
 class UsageTokenController extends Controller
 {
     /**
-     * Kullanıcının usage token'ını güncelle
+     * Kullanıcının usage token'ını güncelle (Yeni User tablosu sistemi)
      */
     public function updateUserTokens(Request $request)
     {
@@ -22,17 +21,9 @@ class UsageTokenController extends Controller
         ]);
 
         $user = User::findOrFail($request->user_id);
-        $usageToken = UsageToken::getActiveForUser($user->id);
 
-        if (!$usageToken) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kullanıcının aktif usage token\'ı bulunamadı'
-            ], 404);
-        }
-
-        // Token'ları güncelle
-        $usageToken->update([
+        // Yeni User tablosundaki token sistemi
+        $user->update([
             'tokens_remaining' => $request->tokens_remaining,
             'tokens_total' => $request->tokens_total,
             'tokens_used' => $request->tokens_total - $request->tokens_remaining
@@ -42,15 +33,16 @@ class UsageTokenController extends Controller
             'success' => true,
             'message' => 'Usage token başarıyla güncellendi',
             'data' => [
-                'tokens_remaining' => $usageToken->tokens_remaining,
-                'tokens_total' => $usageToken->tokens_total,
-                'tokens_used' => $usageToken->tokens_used
+                'tokens_remaining' => $user->tokens_remaining,
+                'tokens_total' => $user->tokens_total,
+                'tokens_used' => $user->tokens_used,
+                'usage_percentage' => $user->token_usage_percentage
             ]
         ]);
     }
 
     /**
-     * Kullanıcıya token ekle
+     * Kullanıcıya token ekle (Yeni User tablosu sistemi)
      */
     public function addTokens(Request $request)
     {
@@ -60,31 +52,24 @@ class UsageTokenController extends Controller
         ]);
 
         $user = User::findOrFail($request->user_id);
-        $usageToken = UsageToken::getActiveForUser($user->id);
 
-        if (!$usageToken) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kullanıcının aktif usage token\'ı bulunamadı'
-            ], 404);
-        }
-
-        // Token ekle
-        $usageToken->addTokens($request->amount);
+        // Yeni User tablosundaki token sistemi
+        $user->addTokens($request->amount);
 
         return response()->json([
             'success' => true,
             'message' => 'Token başarıyla eklendi',
             'data' => [
-                'tokens_remaining' => $usageToken->tokens_remaining,
-                'tokens_total' => $usageToken->tokens_total,
-                'tokens_used' => $usageToken->tokens_used
+                'tokens_remaining' => $user->tokens_remaining,
+                'tokens_total' => $user->tokens_total,
+                'tokens_used' => $user->tokens_used,
+                'usage_percentage' => $user->token_usage_percentage
             ]
         ]);
     }
 
     /**
-     * Kullanıcının usage token bilgilerini getir
+     * Kullanıcının usage token bilgilerini getir (Yeni User tablosu sistemi)
      */
     public function getUserTokens(Request $request)
     {
@@ -93,30 +78,24 @@ class UsageTokenController extends Controller
         ]);
 
         $user = User::findOrFail($request->user_id);
-        $usageToken = UsageToken::getActiveForUser($user->id);
-
-        if (!$usageToken) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kullanıcının aktif usage token\'ı bulunamadı'
-            ], 404);
-        }
 
         return response()->json([
             'success' => true,
             'data' => [
-                'tokens_remaining' => $usageToken->tokens_remaining,
-                'tokens_total' => $usageToken->tokens_total,
-                'tokens_used' => $usageToken->tokens_used,
-                'usage_percentage' => $usageToken->usage_percentage,
-                'reset_date' => $usageToken->reset_date ? $usageToken->reset_date->format('Y-m-d') : null,
-                'is_expired' => $usageToken->isExpired()
+                'tokens_remaining' => $user->tokens_remaining,
+                'tokens_total' => $user->tokens_total,
+                'tokens_used' => $user->tokens_used,
+                'usage_percentage' => $user->token_usage_percentage,
+                'reset_date' => $user->token_reset_date ? $user->token_reset_date->format('Y-m-d') : null,
+                'is_expired' => $user->isTokenExpired(),
+                'can_use_token' => $user->canUseToken(),
+                'current_plan_id' => $user->current_plan_id
             ]
         ]);
     }
 
     /**
-     * Plan için kullanıcıların token bilgilerini getir
+     * Plan için kullanıcıların token bilgilerini getir (Yeni User tablosu sistemi)
      */
     public function getPlanTokens(Request $request)
     {
@@ -124,19 +103,23 @@ class UsageTokenController extends Controller
             'plan_id' => 'required|exists:plans,id'
         ]);
 
-        $plan = Plan::with('usageTokens.user')->findOrFail($request->plan_id);
+        $plan = Plan::findOrFail($request->plan_id);
         
-        $tokenData = $plan->usageTokens->map(function ($token) {
+        // Bu plana sahip kullanıcıları bul
+        $users = User::where('current_plan_id', $plan->id)->get();
+        
+        $tokenData = $users->map(function ($user) {
             return [
-                'user_id' => $token->user_id,
-                'user_name' => $token->user->name,
-                'user_email' => $token->user->email,
-                'tokens_remaining' => $token->tokens_remaining,
-                'tokens_total' => $token->tokens_total,
-                'tokens_used' => $token->tokens_used,
-                'usage_percentage' => $token->usage_percentage,
-                'is_active' => $token->is_active,
-                'reset_date' => $token->reset_date ? $token->reset_date->format('Y-m-d') : null
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'tokens_remaining' => $user->tokens_remaining,
+                'tokens_total' => $user->tokens_total,
+                'tokens_used' => $user->tokens_used,
+                'usage_percentage' => $user->token_usage_percentage,
+                'can_use_token' => $user->canUseToken(),
+                'is_expired' => $user->isTokenExpired(),
+                'reset_date' => $user->token_reset_date ? $user->token_reset_date->format('Y-m-d') : null
             ];
         });
 
@@ -144,8 +127,9 @@ class UsageTokenController extends Controller
             'success' => true,
             'data' => [
                 'plan_name' => $plan->name,
-                'plan_usage_tokens' => $plan->usage_tokens,
-                'total_remaining' => $plan->usageTokens->sum('tokens_remaining'),
+                'plan_usage_tokens' => $plan->calculateUsageTokens(),
+                'total_remaining' => $users->sum('tokens_remaining'),
+                'total_used' => $users->sum('tokens_used'),
                 'users' => $tokenData
             ]
         ]);

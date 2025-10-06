@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('usage_tokens', function (Blueprint $table) {
-            $table->unsignedBigInteger('plan_id')->nullable()->after('subscription_id');
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-        });
+        // Check if usage_tokens table exists before trying to modify it
+        if (Schema::hasTable('usage_tokens')) {
+            Schema::table('usage_tokens', function (Blueprint $table) {
+                $table->unsignedBigInteger('plan_id')->nullable()->after('subscription_id');
+                $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
+            });
+        }
     }
 
     /**

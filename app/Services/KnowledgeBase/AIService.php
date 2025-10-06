@@ -130,7 +130,7 @@ class AIService
         $confidence = 0.5;
         
         // "Ürün öner", "ürün tavsiye" gibi spesifik öneri ifadeleri - ÖNCELİKLİ
-        if (preg_match('/(ürün öner|ürün tavsiye|ürün önerisi|ürün tavsiyesi|ne önerirsin|bana öner|bana tavsiye|öneri|tavsiye|öner|tavsiye)/i', $query)) {
+        if (preg_match('/(ürün öner|ürün tavsiye|ürün önerisi|ürün tavsiyesi|ne önerirsin|bana öner|bana tavsiye|öneri|tavsiye|öner|tavsiye|bana bir ürün|bir ürün öner|hangi ürün|ne almalıyım|hangisini önerirsin)/i', $query)) {
             $intent = 'product_recommendation';
             $confidence = 0.95;
         }
@@ -270,7 +270,7 @@ class AIService
           Örnekler: 'saat varmı', 'telefon bul', 'kırmızı elbise', 'mavi kazak', 'nike ayakkabı'
         
         - product_recommendation: Ürün önerisi, tavsiye
-          Örnekler: 'ürün öner', 'ürün tavsiye', 'ne önerirsin', 'bana öner', 'bana tavsiye'
+          Örnekler: 'ürün öner', 'ürün tavsiye', 'ne önerirsin', 'bana öner', 'bana tavsiye', 'bana bir ürün', 'bir ürün öner', 'hangi ürün', 'ne almalıyım', 'hangisini önerirsin'
         
         - product_search: Ürün arama, bulma, listeleme
           Örnekler: 'saat varmı', 'telefon bul', 'kırmızı elbise', 'mavi kazak', 'nike ayakkabı', 'oyuncak bul', 'kitap ara'
@@ -369,7 +369,7 @@ class AIService
         $confidence = 0.5;
         
         // "Ürün öner", "ürün tavsiye" gibi ifadeler - ÖNCELİKLİ
-        if (preg_match('/(ürün öner|ürün tavsiye|ne önerirsin|bana göre|öner|tavsiye)/i', $response)) {
+        if (preg_match('/(ürün öner|ürün tavsiye|ne önerirsin|bana göre|öner|tavsiye|bana bir ürün|bir ürün öner|hangi ürün|ne almalıyım|hangisini önerirsin)/i', $response)) {
             $intent = 'product_recommendation';
             $confidence = 0.95;
         }
@@ -1313,5 +1313,377 @@ class AIService
             Log::error("Single image analysis error for {$imageUrl}: " . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * AI-powered field mapping - JSON verilerini analiz ederek otomatik field mapping yapar
+     */
+    public function performAIFieldMapping(array $jsonData, string $contentType = 'auto'): array
+    {
+        try {
+            Log::info('AI Field Mapping başlatılıyor', [
+                'data_count' => count($jsonData),
+                'content_type' => $contentType
+            ]);
+
+            // JSON verisini analiz et
+            $analysisResult = $this->analyzeJsonStructure($jsonData);
+            
+            // AI ile field mapping önerisi oluştur
+            $mappingSuggestion = $this->generateFieldMappingSuggestion($analysisResult, $contentType);
+            
+            // Mapping'i uygula
+            $mappedData = $this->applyFieldMapping($jsonData, $mappingSuggestion);
+            
+            Log::info('AI Field Mapping tamamlandı', [
+                'original_fields' => $analysisResult['detected_fields'],
+                'mapped_fields' => array_keys($mappingSuggestion['field_mapping'] ?? []),
+                'mapped_records' => count($mappedData)
+            ]);
+
+            return [
+                'success' => true,
+                'original_data' => $jsonData,
+                'mapped_data' => $mappedData,
+                'field_mapping' => $mappingSuggestion,
+                'analysis' => $analysisResult,
+                'content_type' => $mappingSuggestion['content_type'] ?? $contentType,
+                'confidence_score' => $mappingSuggestion['confidence_score'] ?? 0.8
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('AI Field Mapping hatası: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'original_data' => $jsonData,
+                'mapped_data' => $jsonData, // Fallback olarak orijinal veriyi döndür
+                'field_mapping' => [],
+                'analysis' => [],
+                'content_type' => $contentType,
+                'confidence_score' => 0.0
+            ];
+        }
+    }
+
+    /**
+     * JSON yapısını analiz eder
+     */
+    private function analyzeJsonStructure(array $jsonData): array
+    {
+        $sampleSize = min(5, count($jsonData)); // İlk 5 kaydı analiz et
+        $sampleData = array_slice($jsonData, 0, $sampleSize);
+        
+        $allFields = [];
+        $fieldTypes = [];
+        $fieldValues = [];
+        
+        foreach ($sampleData as $record) {
+            if (is_array($record)) {
+                foreach ($record as $key => $value) {
+                    $allFields[] = $key;
+                    
+                    // Field tipini belirle
+                    $fieldTypes[$key] = $this->determineFieldType($value);
+                    
+                    // Field değerlerini topla (analiz için)
+                    if (!isset($fieldValues[$key])) {
+                        $fieldValues[$key] = [];
+                    }
+                    $fieldValues[$key][] = $value;
+                }
+            }
+        }
+        
+        $uniqueFields = array_unique($allFields);
+        $fieldFrequency = array_count_values($allFields);
+        
+        return [
+            'detected_fields' => $uniqueFields,
+            'field_frequency' => $fieldFrequency,
+            'field_types' => $fieldTypes,
+            'field_values' => $fieldValues,
+            'sample_size' => $sampleSize,
+            'total_records' => count($jsonData),
+            'is_array_of_objects' => $this->isArrayOfObjects($jsonData),
+            'is_single_object' => $this->isSingleObject($jsonData)
+        ];
+    }
+
+    /**
+     * Field tipini belirler
+     */
+    private function determineFieldType($value): string
+    {
+        if (is_numeric($value)) {
+            return 'numeric';
+        } elseif (is_string($value)) {
+            if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                return 'email';
+            } elseif (filter_var($value, FILTER_VALIDATE_URL)) {
+                return 'url';
+            } elseif (preg_match('/^\d{4}-\d{2}-\d{2}/', $value)) {
+                return 'date';
+            } else {
+                return 'string';
+            }
+        } elseif (is_bool($value)) {
+            return 'boolean';
+        } elseif (is_array($value)) {
+            return 'array';
+        } else {
+            return 'unknown';
+        }
+    }
+
+    /**
+     * Array of objects kontrolü
+     */
+    private function isArrayOfObjects(array $data): bool
+    {
+        if (empty($data)) return false;
+        
+        foreach ($data as $item) {
+            if (!is_array($item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Single object kontrolü
+     */
+    private function isSingleObject(array $data): bool
+    {
+        return count($data) === 1 && is_array($data[0]);
+    }
+
+    /**
+     * AI ile field mapping önerisi oluşturur
+     */
+    private function generateFieldMappingSuggestion(array $analysis, string $contentType): array
+    {
+        try {
+            $prompt = $this->buildFieldMappingPrompt($analysis, $contentType);
+            
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->post($this->baseUrl . '/chat/completions', [
+                'model' => $this->model,
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'Sen bir veri analisti ve field mapping uzmanısın. JSON verilerini analiz ederek en uygun field mapping önerilerini sunarsın.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $prompt
+                    ]
+                ],
+                'temperature' => 0.3,
+                'max_tokens' => 2000
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception('OpenAI API Error: ' . $response->body());
+            }
+
+            $data = $response->json();
+            $aiResponse = $data['choices'][0]['message']['content'];
+            
+            return $this->parseFieldMappingResponse($aiResponse, $analysis);
+
+        } catch (\Exception $e) {
+            Log::error('AI Field Mapping suggestion error: ' . $e->getMessage());
+            return $this->getFallbackFieldMapping($analysis, $contentType);
+        }
+    }
+
+    /**
+     * Field mapping için AI prompt oluşturur
+     */
+    private function buildFieldMappingPrompt(array $analysis, string $contentType): string
+    {
+        $fields = implode(', ', $analysis['detected_fields']);
+        $fieldTypes = json_encode($analysis['field_types'], JSON_UNESCAPED_UNICODE);
+        
+        return "Aşağıdaki JSON verisini analiz ederek field mapping önerisi oluştur:
+
+VERİ ANALİZİ:
+- Tespit edilen field'lar: {$fields}
+- Field tipleri: {$fieldTypes}
+- Toplam kayıt sayısı: {$analysis['total_records']}
+- İçerik tipi: {$contentType}
+
+STANDART FIELD MAPPING'LER:
+- id: Ürün/hizmet ID'si
+- name/title: Ürün/hizmet adı
+- price: Fiyat bilgisi
+- description: Açıklama
+- category: Kategori
+- brand: Marka
+- image: Resim URL'i
+- rating: Değerlendirme puanı
+- stock: Stok durumu
+- url: Ürün URL'i
+
+FAQ İÇİN:
+- question/soru: Soru metni
+- answer/cevap: Cevap metni
+
+Lütfen aşağıdaki JSON formatında yanıt ver:
+
+{
+  \"content_type\": \"product|faq|general\",
+  \"confidence_score\": 0.95,
+  \"field_mapping\": {
+    \"original_field_name\": \"standard_field_name\",
+    \"original_field_name2\": \"standard_field_name2\"
+  },
+  \"reasoning\": \"Mapping önerisinin açıklaması\",
+  \"suggestions\": [
+    \"Ek öneri 1\",
+    \"Ek öneri 2\"
+  ]
+}
+
+Türkçe field isimlerini de destekle ve en uygun mapping'i öner.";
+    }
+
+    /**
+     * AI response'unu parse eder
+     */
+    private function parseFieldMappingResponse(string $aiResponse, array $analysis): array
+    {
+        try {
+            // JSON'u extract et
+            $jsonStart = strpos($aiResponse, '{');
+            $jsonEnd = strrpos($aiResponse, '}') + 1;
+            
+            if ($jsonStart !== false && $jsonEnd !== false) {
+                $jsonString = substr($aiResponse, $jsonStart, $jsonEnd - $jsonStart);
+                $parsed = json_decode($jsonString, true);
+                
+                if ($parsed && is_array($parsed)) {
+                    return $parsed;
+                }
+            }
+            
+            // JSON parse edilemezse fallback kullan
+            return $this->getFallbackFieldMapping($analysis, 'auto');
+            
+        } catch (\Exception $e) {
+            Log::error('Field mapping response parsing failed: ' . $e->getMessage());
+            return $this->getFallbackFieldMapping($analysis, 'auto');
+        }
+    }
+
+    /**
+     * Fallback field mapping
+     */
+    private function getFallbackFieldMapping(array $analysis, string $contentType): array
+    {
+        $fieldMapping = [];
+        $detectedFields = $analysis['detected_fields'];
+        
+        // Basit field mapping kuralları
+        $mappingRules = [
+            'id' => 'id',
+            'name' => 'name',
+            'title' => 'name',
+            'price' => 'price',
+            'fiyat' => 'price',
+            'description' => 'description',
+            'aciklama' => 'description',
+            'category' => 'category',
+            'kategori' => 'category',
+            'brand' => 'brand',
+            'marka' => 'brand',
+            'image' => 'image',
+            'resim' => 'image',
+            'rating' => 'rating',
+            'degerlendirme' => 'rating',
+            'stock' => 'stock',
+            'stok' => 'stock',
+            'url' => 'url',
+            'link' => 'url',
+            'question' => 'question',
+            'soru' => 'question',
+            'answer' => 'answer',
+            'cevap' => 'answer',
+            // FakeStore API özel mapping'leri
+            'rate' => 'rating',
+            'count' => 'review_count',
+            'reviews' => 'review_count'
+        ];
+        
+        foreach ($detectedFields as $field) {
+            $lowerField = strtolower($field);
+            if (isset($mappingRules[$lowerField])) {
+                $fieldMapping[$field] = $mappingRules[$lowerField];
+            } else {
+                $fieldMapping[$field] = $field; // Orijinal field'ı koru
+            }
+        }
+        
+        // Content type'ı belirle
+        $finalContentType = $contentType;
+        if ($contentType === 'auto') {
+            $mappedFields = array_values($fieldMapping);
+            
+            // FAQ kontrolü
+            if (in_array('question', $mappedFields) || in_array('answer', $mappedFields) || 
+                in_array('soru', $mappedFields) || in_array('cevap', $mappedFields)) {
+                $finalContentType = 'faq';
+            }
+            // Ürün kontrolü - daha kapsamlı
+            elseif (in_array('price', $mappedFields) || in_array('fiyat', $mappedFields) ||
+                   in_array('name', $mappedFields) || in_array('title', $mappedFields) ||
+                   in_array('category', $mappedFields) || in_array('kategori', $mappedFields) ||
+                   in_array('brand', $mappedFields) || in_array('marka', $mappedFields) ||
+                   in_array('image', $mappedFields) || in_array('resim', $mappedFields) ||
+                   in_array('rating', $mappedFields) || in_array('degerlendirme', $mappedFields)) {
+                $finalContentType = 'product';
+            } else {
+                $finalContentType = 'general';
+            }
+        }
+        
+        return [
+            'content_type' => $finalContentType,
+            'confidence_score' => 0.6,
+            'field_mapping' => $fieldMapping,
+            'reasoning' => 'Fallback mapping uygulandı',
+            'suggestions' => ['Manuel kontrol önerilir']
+        ];
+    }
+
+    /**
+     * Field mapping'i uygular
+     */
+    private function applyFieldMapping(array $jsonData, array $mappingSuggestion): array
+    {
+        $mappedData = [];
+        $fieldMapping = $mappingSuggestion['field_mapping'] ?? [];
+        
+        foreach ($jsonData as $record) {
+            if (is_array($record)) {
+                $mappedRecord = [];
+                
+                foreach ($record as $originalField => $value) {
+                    $mappedField = $fieldMapping[$originalField] ?? $originalField;
+                    $mappedRecord[$mappedField] = $value;
+                }
+                
+                $mappedData[] = $mappedRecord;
+            } else {
+                $mappedData[] = $record;
+            }
+        }
+        
+        return $mappedData;
     }
 }
