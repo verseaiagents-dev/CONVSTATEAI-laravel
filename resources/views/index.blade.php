@@ -38,12 +38,7 @@ src="https://www.facebook.com/tr?id=24557115803931045&ev=PageView&noscript=1"
 
   gtag('config', 'G-PYZ8FQ8JV2');
 </script>
-                  <script src="https://convstateai.com/embed/convstateai.min.js"></script>
-<script>
-window.convstateaiConfig = {
- projectId: "1",
- customizationToken: "7ad7f50cafe54fa113a60425fd7abeef257b6194ef18e65d71db0e65d40d2dea"
-};
+
 </script>
     <script>
         tailwind.config = {
@@ -932,7 +927,12 @@ window.convstateaiConfig = {
 
  
 </script>
-
+<script src="https://convstateai.com/embed/convstateai.min.js"></script>
+<script>
+window.convstateaiConfig = {
+ projectId: "1",
+ customizationToken: "7ad7f50cafe54fa113a60425fd7abeef257b6194ef18e65d71db0e65d40d2dea"
+};
 
 </body>
 </html>
