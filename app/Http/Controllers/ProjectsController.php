@@ -59,7 +59,7 @@ class ProjectsController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'url' => $request->url,
-            'status' => $request->status,
+            'status' => 'active', // Otomatik olarak aktif yap
             'created_by' => Auth::id(),
         ]);
 
@@ -94,7 +94,7 @@ class ProjectsController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'url' => $request->url,
-            'status' => $request->status,
+            'status' => 'active', // Güncelleme sırasında otomatik aktif yap
         ]);
 
         return response()->json([

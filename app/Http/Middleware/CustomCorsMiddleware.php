@@ -104,28 +104,9 @@ class CustomCorsMiddleware
             case 'development':
                 $defaultOrigins = [
                     'http://localhost:3000',
-                    'http://127.0.0.1:3000',
-                    'http://192.168.1.100:3000',
-                    'http://localhost:3001',
-                    'http://127.0.0.1:3001',
-                    'http://localhost:8000',
-                    'http://127.0.0.1:8000',
-                    'http://localhost:8001',
-                    'http://127.0.0.1:8001',
-                    'http://localhost:8080',
-                    'http://127.0.0.1:8080',
-                    'https://localhost:3000',
-                    'https://127.0.0.1:3000',
-                    'https://192.168.1.100:3000',
-                    'http://127.0.0.1:3000/widget/test.html',
-                    'https://localhost:3001',
-                    'https://127.0.0.1:3001',
-                    'https://localhost:8000',
-                    'https://localhost:8080',
+                    
                     'https://127.0.0.1:8000',
-                    'https://127.0.0.1:8001',
-                    'https://127.0.0.1:5500',
-                    'https://127.0.0.1:8080'
+               
                 ];
                 
                 // Environment'dan gelen originleri ekle
@@ -166,8 +147,7 @@ class CustomCorsMiddleware
         $origins = [];
         
         try {
-            $projects = Project::where('status', 'active')
-                ->whereNotNull('url')
+            $projects = Project::whereNotNull('url')
                 ->where('url', '!=', '')
                 ->get();
 
