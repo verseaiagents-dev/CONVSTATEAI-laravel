@@ -145,4 +145,41 @@ class ProjectsController extends Controller
             'project' => $project
         ]);
     }
+
+    /**
+     * Get embed code for project
+     */
+    public function getEmbedCode(Project $project)
+    {
+        // Check if user owns this project
+        if ($project->created_by !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bu projeye erişim yetkiniz yok.'
+            ], 403);
+        }
+
+        $user = Auth::user();
+        $customizationToken = $user->personal_token ? $user->personal_token : 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246';
+        
+        // Generate embed code
+        $embedCode = <<<EOT
+<script src="https://convstateai.com/embed/convstateai.min.js"></script>
+<script>
+window.convstateaiConfig = {
+    projectId: "{$project->id}",
+    customizationToken: "{$customizationToken}"
+};
+</script>
+EOT;
+
+        return response()->json([
+            'success' => true,
+            'embedCode' => $embedCode,
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name
+            ]
+        ]);
+    }
 }

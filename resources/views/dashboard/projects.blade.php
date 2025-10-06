@@ -454,6 +454,11 @@ function populateContent() {
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xl font-bold text-white">${project.name}</h3>
                         <div class="flex items-center space-x-2">
+                            <button onclick="showEmbedCode(${project.id})" class="text-green-400 hover:text-green-300 transition-colors duration-200" title="Embed Kodu">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                            </button>
                             <button onclick="editProject(${project.id})" class="text-blue-400 hover:text-blue-300 transition-colors duration-200" title="Düzenle">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -672,4 +677,126 @@ document.getElementById('editProjectForm').addEventListener('submit', function(e
         }
     });
 </script>
+
+<!-- Embed Code Modal -->
+<div id="embedCodeModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-effect rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+                <span class="gradient-text">Embed Kodu</span>
+            </h3>
+            <button id="closeEmbedModal" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mb-6">
+            <p class="text-gray-300 mb-4">Widget'ınızı web sitenize entegre etmek için aşağıdaki kodu kullanın:</p>
+            
+            <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-lg font-semibold text-white">Embed Script</h4>
+                    <button id="copyEmbedCodeBtn" class="px-4 py-2 bg-gradient-to-r from-purple-glow to-neon-purple text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Kodu Kopyala</span>
+                    </button>
+                </div>
+                
+                <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-600">
+                    <pre id="embedCodeDisplay" class="text-green-400 font-mono text-sm break-all whitespace-pre-wrap overflow-x-auto"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+            <h4 class="text-blue-400 font-semibold mb-2">Nasıl Kullanılır?</h4>
+            <ol class="text-gray-300 text-sm space-y-2 list-decimal list-inside">
+                <li>Yukarıdaki kodu kopyalayın</li>
+                <li>Web sitenizin HTML kodunda, &lt;/body&gt; etiketinden hemen önce yapıştırın</li>
+                <li>Sayfanızı kaydedin ve yenileyin</li>
+                <li>Widget otomatik olarak görünecektir</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+// Embed Code Modal Functions
+function showEmbedCode(projectId) {
+    // Fetch project data and generate embed code
+    fetch(`/dashboard/projects/${projectId}/embed-code`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('embedCodeDisplay').textContent = data.embedCode;
+                document.getElementById('embedCodeModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                alert('Embed kodu alınamadı: ' + (data.message || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(error => {
+            console.error('Embed code fetch error:', error);
+            alert('Embed kodu alınırken hata oluştu');
+        });
+}
+
+// Close embed modal
+function closeEmbedModal() {
+    document.getElementById('embedCodeModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Event listeners for embed modal
+document.addEventListener('DOMContentLoaded', function() {
+    const closeEmbedModalBtn = document.getElementById('closeEmbedModal');
+    const embedCodeModal = document.getElementById('embedCodeModal');
+    const copyEmbedCodeBtn = document.getElementById('copyEmbedCodeBtn');
+    
+    if (closeEmbedModalBtn) {
+        closeEmbedModalBtn.addEventListener('click', closeEmbedModal);
+    }
+    
+    if (embedCodeModal) {
+        embedCodeModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEmbedModal();
+            }
+        });
+    }
+    
+    if (copyEmbedCodeBtn) {
+        copyEmbedCodeBtn.addEventListener('click', function() {
+            const embedCode = document.getElementById('embedCodeDisplay').textContent;
+            
+            if (embedCode) {
+                navigator.clipboard.writeText(embedCode).then(function() {
+                    // Show success feedback
+                    const originalText = copyEmbedCodeBtn.querySelector('span').textContent;
+                    copyEmbedCodeBtn.querySelector('span').textContent = 'Kopyalandı!';
+                    copyEmbedCodeBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    copyEmbedCodeBtn.classList.remove('from-purple-glow', 'to-neon-purple', 'hover:from-purple-600', 'hover:to-purple-700');
+                    
+                    // Reset after 2 seconds
+                    setTimeout(function() {
+                        copyEmbedCodeBtn.querySelector('span').textContent = originalText;
+                        copyEmbedCodeBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                        copyEmbedCodeBtn.classList.add('from-purple-glow', 'to-neon-purple', 'hover:from-purple-600', 'hover:to-purple-700');
+                    }, 2000);
+                }).catch(function(err) {
+                    console.error('Embed code kopyalanamadı: ', err);
+                    alert('Embed kodu kopyalanamadı. Lütfen manuel olarak kopyalayın.');
+                });
+            } else {
+                alert('Embed kodu bulunamadı.');
+            }
+        });
+    }
+});
+</script>
+
 @endsection

@@ -89,6 +89,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/projects/load-content', [App\Http\Controllers\ProjectsController::class, 'loadContent'])->name('dashboard.projects.load-content');
     Route::post('/dashboard/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('dashboard.projects.store');
     Route::get('/dashboard/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('dashboard.projects.show');
+    Route::get('/dashboard/projects/{project}/embed-code', [App\Http\Controllers\ProjectsController::class, 'getEmbedCode'])->name('dashboard.projects.embed-code');
     Route::put('/dashboard/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'update'])->name('dashboard.projects.update');
     Route::delete('/dashboard/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'destroy'])->name('dashboard.projects.destroy');
 

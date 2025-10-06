@@ -97,62 +97,6 @@
         </div>
     </div>
 
-    <!-- Embed Script Container -->
-    <div class="glass-effect rounded-2xl p-8 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-green-glow rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
-        <div class="absolute bottom-0 left-0 w-40 h-40 bg-blue-glow rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
-        
-        <div class="relative z-10">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-white mb-2">
-                        <span class="gradient-text">Embed Script</span>
-                    </h2>
-                    <p class="text-gray-300">Widget'ınızı web sitenize entegre etmek için aşağıdaki kodu kullanın</p>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button id="copyEmbedScriptBtn" 
-                            class="px-4 py-2 bg-gradient-to-r from-purple-glow to-neon-purple text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        <span>Kodu Kopyala</span>
-                    </button>
-                    
-                    <!-- How to Use Button -->
-                    <button id="howToUseBtn" 
-                            class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all duration-300 flex items-center space-x-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span>Nasıl Kullanılır?</span>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Embed Script Display -->
-            <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-white">Embed Kodu</h3>
-                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
-                        Hazır
-                    </span>
-                </div>
-                <div class="bg-gray-900/50 rounded-lg p-4 border border-gray-600">
-                    <pre id="embedScriptDisplay" class="text-green-400 font-mono text-sm break-all whitespace-pre-wrap">
-********************</pre>
-                    <div id="actualEmbedScript" style="display: none;"><script src="{{ url('/embed/convstateai.min.js') }}"></script>
-<script>
-    window.convstateaiConfig = {
-        projectId: "{{ request('project_id') ?? '1' }}",
-        customizationToken: "{{ Auth::user()->personal_token ?? 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246' }}"
-    };
-</script></div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
 
     <!-- Usage Instructions Modal -->
     <div id="usageModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -1729,57 +1673,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Embed Script Container Functions
-    const copyEmbedScriptBtn = document.getElementById('copyEmbedScriptBtn');
-    const embedScriptDisplay = document.getElementById('embedScriptDisplay');
     
-    // Copy Embed Script functionality
-    if (copyEmbedScriptBtn && embedScriptDisplay) {
-        copyEmbedScriptBtn.addEventListener('click', function() {
-            // Get the actual embed script from the hidden div
-            const actualEmbedScript = document.getElementById('actualEmbedScript');
-            const embedScript = actualEmbedScript ? actualEmbedScript.textContent.trim() : '';
-            
-            // Debug: Log what we're trying to copy
-            console.log('Copying embed script:', embedScript);
-            
-            if (embedScript) {
-                navigator.clipboard.writeText(embedScript).then(function() {
-                    // Show success feedback
-                    const originalText = copyEmbedScriptBtn.querySelector('span').textContent;
-                    copyEmbedScriptBtn.querySelector('span').textContent = 'Kopyalandı!';
-                    copyEmbedScriptBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                    copyEmbedScriptBtn.classList.remove('from-purple-glow', 'to-neon-purple', 'hover:from-purple-600', 'hover:to-purple-700');
-                    
-                    // Reset after 2 seconds
-                    setTimeout(function() {
-                        copyEmbedScriptBtn.querySelector('span').textContent = originalText;
-                        copyEmbedScriptBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                        copyEmbedScriptBtn.classList.add('from-purple-glow', 'to-neon-purple', 'hover:from-purple-600', 'hover:to-purple-700');
-                    }, 2000);
-                }).catch(function(err) {
-                    console.error('Embed script kopyalanamadı: ', err);
-                    alert('Embed script kopyalanamadı. Lütfen manuel olarak kopyalayın.');
-                });
-            } else {
-                alert('Embed script bulunamadı. Lütfen sayfayı yenileyin.');
-            }
-        });
-    }
-    
-    // Usage Modal Functions
-    const howToUseBtn = document.getElementById('howToUseBtn');
-    const usageModal = document.getElementById('usageModal');
-    const closeUsageModal = document.getElementById('closeUsageModal');
-    const closeUsageModalBtn = document.getElementById('closeUsageModalBtn');
-    
-    // Open modal
-    if (howToUseBtn && usageModal) {
-        howToUseBtn.addEventListener('click', function() {
-            usageModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        });
-    }
     
     // Close modal functions
     function closeModal() {
