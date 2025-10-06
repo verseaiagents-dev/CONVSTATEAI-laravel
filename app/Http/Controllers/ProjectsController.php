@@ -192,12 +192,16 @@ EOT;
             'url' => 'required|string|max:500',
         ]);
 
-        $originalUrl = trim($request->url);
-        $url = $originalUrl;
+        $url = trim($request->url);
         
-        // Add protocol if missing
-        if (!preg_match('/^https?:\/\//', $url)) {
-            $url = 'https://' . $url;
+        // URL'yi parse et ve geçerli olup olmadığını kontrol et
+        $parsed = parse_url($url);
+        if (!$parsed || !isset($parsed['host'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Geçersiz URL formatı.',
+                'url' => $url
+            ], 400);
         }
 
         try {
@@ -223,7 +227,7 @@ EOT;
                 return response()->json([
                     'success' => false,
                     'message' => 'URL kullanılamaz.',
-                    'url' => $originalUrl
+                    'url' => $url
                 ], 400);
             }
 
@@ -238,14 +242,14 @@ EOT;
                 return response()->json([
                     'success' => true,
                     'message' => 'URL kullanılabilir.',
-                    'url' => $originalUrl,
+                    'url' => $url,
                     'status_code' => $statusCode
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
                     'message' => "URL test edilemedi. HTTP durum kodu: {$statusCode}",
-                    'url' => $originalUrl,
+                    'url' => $url,
                     'status_code' => $statusCode
                 ], 400);
             }
@@ -254,7 +258,7 @@ EOT;
             return response()->json([
                 'success' => false,
                 'message' => 'URL test edilirken hata oluştu: ' . $e->getMessage(),
-                'url' => $originalUrl
+                'url' => $url
             ], 500);
         }
     }

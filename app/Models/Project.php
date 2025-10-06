@@ -112,11 +112,7 @@ class Project extends Model
 
         $url = trim($this->url);
         
-        // Protocol yoksa https ekle
-        if (!preg_match('/^https?:\/\//', $url)) {
-            $url = 'https://' . $url;
-        }
-
+        // URL'yi parse et
         $parsed = parse_url($url);
         if (!$parsed || !isset($parsed['host'])) {
             return false;

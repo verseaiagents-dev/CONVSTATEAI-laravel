@@ -142,15 +142,7 @@ class CustomCorsMiddleware
                 ];
                 
             case 'production':
-                $productionOrigins = $this->getProductionAllowedOrigins();
-                // Add takizen.shop domains to production origins (both www and non-www)
-                $takizenOrigins = [
-                    'http://www.takizen.shop',
-                    'https://www.takizen.shop',
-                    'http://takizen.shop',
-                    'https://takizen.shop'
-                ];
-                return array_unique(array_merge($productionOrigins, $takizenOrigins));
+                return $this->getProductionAllowedOrigins();
                 
             default:
                 return [];
@@ -184,16 +176,24 @@ class CustomCorsMiddleware
                 if ($project->isAllowedForCors()) {
                     $url = trim($project->url);
                     
-                    // Protocol yoksa https ekle
-                    if (!preg_match('/^https?:\/\//', $url)) {
-                        $url = 'https://' . $url;
-                    }
-
                     // URL'yi parse et
                     $parsed = parse_url($url);
                     if ($parsed && isset($parsed['host'])) {
-                        // Kullanıcının girdiği URL'yi olduğu gibi kullan (normalize etme)
-                        $origins[] = $url;
+                        $host = strtolower(trim($parsed['host']));
+                        if (!empty($host)) {
+                            // Kullanıcının girdiği URL'yi olduğu gibi kullan
+                            $protocol = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
+                            $origins[] = $protocol . '://' . $host;
+                            
+                            // www. olmayan versiyonunu da ekle (eğer www. varsa)
+                            if (strpos($host, 'www.') === 0) {
+                                $hostWithoutWww = substr($host, 4);
+                                $origins[] = $protocol . '://' . $hostWithoutWww;
+                            } else {
+                                // www. olmayan versiyonunun www. versiyonunu da ekle
+                                $origins[] = $protocol . '://www.' . $host;
+                            }
+                        }
                     }
                 }
             }
