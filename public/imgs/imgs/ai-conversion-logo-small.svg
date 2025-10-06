@@ -1,0 +1,46 @@
+<svg width="35" height="35" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Gradient -->
+  <defs>
+    <linearGradient id="bgGradientSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGradientSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f9ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main Background Circle -->
+  <circle cx="17.5" cy="17.5" r="16" fill="url(#bgGradientSmall)" stroke="#ffffff" stroke-width="1.5"/>
+  
+  <!-- AI Brain Circuit Pattern (Simplified for small size) -->
+  <g fill="url(#iconGradientSmall)" opacity="0.9">
+    <!-- Central Node -->
+    <circle cx="17.5" cy="17.5" r="2.5"/>
+    
+    <!-- Main Circuit Lines -->
+    <path d="M17.5 15 L17.5 12 M17.5 23 L17.5 20 M15 17.5 L12 17.5 M23 17.5 L20 17.5" 
+          stroke="url(#iconGradientSmall)" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- Connection Nodes -->
+    <circle cx="17.5" cy="12" r="1.2"/>
+    <circle cx="17.5" cy="23" r="1.2"/>
+    <circle cx="12" cy="17.5" r="1.2"/>
+    <circle cx="23" cy="17.5" r="1.2"/>
+  </g>
+  
+  <!-- Conversion Arrow (Simplified) -->
+  <g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 24 L17.5 17.5 L24 11" opacity="0.8"/>
+    <path d="M24 11 L21 11 L21 14" opacity="0.8"/>
+  </g>
+  
+  <!-- AI Indicator Dots -->
+  <g fill="#ffffff" opacity="0.7">
+    <circle cx="9" cy="9" r="1"/>
+    <circle cx="26" cy="9" r="1"/>
+    <circle cx="9" cy="26" r="1"/>
+    <circle cx="26" cy="26" r="1"/>
+  </g>
+</svg>

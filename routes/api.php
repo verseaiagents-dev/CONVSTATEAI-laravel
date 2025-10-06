@@ -21,6 +21,22 @@ Route::get('/widgetcust/imgs/{filename}', function ($filename) {
         ->header('Cache-Control', 'public, max-age=31536000');
 })->where('filename', '[^/]+');
 
+// Images Assets - Public Access with CORS support (for /imgs/ path)
+Route::get('/imgs/{filename}', function ($filename) {
+    $filePath = public_path('imgs/' . $filename);
+    
+    if (!file_exists($filePath)) {
+        return response('File not found', 404);
+    }
+    
+    $mimeType = mime_content_type($filePath);
+    $fileContent = file_get_contents($filePath);
+    
+    return response($fileContent)
+        ->header('Content-Type', $mimeType)
+        ->header('Cache-Control', 'public, max-age=31536000');
+})->where('filename', '[^/]+');
+
 // AI Helper API Routes
 Route::prefix('ai')->group(function () {
     Route::post('/response', [AIController::class, 'response']);
