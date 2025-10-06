@@ -32,7 +32,7 @@ class CustomCorsMiddleware
 
         // CORS headers - Environment-based configuration
         $origin = $request->headers->get('Origin');
-        $environment = app()->environment();
+        $environment = config('app.env', 'local');
         
         // Environment'a göre allowed origins belirle
         $allowedOrigins = $this->getAllowedOrigins($environment);
@@ -56,11 +56,56 @@ class CustomCorsMiddleware
             $response->headers->set('Access-Control-Allow-Origin', '*');
         } else {
             // Production'da sadece belirli originlere izin ver
-            $response->headers->set('Access-Control-Allow-Origin', 'null');
+            if (in_array($origin, $allowedOrigins)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+            } else {
+                // Origin null ise (ana sayfa yükleme) normal response döndür
+                if (!$origin) {
+                    $response->headers->set('Access-Control-Allow-Origin', 'https://convstateai.com');
+                } 
+                // Check-availability API'si için özel kontrol
+                elseif ($this->isCheckAvailabilityApi($request)) {
+                    // Check-availability API'si için CORS hatası kontrolü yap
+                    $response->headers->set('Access-Control-Allow-Origin', 'https://convstateai.com');
+                    
+                    if ($request->isMethod('OPTIONS')) {
+                        return response('', 200)->withHeaders([
+                            'Access-Control-Allow-Origin' => 'https://convstateai.com',
+                            'Access-Control-Allow-Methods' => 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+                            'Access-Control-Allow-Headers' => 'Content-Type, Accept, Authorization, X-Requested-With, Origin, X-CSRF-TOKEN, X-Browser-UUID, X-Project-ID',
+                            'Access-Control-Allow-Credentials' => 'true',
+                            'Access-Control-Max-Age' => '86400'
+                        ]);
+                    }
+                    
+                    // Check-availability API'si için CORS hatası response
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'cors_error',
+                        'message' => 'Proje verileriniz eşleştirilemedi. https://convstateai.com adresinden gerekli ayarları yapınız.',
+                        'cors_error' => true,
+                        'allowed_origins' => $allowedOrigins,
+                        'request_origin' => $origin
+                    ], 403)->withHeaders([
+                        'Access-Control-Allow-Origin' => 'https://convstateai.com',
+                        'Access-Control-Allow-Methods' => 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+                        'Access-Control-Allow-Headers' => 'Content-Type, Accept, Authorization, X-Requested-With, Origin, X-CSRF-TOKEN, X-Browser-UUID, X-Project-ID',
+                        'Access-Control-Allow-Credentials' => 'true',
+                        'Access-Control-Max-Age' => '86400'
+                    ]);
+                }
+                // Diğer API çağrıları için normal kontrol
+                elseif ($this->isApiRequest($request)) {
+                    $response->headers->set('Access-Control-Allow-Origin', 'https://convstateai.com');
+                } else {
+                    // Ana sayfa ve diğer sayfalar için normal response
+                    $response->headers->set('Access-Control-Allow-Origin', 'https://convstateai.com');
+                }
+            }
         }
 
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Origin, X-CSRF-TOKEN, X-Browser-UUID, X-Project-ID, X-IP-Based-Session, X-Session-ID, X-User-Agent');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Origin, X-CSRF-TOKEN, X-Browser-UUID, X-Project-ID');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
         $response->headers->set('Access-Control-Max-Age', '86400');
 
@@ -104,9 +149,25 @@ class CustomCorsMiddleware
             case 'development':
                 $defaultOrigins = [
                     'http://localhost:3000',
-                    
+                    'http://127.0.0.1:3000',
+                    'http://192.168.1.100:3000',
+                    'http://localhost:3001',
+                    'http://127.0.0.1:3001',
+                    'http://localhost:8000',
+                    'http://127.0.0.1:8000',
+                    'http://localhost:8080',
+                    'http://127.0.0.1:8080',
+                    'https://localhost:3000',
+                    'https://127.0.0.1:3000',
+                    'https://192.168.1.100:3000',
+                    'http://127.0.0.1:3000/widget/test.html',
+                    'https://localhost:3001',
+                    'https://127.0.0.1:3001',
+                    'https://localhost:8000',
+                    'https://localhost:8080',
                     'https://127.0.0.1:8000',
-               
+                    'https://127.0.0.1:5500',
+                    'https://127.0.0.1:8080'
                 ];
                 
                 // Environment'dan gelen originleri ekle
@@ -123,7 +184,11 @@ class CustomCorsMiddleware
                 ];
                 
             case 'production':
-                return $this->getProductionAllowedOrigins();
+                // Production'da sadece Project tablosundaki aktif projelerin domain'lerine izin ver
+                $productionOrigins = $this->getProductionAllowedOrigins();
+                // ConvStateAI domain'ini her zaman ekle
+
+                return array_unique($productionOrigins);
                 
             default:
                 return [];
@@ -147,6 +212,7 @@ class CustomCorsMiddleware
         $origins = [];
         
         try {
+            // Tüm projelerde url'i boş olmayanları değişkene ata
             $projects = Project::whereNotNull('url')
                 ->where('url', '!=', '')
                 ->get();
@@ -154,31 +220,19 @@ class CustomCorsMiddleware
             foreach ($projects as $project) {
                 // Project model'inin validation method'unu kullan
                 if ($project->isAllowedForCors()) {
-                    $url = trim($project->url);
-                    
-                    // Kullanıcının girdiği URL'yi tam olarak olduğu gibi kullan
-                    if (!empty($url)) {
-                        $origins[] = $url;
+                    $normalizedUrl = $project->getNormalizedUrlAttribute();
+                    if ($normalizedUrl) {
+                        $origins[] = $normalizedUrl;
                     }
                 }
             }
 
-            // Environment'dan gelen ek URL'leri ekle
+            // Environment'dan gelen ek URL'leri ekle (sadece production için)
             $envOrigins = array_filter([
                 env('FRONTEND_URL'),
                 env('WIDGET_URL'),
                 env('CORS_ALLOWED_ORIGINS') ? explode(',', env('CORS_ALLOWED_ORIGINS')) : []
             ]);
-            
-            // Local development için localhost originleri ekle
-            $localhostOrigins = [
-                'http://localhost:3000',
-                'http://127.0.0.1:3000',
-                'http://localhost:8080',
-                'http://127.0.0.1:8080',
-                'http://localhost:8000',
-                'http://127.0.0.1:8000'
-            ];
             
             // array_flatten yerine array_merge kullan
             $flatEnvOrigins = [];
@@ -190,7 +244,8 @@ class CustomCorsMiddleware
                 }
             }
             
-            $origins = array_merge($origins, $flatEnvOrigins, $localhostOrigins);
+            // Sadece Project tablosundaki domain'ler ve environment'dan gelenler
+            $origins = array_merge($origins, $flatEnvOrigins);
             $origins = array_unique(array_filter($origins));
 
             // Cache'e kaydet (5 dakika)
@@ -199,7 +254,7 @@ class CustomCorsMiddleware
             return $origins;
             
         } catch (\Exception $e) {
-            // Database hatası durumunda güvenli varsayılan
+            // Database hatası durumunda sadece environment'dan gelen URL'leri döndür
             \Log::error('CORS: Database error while fetching allowed origins', [
                 'error' => $e->getMessage()
             ]);
@@ -207,14 +262,45 @@ class CustomCorsMiddleware
             return array_filter([
                 env('FRONTEND_URL'),
                 env('WIDGET_URL'),
-                'http://localhost:3000',
-                'http://127.0.0.1:3000',
-                'http://localhost:8080',
-                'http://127.0.0.1:8080',
-                'http://localhost:8000',
-                'http://127.0.0.1:8000'
+                env('CORS_ALLOWED_ORIGINS') ? explode(',', env('CORS_ALLOWED_ORIGINS')) : []
             ]);
         }
+    }
+
+    /**
+     * Request'in API çağrısı olup olmadığını kontrol et
+     */
+    private function isApiRequest(Request $request): bool
+    {
+        $path = $request->path();
+        
+        // API route'ları
+        $apiRoutes = [
+            'api/',
+            'api/auth/',
+            'api/widget/',
+            'api/check-availability',
+            'api/faqs',
+            'api/campaigns',
+            'api/widget-customization'
+        ];
+        
+        // Path'in API route'larından biriyle başlayıp başlamadığını kontrol et
+        foreach ($apiRoutes as $route) {
+            if (str_starts_with($path, $route)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check-availability API'si için özel CORS kontrolü
+     */
+    private function isCheckAvailabilityApi(Request $request): bool
+    {
+        return $request->path() === 'api/check-availability';
     }
 
     /**

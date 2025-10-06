@@ -100,20 +100,55 @@ class Project extends Model
         };
     }
 
+    /**
+     * Domain'i normalize et ve doğrula
+     */
+    public function getNormalizedUrlAttribute(): ?string
+    {
+        if (empty($this->url)) {
+            return null;
+        }
+
+        $url = trim($this->url);
+        
+        // Protocol yoksa https ekle
+        if (!preg_match('/^https?:\/\//', $url)) {
+            $url = 'https://' . $url;
+        }
+
+        // URL'yi parse et
+        $parsed = parse_url($url);
+        if (!$parsed || !isset($parsed['host'])) {
+            return null;
+        }
+
+        // Host'u temizle
+        $host = strtolower(trim($parsed['host']));
+        if (empty($host)) {
+            return null;
+        }
+
+        // www. prefix'ini kaldır (opsiyonel)
+        if (strpos($host, 'www.') === 0) {
+            $host = substr($host, 4);
+        }
+
+        // Protocol + host döndür
+        $protocol = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
+        return $protocol . '://' . $host;
+    }
 
     /**
      * Domain'in geçerli olup olmadığını kontrol et
      */
     public function isValidDomain(): bool
     {
-        if (empty($this->url)) {
+        $normalizedUrl = $this->getNormalizedUrlAttribute();
+        if (!$normalizedUrl) {
             return false;
         }
 
-        $url = trim($this->url);
-        
-        // URL'yi parse et
-        $parsed = parse_url($url);
+        $parsed = parse_url($normalizedUrl);
         if (!$parsed || !isset($parsed['host'])) {
             return false;
         }
@@ -133,11 +168,159 @@ class Project extends Model
             return false;
         }
 
+        // Sadece aktif projeler CORS'a izin verir
+        if ($this->status !== 'active') {
+            return false;
+        }
+
         // URL boş olamaz
         if (empty($this->url)) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * URL'nin erişilebilir olup olmadığını test et
+     */
+    public function testUrlAccessibility(): array
+    {
+        if (empty($this->url)) {
+            return [
+                'success' => false,
+                'message' => 'URL boş olamaz',
+                'status_code' => null,
+                'response_time' => null
+            ];
+        }
+
+        $url = trim($this->url);
+        
+        // Protocol yoksa https ekle
+        if (!preg_match('/^https?:\/\//', $url)) {
+            $url = 'https://' . $url;
+        }
+
+        $startTime = microtime(true);
+        
+        try {
+            // cURL ile HEAD request gönder (daha hızlı)
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10); // 10 saniye timeout
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // SSL doğrulamasını atla
+            curl_setopt($ch, CURLOPT_USERAGENT, 'ConvStateAI/1.0');
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+            
+            $endTime = microtime(true);
+            $responseTime = round(($endTime - $startTime) * 1000, 2); // milisaniye
+            
+            if ($error) {
+                return [
+                    'success' => false,
+                    'message' => 'cURL hatası: ' . $error,
+                    'status_code' => null,
+                    'response_time' => $responseTime,
+                    'url_tested' => $url
+                ];
+            }
+            
+            // 200-299 arası başarılı sayılır
+            if ($httpCode >= 200 && $httpCode < 300) {
+                return [
+                    'success' => true,
+                    'message' => 'URL erişilebilir',
+                    'status_code' => $httpCode,
+                    'response_time' => $responseTime,
+                    'url_tested' => $url
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'HTTP ' . $httpCode . ' hatası',
+                    'status_code' => $httpCode,
+                    'response_time' => $responseTime,
+                    'url_tested' => $url
+                ];
+            }
+            
+        } catch (\Exception $e) {
+            $endTime = microtime(true);
+            $responseTime = round(($endTime - $startTime) * 1000, 2);
+            
+            return [
+                'success' => false,
+                'message' => 'Test hatası: ' . $e->getMessage(),
+                'status_code' => null,
+                'response_time' => $responseTime,
+                'url_tested' => $url
+            ];
+        }
+    }
+
+    /**
+     * URL'yi test et ve sonucu kaydet
+     */
+    public function testAndSaveUrl(): array
+    {
+        $testResult = $this->testUrlAccessibility();
+        
+        // Test sonucunu logla
+        \Log::info('Project URL Test', [
+            'project_id' => $this->id,
+            'project_name' => $this->name,
+            'url' => $this->url,
+            'test_result' => $testResult
+        ]);
+        
+        return $testResult;
+    }
+
+    /**
+     * CORS için tüm URL varyasyonlarını döndür
+     */
+    public function getAllCorsUrls(): array
+    {
+        if (empty($this->url)) {
+            return [];
+        }
+
+        $urls = [];
+        $originalUrl = trim($this->url);
+        
+        // Orijinal URL'yi ekle
+        $urls[] = $originalUrl;
+        
+        // Protocol ekleme
+        if (!preg_match('/^https?:\/\//', $originalUrl)) {
+            $urls[] = 'https://' . $originalUrl;
+            $urls[] = 'http://' . $originalUrl;
+        }
+        
+        // www. varyasyonları
+        $parsed = parse_url($originalUrl);
+        if ($parsed && isset($parsed['host'])) {
+            $host = $parsed['host'];
+            $protocol = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
+            
+            if (strpos($host, 'www.') === 0) {
+                // www. ile başlıyorsa www. olmadan versiyonu ekle
+                $withoutWww = substr($host, 4);
+                $urls[] = $protocol . '://' . $withoutWww;
+            } else {
+                // www. ile başlamıyorsa www. ile versiyonu ekle
+                $urls[] = $protocol . '://www.' . $host;
+            }
+        }
+        
+        return array_unique(array_filter($urls));
     }
 }
