@@ -363,18 +363,18 @@ class WidgetCustomizationController extends Controller
             ]);
 
             // Admin kullanıcıyı bul
-            $adminUser = \App\Models\User::where('is_admin', true)->first();
-            if (!$adminUser) {
+            $authUser = auth()->user();
+            if (!$authUser) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Admin kullanıcı bulunamadı'
+                    'message' => 'Kullanıcı bulunamadı'
                 ], 404);
             }
 
             // Widget konfigürasyonunu veritabanına kaydet
             $widgetConfig = \App\Models\WidgetCustomization::updateOrCreate(
                 [
-                    'user_id' => $adminUser->id,
+                    'user_id' => $authUser->id,
                     'project_id' => $validated['projectId']
                 ],
                 [

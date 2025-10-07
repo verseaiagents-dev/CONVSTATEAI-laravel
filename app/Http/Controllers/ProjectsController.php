@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use App\Models\KnowledgeBase;
 use App\Models\EnhancedChatSession;
+use App\Models\WidgetCustomization;
 
 class ProjectsController extends Controller
 {
@@ -130,21 +131,27 @@ class ProjectsController extends Controller
     public function getEmbedCode(Project $project)
     {
         try {
-            // Customization token'ı kontrol et
-            if (!$project->customization_token) {
-                // Token yoksa oluştur
-                $project->customization_token = hash('sha256', $project->id . time() . uniqid());
-                $project->save();
-            }
+            // Mevcut widget customization'ı kontrol et veya yeni oluştur
+            $widgetCustomization = WidgetCustomization::firstOrCreate(
+                [
+                    'user_id' => Auth::id(),
+                    'project_id' => $project->id
+                ],
+                [
+                    'customization_token' => hash('sha256', $project->id . time() . uniqid()),
+                    'customization_data' => json_encode([])
+                ]
+            );
 
             $embedCode = view('dashboard.partials.embed-code', [
-                'project' => $project
+                'project' => $project,
+                'customization_token' => $widgetCustomization->customization_token
             ])->render();
 
             return response()->json([
                 'success' => true,
                 'embedCode' => $embedCode,
-                'customizationToken' => $project->customization_token
+                'customizationToken' => $widgetCustomization->customization_token
             ]);
         } catch (\Exception $e) {
             return response()->json([

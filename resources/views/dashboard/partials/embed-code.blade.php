@@ -2,6 +2,6 @@
 <script>
 window.convstateaiConfig = {
     projectId: "{{ $project->id }}",
-    customizationToken: "{{ $project->customization_token }}"
+    customizationToken: "{{ $customization_token }}"
 };
 </script>
