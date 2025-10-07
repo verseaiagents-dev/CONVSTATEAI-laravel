@@ -37,7 +37,8 @@ class ResetDailyViewLimits extends Command
             foreach ($allSessions as $session) {
                 // Reset daily view count and update activity
                 $session->update([
-                    'daily_view_count' => 0,
+                    'view_count' => 0,
+                    'daily_view_count' => 0, // Sıfırla, 20 değil
                     'last_activity' => now(),
                     'status' => 'active' // Ensure session is active
                 ]);

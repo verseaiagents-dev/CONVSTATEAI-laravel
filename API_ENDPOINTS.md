@@ -4,6 +4,76 @@ Bu dokümantasyon, ConvStateAI Laravel uygulamasındaki project-based API endpoi
 
 ## 📋 API Endpoint'leri ve URL'leri
 
+### 🆕 Unified Availability Check (YENİ)
+
+**API Group:** `unified`  
+**Method:** `GET`  
+**URL:** `http://127.0.0.1:8000/api/unified/check-availability`  
+**Query Parameter:** `project_id` (required)
+
+Bu endpoint, FAQs, Campaigns ve Notification Widget durumlarını tek bir istekte kontrol eder.
+
+#### Request Example:
+```bash
+curl "http://127.0.0.1:8000/api/unified/check-availability?project_id=3"
+```
+
+#### Response:
+```json
+{
+  "success": true,
+  "message": "Tüm durumlar başarıyla kontrol edildi",
+  "data": {
+    "faqs": {
+      "has_faqs": false,
+      "faq_count": 0
+    },
+    "campaigns": {
+      "has_campaigns": false,
+      "campaign_count": 0
+    },
+    "notification_widget": {
+      "has_notification": true,
+      "message_text": "Sizin için kampanyamız var!",
+      "ai_name": "AI Asistan",
+      "color_theme": "purple",
+      "display_duration": 5000,
+      "animation_type": "fade-in",
+      "show_close_button": true,
+      "redirect_url": null,
+      "color_theme_css": {
+        "primary": "#8B5CF6",
+        "secondary": "#A78BFA",
+        "gradient": "linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)"
+      }
+    }
+  }
+}
+```
+
+#### Error Response:
+```json
+{
+  "success": false,
+  "message": "Project ID gerekli",
+  "data": {
+    "faqs": {
+      "has_faqs": false,
+      "faq_count": 0
+    },
+    "campaigns": {
+      "has_campaigns": false,
+      "campaign_count": 0
+    },
+    "notification_widget": {
+      "has_notification": false
+    }
+  }
+}
+```
+
+---
+
 ### 1. CampaignController::checkAvailability
 
 **API Group:** `campaigns`  
@@ -244,6 +314,80 @@ curl "http://127.0.0.1:8000/api/notification-widget/check-availability?project_i
 - **Models:** `app/Models/Campaign.php`, `app/Models/FAQ.php`, `app/Models/NotificationWidgetSetting.php`
 - **Routes:** `routes/api.php`
 - **Migrations:** `database/migrations/2025_09_13_181447_add_project_id_to_campaigns_table.php`, `database/migrations/2025_09_13_181306_add_project_id_to_faqs_table.php`
+
+---
+
+## 🚀 Unified API Avantajları
+
+### Performans İyileştirmeleri
+- **Tek İstek:** Üç ayrı API çağrısı yerine tek bir istek
+- **Daha Az Network Overhead:** HTTP bağlantı sayısı azalır
+- **Daha Hızlı Yükleme:** Paralel işlemler yerine tek işlem
+- **Bandwidth Tasarrufu:** Daha az HTTP header ve overhead
+
+### Kod Basitliği
+- **Tek Error Handling:** Tek bir try-catch bloğu
+- **Tek Response Handling:** Tek bir response parse işlemi
+- **Daha Az State Management:** React component'te daha az state
+- **Daha Az Dependency:** useEffect dependency array'i basitleşir
+
+### Örnek Kullanım (React)
+
+#### Eski Yöntem (3 Ayrı API Çağrısı):
+```javascript
+const [campaignsResponse, faqsResponse, notificationResponse] = await Promise.allSettled([
+  fetch('/api/campaigns/check-availability?project_id=3'),
+  fetch('/api/faqs/check-availability?project_id=3'),
+  fetch('/api/notification-widget/check-availability?project_id=3')
+]);
+```
+
+#### Yeni Yöntem (Tek API Çağrısı):
+```javascript
+const response = await fetch('/api/unified/check-availability?project_id=3');
+const data = await response.json();
+// Tüm veriler data.data içinde
+```
+
+### Migration Rehberi
+
+Mevcut kodunuzu unified API'ye geçirmek için:
+
+1. **API URL'ini değiştirin:**
+   ```javascript
+   // Eski
+   const campaignsUrl = '/api/campaigns/check-availability';
+   const faqsUrl = '/api/faqs/check-availability';
+   const notificationUrl = '/api/notification-widget/check-availability';
+   
+   // Yeni
+   const unifiedUrl = '/api/unified/check-availability';
+   ```
+
+2. **Response handling'i güncelleyin:**
+   ```javascript
+   // Eski
+   const campaignsData = await campaignsResponse.json();
+   const faqsData = await faqsResponse.json();
+   const notificationData = await notificationResponse.json();
+   
+   // Yeni
+   const data = await response.json();
+   const campaignsData = data.data.campaigns;
+   const faqsData = data.data.faqs;
+   const notificationData = data.data.notification_widget;
+   ```
+
+3. **Error handling'i basitleştirin:**
+   ```javascript
+   // Eski - Her API için ayrı error handling
+   if (campaignsResponse.status === 'rejected') { /* handle error */ }
+   if (faqsResponse.status === 'rejected') { /* handle error */ }
+   if (notificationResponse.status === 'rejected') { /* handle error */ }
+   
+   // Yeni - Tek error handling
+   if (!response.ok) { /* handle error */ }
+   ```
 
 ---
 

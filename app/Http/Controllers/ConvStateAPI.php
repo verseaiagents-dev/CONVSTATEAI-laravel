@@ -2754,10 +2754,13 @@ class ConvStateAPI extends Controller
                 $session->increment('daily_view_count');
             }
             
+            // Development için limit kontrolünü devre dışı bırak
+            $canLoad = app()->environment('local', 'development') ? true : $session->canViewMore();
+            
             return response()->json([
                 'success' => true,
-                'can_load' => $session->canViewMore(),
-                'can_view' => $session->canViewMore() // Widget script'i için uyumluluk
+                'can_load' => $canLoad,
+                'can_view' => $canLoad // Widget script'i için uyumluluk
             ]);
 
         } catch (\Exception $e) {
@@ -4899,5 +4902,170 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
         }
         
         return [];
+    }
+
+    /**
+     * Unified availability check for FAQs, Campaigns, and Notification Widget
+     */
+    public function unifiedCheckAvailability(Request $request)
+    {
+        try {
+            $projectId = $request->get('project_id');
+            
+            if (!$projectId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project ID gerekli',
+                    'data' => [
+                        'faqs' => [
+                            'has_faqs' => false,
+                            'faq_count' => 0
+                        ],
+                        'campaigns' => [
+                            'has_campaigns' => false,
+                            'campaign_count' => 0
+                        ],
+                        'notification_widget' => [
+                            'has_notification' => false
+                        ]
+                    ]
+                ], 400);
+            }
+
+            // Check FAQs availability
+            $faqCount = \App\Models\FAQ::where('project_id', $projectId)
+                ->where('is_active', true)
+                ->count();
+
+            // Check Campaigns availability
+            $campaignCount = \App\Models\Campaign::where('project_id', $projectId)
+                ->where('is_active', true)
+                ->count();
+
+            // Check Notification Widget availability
+            $notificationData = $this->getNotificationWidgetData($projectId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tüm durumlar başarıyla kontrol edildi',
+                'data' => [
+                    'faqs' => [
+                        'has_faqs' => $faqCount > 0,
+                        'faq_count' => $faqCount
+                    ],
+                    'campaigns' => [
+                        'has_campaigns' => $campaignCount > 0,
+                        'campaign_count' => $campaignCount
+                    ],
+                    'notification_widget' => $notificationData
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Durumlar kontrol edilirken hata oluştu: ' . $e->getMessage(),
+                'data' => [
+                    'faqs' => [
+                        'has_faqs' => false,
+                        'faq_count' => 0
+                    ],
+                    'campaigns' => [
+                        'has_campaigns' => false,
+                        'campaign_count' => 0
+                    ],
+                    'notification_widget' => [
+                        'has_notification' => false
+                    ]
+                ]
+            ], 500);
+        }
+    }
+
+    /**
+     * Get notification widget data
+     */
+    private function getNotificationWidgetData($projectId): array
+    {
+        // First, try to get WidgetCustomization data for this project
+        $widgetCustomization = \App\Models\WidgetCustomization::where('project_id', $projectId)
+            ->where('is_active', true)
+            ->first();
+
+        // If no customization for this project, try to get any active customization
+        if (!$widgetCustomization) {
+            $widgetCustomization = \App\Models\WidgetCustomization::where('is_active', true)->first();
+        }
+
+        // Check if we have notification message in customization
+        $hasNotificationMessage = $widgetCustomization && !empty($widgetCustomization->notification_message);
+
+        // If no notification message in customization, check NotificationWidgetSetting
+        if (!$hasNotificationMessage) {
+            $settings = \App\Models\NotificationWidgetSetting::active()->first();
+            if (!$settings) {
+                return [
+                    'has_notification' => false
+                ];
+            }
+        }
+
+        // Get AI name from customization or default
+        $aiName = $widgetCustomization->ai_name ?? 'ConvState AI';
+        
+        // Get notification message with priority: WidgetCustomization > NotificationWidgetSetting > Default
+        $messageText = null;
+        if ($widgetCustomization && !empty($widgetCustomization->notification_message)) {
+            $messageText = $widgetCustomization->notification_message;
+        } elseif (isset($settings)) {
+            $messageText = $settings->message_text;
+        } else {
+            $messageText = 'Merhaba! Size nasıl yardımcı olabilirim?';
+        }
+
+        // Get other settings from NotificationWidgetSetting or use defaults
+        $settings = \App\Models\NotificationWidgetSetting::active()->first();
+        
+        $colorTheme = $settings->color_theme ?? 'purple';
+        $displayDuration = $settings->display_duration ?? 5000;
+        $animationType = $settings->animation_type ?? 'slide-in';
+        $showCloseButton = $settings->show_close_button ?? true;
+        $redirectUrl = $settings->redirect_url ?? null;
+
+        // Get color theme CSS
+        $colorThemeCss = [
+            'purple' => [
+                'primary' => '#8B5CF6',
+                'secondary' => '#A78BFA',
+                'gradient' => 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)'
+            ],
+            'blue' => [
+                'primary' => '#3B82F6',
+                'secondary' => '#60A5FA',
+                'gradient' => 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)'
+            ],
+            'green' => [
+                'primary' => '#10B981',
+                'secondary' => '#34D399',
+                'gradient' => 'linear-gradient(135deg, #10B981 0%, #34D399 100%)'
+            ],
+            'orange' => [
+                'primary' => '#F59E0B',
+                'secondary' => '#FBBF24',
+                'gradient' => 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)'
+            ]
+        ];
+
+        return [
+            'has_notification' => true,
+            'message_text' => $messageText,
+            'ai_name' => $aiName,
+            'color_theme' => $colorTheme,
+            'display_duration' => $displayDuration,
+            'animation_type' => $animationType,
+            'show_close_button' => $showCloseButton,
+            'redirect_url' => $redirectUrl,
+            'color_theme_css' => $colorThemeCss[$colorTheme] ?? $colorThemeCss['purple']
+        ];
     }
 }

@@ -33,7 +33,9 @@ class ProjectsController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => compact('projects')
+                'data' => [
+                    'projects' => $projects
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -75,14 +77,6 @@ class ProjectsController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        // Check if user owns this project
-        if ($project->created_by !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bu projeyi düzenleme yetkiniz yok.'
-            ], 403);
-        }
-
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
@@ -94,7 +88,7 @@ class ProjectsController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'url' => $request->url,
-            'status' => 'active', // Güncelleme sırasında otomatik aktif yap
+            'status' => $request->status,
         ]);
 
         return response()->json([
@@ -109,14 +103,6 @@ class ProjectsController extends Controller
      */
     public function destroy(Project $project)
     {
-        // Check if user owns this project
-        if ($project->created_by !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bu projeyi silme yetkiniz yok.'
-            ], 403);
-        }
-
         $project->delete();
 
         return response()->json([
@@ -126,20 +112,12 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Get project details with knowledge bases
+     * Show project details
      */
     public function show(Project $project)
     {
-        // Check if user owns this project
-        if ($project->created_by !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bu projeye erişim yetkiniz yok.'
-            ], 403);
-        }
-
-        $project->load(['knowledgeBases', 'chatSessions']);
-
+        $project->load(['creator', 'knowledgeBases', 'chatSessions']);
+        
         return response()->json([
             'success' => true,
             'project' => $project
@@ -147,118 +125,31 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Get embed code for project
+     * Get project embed code
      */
     public function getEmbedCode(Project $project)
     {
-        // Check if user owns this project
-        if ($project->created_by !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bu projeye erişim yetkiniz yok.'
-            ], 403);
-        }
-
-        $user = Auth::user();
-        $customizationToken = $user->personal_token ? $user->personal_token : 'dcf91b8e63c9552b724a4523261318e565ef33992e454dbc0cff1064aae19246';
-        
-        // Generate embed code
-        $embedCode = <<<EOT
-<script src="https://convstateai.com/embed/convstateai.min.js"></script>
-<script>
-window.convstateaiConfig = {
-    projectId: "{$project->id}",
-    customizationToken: "{$customizationToken}"
-};
-</script>
-EOT;
-
-        return response()->json([
-            'success' => true,
-            'embedCode' => $embedCode,
-            'project' => [
-                'id' => $project->id,
-                'name' => $project->name
-            ]
-        ]);
-    }
-
-    /**
-     * Test URL accessibility
-     */
-    public function testUrl(Request $request)
-    {
-        $request->validate([
-            'url' => 'required|string|max:500',
-        ]);
-
-        $url = trim($request->url);
-        
-        // URL'yi parse et ve geçerli olup olmadığını kontrol et
-        $parsed = parse_url($url);
-        if (!$parsed || !isset($parsed['host'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Geçersiz URL formatı.',
-                'url' => $url
-            ], 400);
-        }
-
         try {
-            // Create a context with timeout and user agent
-            $context = stream_context_create([
-                'http' => [
-                    'timeout' => 10,
-                    'user_agent' => 'ConvStateAI/1.0',
-                    'method' => 'GET',
-                    'header' => [
-                        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'Accept-Language: en-US,en;q=0.5',
-                        'Accept-Encoding: gzip, deflate',
-                        'Connection: keep-alive',
-                    ]
-                ]
+            // Customization token'ı kontrol et
+            if (!$project->customization_token) {
+                // Token yoksa oluştur
+                $project->customization_token = hash('sha256', $project->id . time() . uniqid());
+                $project->save();
+            }
+
+            $embedCode = view('dashboard.partials.embed-code', [
+                'project' => $project
+            ])->render();
+
+            return response()->json([
+                'success' => true,
+                'embedCode' => $embedCode,
+                'customizationToken' => $project->customization_token
             ]);
-
-            // Test the URL
-            $headers = @get_headers($url, 1, $context);
-            
-            if ($headers === false) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'URL kullanılamaz.',
-                    'url' => $url
-                ], 400);
-            }
-
-            // Check if we got a 200 status code
-            $statusCode = null;
-            if (isset($headers[0])) {
-                preg_match('/HTTP\/\d\.\d\s+(\d+)/', $headers[0], $matches);
-                $statusCode = isset($matches[1]) ? (int)$matches[1] : null;
-            }
-
-            if ($statusCode === 200) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'URL kullanılabilir.',
-                    'url' => $url,
-                    'status_code' => $statusCode
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => "URL test edilemedi. HTTP durum kodu: {$statusCode}",
-                    'url' => $url,
-                    'status_code' => $statusCode
-                ], 400);
-            }
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'URL test edilirken hata oluştu: ' . $e->getMessage(),
-                'url' => $url
+                'message' => 'Embed kodu oluşturulurken bir hata oluştu: ' . $e->getMessage()
             ], 500);
         }
     }

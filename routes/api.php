@@ -117,6 +117,7 @@ Route::post('/order-tracking', [ConvStateAPI::class, 'handleOrderTracking']);
 
 // Enhanced Chat Session & Product Interaction Routes
 Route::get('/check-daily-limit', [ConvStateAPI::class, 'checkDailyViewLimit']);
+Route::post('/init-widget', [ConvStateAPI::class, 'initWidget']);
 Route::post('/product-interaction', [ConvStateAPI::class, 'handleProductInteraction']);
 Route::post('/product-details', [ConvStateAPI::class, 'getProductDetails']);
 Route::post('/price-comparison', [ConvStateAPI::class, 'getPriceComparison']);
@@ -283,6 +284,9 @@ Route::prefix('notification-widget')->group(function () {
     Route::get('/check-availability', [App\Http\Controllers\NotificationWidgetController::class, 'checkAvailability'])->middleware('token.check');
     Route::post('/settings', [App\Http\Controllers\NotificationWidgetController::class, 'updateSettings']);
 });
+
+// Unified Availability API Route - Single endpoint for FAQs, Campaigns, and Notification Widget
+Route::get('/unified/check-availability', [ConvStateAPI::class, 'unifiedCheckAvailability'])->middleware('token.check');
 
 
 Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])

@@ -144,18 +144,30 @@ class EnhancedChatSession extends Model
 
     /**
      * Session daha fazla ürün görüntüleyebilir mi kontrol et
+     * DEVELOPMENT MODE: Limit kontrolü devre dışı
      */
     public function canViewMore(): bool
     {
+        // Development için limit kontrolünü devre dışı bırak
+        if (app()->environment('local', 'development')) {
+            return true;
+        }
+        
         return $this->isActive() && 
                $this->daily_view_count < $this->daily_view_limit;
     }
 
     /**
      * Check if IP can view more products today (IP bazlı kontrol)
+     * DEVELOPMENT MODE: IP kontrolü devre dışı
      */
     public static function canIPViewMore(string $ipAddress): bool
     {
+        // Development için IP kontrolünü devre dışı bırak
+        if (app()->environment('local', 'development')) {
+            return true;
+        }
+        
         // Bugün aktif olan aynı IP'deki session'ları kontrol et
         $todaySessions = self::where('ip_address', $ipAddress)
             ->where('status', 'active')

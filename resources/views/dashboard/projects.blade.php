@@ -428,9 +428,14 @@ async function loadContent() {
         console.log('Response data:', result);
         
         if (result.success) {
-            projects = result.data.projects || [];
-            console.log('Projects count:', projects.length);
-            completeLoading();
+            if (Array.isArray(result.data.projects)) {
+                projects = result.data.projects;
+                console.log('Projects count:', projects.length);
+                completeLoading();
+            } else {
+                console.error('Invalid projects data:', result.data);
+                throw new Error('Projects data is not an array');
+            }
         } else {
             throw new Error(result.message || 'Projeler yüklenemedi');
         }
@@ -814,20 +819,70 @@ document.getElementById('editProjectForm').addEventListener('submit', function(e
 // Embed Code Modal Functions
 function showEmbedCode(projectId) {
     // Fetch project data and generate embed code
-    fetch(`/dashboard/projects/${projectId}/embed-code`)
-        .then(response => response.json())
+    fetch(`/dashboard/projects/${projectId}/embed-code`, {
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
+                // Embed kodunu göster
                 document.getElementById('embedCodeDisplay').textContent = data.embedCode;
+                
+                // Token bilgisini göster
+                const tokenDisplay = document.getElementById('customizationTokenDisplay');
+                if (tokenDisplay) {
+                    tokenDisplay.textContent = data.customizationToken;
+                }
+                
+                // Modal'ı aç
                 document.getElementById('embedCodeModal').classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
+                
+                // Başarılı mesajı
+                Swal.fire({
+                    title: 'Başarılı!',
+                    text: 'Embed kodu başarıyla oluşturuldu.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             } else {
-                alert('Embed kodu alınamadı: ' + (data.message || 'Bilinmeyen hata'));
+                Swal.fire({
+                    title: 'Hata!',
+                    text: data.message || 'Embed kodu alınamadı.',
+                    icon: 'error',
+                    confirmButtonText: 'Tamam',
+                    confirmButtonColor: '#3B82F6'
+                });
             }
         })
         .catch(error => {
             console.error('Embed code fetch error:', error);
-            alert('Embed kodu alınırken hata oluştu');
+            let errorMessage = 'Embed kodu alınırken bir hata oluştu.';
+            
+            if (error.message.includes('HTTP error!')) {
+                errorMessage = 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.';
+            } else if (error.message.includes('NetworkError')) {
+                errorMessage = 'Ağ bağlantısı hatası. İnternet bağlantınızı kontrol edin.';
+            } else if (error.message.includes('Failed to fetch')) {
+                errorMessage = 'Sunucuya ulaşılamıyor. Lütfen daha sonra tekrar deneyin.';
+            }
+            
+            Swal.fire({
+                title: 'Hata!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'Tamam',
+                confirmButtonColor: '#3B82F6'
+            });
         });
 }
 
