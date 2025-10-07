@@ -38,7 +38,7 @@ class ResetDailyViewLimits extends Command
                 // Reset daily view count and update activity
                 $session->update([
                     'view_count' => 0,
-                    'daily_view_count' => 0, // Sıfırla, 20 değil
+                    'daily_view_count' => 20, // Sıfırla, 20 değil
                     'last_activity' => now(),
                     'status' => 'active' // Ensure session is active
                 ]);

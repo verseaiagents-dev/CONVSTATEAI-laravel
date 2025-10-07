@@ -48,8 +48,8 @@ return [
         
         // Production origins - sadece production ortamında aktif
         ...(env('APP_ENV') === 'production' ? [
-            env('FRONTEND_URL', 'https://yourdomain.com'),
-            env('WIDGET_URL', 'https://widget.yourdomain.com')
+            'https://convstateai.com',
+            '*' // Tüm domainlerden widget erişimine izin ver
         ] : []),
         
         // Custom allowed origins from environment
