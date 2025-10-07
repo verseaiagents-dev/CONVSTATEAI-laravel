@@ -845,44 +845,12 @@ function showEmbedCode(projectId) {
                 // Modal'ı aç
                 document.getElementById('embedCodeModal').classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
-                
-                // Başarılı mesajı
-                Swal.fire({
-                    title: 'Başarılı!',
-                    text: 'Embed kodu başarıyla oluşturuldu.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
             } else {
-                Swal.fire({
-                    title: 'Hata!',
-                    text: data.message || 'Embed kodu alınamadı.',
-                    icon: 'error',
-                    confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#3B82F6'
-                });
+                console.error('Embed kodu alınamadı:', data.message);
             }
         })
         .catch(error => {
             console.error('Embed code fetch error:', error);
-            let errorMessage = 'Embed kodu alınırken bir hata oluştu.';
-            
-            if (error.message.includes('HTTP error!')) {
-                errorMessage = 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.';
-            } else if (error.message.includes('NetworkError')) {
-                errorMessage = 'Ağ bağlantısı hatası. İnternet bağlantınızı kontrol edin.';
-            } else if (error.message.includes('Failed to fetch')) {
-                errorMessage = 'Sunucuya ulaşılamıyor. Lütfen daha sonra tekrar deneyin.';
-            }
-            
-            Swal.fire({
-                title: 'Hata!',
-                text: errorMessage,
-                icon: 'error',
-                confirmButtonText: 'Tamam',
-                confirmButtonColor: '#3B82F6'
-            });
         });
 }
 

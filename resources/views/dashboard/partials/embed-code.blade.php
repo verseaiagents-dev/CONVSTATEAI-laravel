@@ -3,4 +3,5 @@
 window.convstateaiConfig = {
     projectId: "{{ $project->id }}",
     customizationToken: "{{ $project->customization_token }}"
-};</script>
+};
+</script>
