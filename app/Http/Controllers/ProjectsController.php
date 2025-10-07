@@ -66,6 +66,14 @@ class ProjectsController extends Controller
             'created_by' => Auth::id(),
         ]);
 
+        // Proje oluşturulduğunda WidgetCustomization kaydını da oluştur
+        WidgetCustomization::create([
+            'user_id' => Auth::id(),
+            'project_id' => $project->id,
+            'customization_token' => hash('sha256', $project->id . time() . uniqid()),
+            'customization_data' => json_encode([])
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Proje başarıyla oluşturuldu.',
@@ -131,17 +139,10 @@ class ProjectsController extends Controller
     public function getEmbedCode(Project $project)
     {
         try {
-            // Mevcut widget customization'ı kontrol et veya yeni oluştur
-            $widgetCustomization = WidgetCustomization::firstOrCreate(
-                [
-                    'user_id' => Auth::id(),
-                    'project_id' => $project->id
-                ],
-                [
-                    'customization_token' => hash('sha256', $project->id . time() . uniqid()),
-                    'customization_data' => json_encode([])
-                ]
-            );
+            // Widget customization kaydını al
+            $widgetCustomization = WidgetCustomization::where('project_id', $project->id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
             $embedCode = view('dashboard.partials.embed-code', [
                 'project' => $project,
