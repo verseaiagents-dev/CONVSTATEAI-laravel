@@ -161,4 +161,39 @@ class ProjectsController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Test if a URL is accessible
+     */
+    public function testUrl(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|url'
+        ]);
+
+        try {
+            $ch = curl_init($request->url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            $isAccessible = $httpCode >= 200 && $httpCode < 400;
+
+            return response()->json([
+                'success' => true,
+                'isAccessible' => $isAccessible,
+                'statusCode' => $httpCode
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'URL test edilirken bir hata oluştu: ' . $e->getMessage(),
+                'isAccessible' => false
+            ], 500);
+        }
+    }
 }
