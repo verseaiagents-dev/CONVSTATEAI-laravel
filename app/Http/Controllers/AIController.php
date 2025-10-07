@@ -434,6 +434,11 @@ class AIController extends Controller
 
     private function logAIInteraction(string $message, array $intentResult, array $actionResult, ?int $userId): void
     {
+        // Kullanıcı mesajı boşsa veya sadece boşluklardan oluşuyorsa kayıt yapma
+        if (empty(trim($message))) {
+            return;
+        }
+
         try {
             AiInteraction::create([
                 'user_id' => $userId,

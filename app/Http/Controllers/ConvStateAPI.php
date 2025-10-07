@@ -2537,6 +2537,11 @@ class ConvStateAPI extends Controller
      */
     private function logAIInteraction(string $userMessage, string $intent, array $response, string $sessionId): void
     {
+        // Kullanıcı mesajı boşsa veya sadece boşluklardan oluşuyorsa kayıt yapma
+        if (empty(trim($userMessage))) {
+            return;
+        }
+
         try {
             // AI interactions tablosuna kaydet (mevcut)
             AiInteraction::create([
