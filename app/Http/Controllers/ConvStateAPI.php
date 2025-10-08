@@ -168,7 +168,7 @@ class ConvStateAPI extends Controller
                     
                     
                     // Intent'e göre response oluştur
-                    $response = $this->generateAIResponse($intent, $userMessage, []);
+                    $response = $this->generateAIResponse($intent, $userMessage, [], $projectId);
                     $response['session_id'] = $sessionId ?? uniqid();
                     $response['intent'] = $intent;
                     $response['confidence'] = $confidence;
@@ -189,7 +189,7 @@ class ConvStateAPI extends Controller
                     ], 200, [], JSON_UNESCAPED_UNICODE);
                 } else {
                     // Enhanced fallback response - AI sistemi simülasyonu
-                    $response = $this->generateEnhancedFallbackResponse($userMessage);
+                    $response = $this->generateEnhancedFallbackResponse($userMessage, $projectId);
                     $response['session_id'] = $sessionId ?? uniqid();
                     $response['intent'] = $response['intent'] ?? 'general';
                     $response['confidence'] = $response['confidence'] ?? 0.7;
@@ -272,11 +272,11 @@ class ConvStateAPI extends Controller
                 ]);
                 
                 // Analytics için intent'i kaydet ama genel response döndür
-                $response = $this->generateAIResponse('general', $userMessage, $searchResults);
+                $response = $this->generateAIResponse('general', $userMessage, $searchResults, $projectId);
                 $response['intent'] = $intent; // Analytics için intent'i koru
             } else {
                 // 4. Normal intent'ler için response oluştur
-                $response = $this->generateAIResponse($intent, $userMessage, $searchResults);
+                $response = $this->generateAIResponse($intent, $userMessage, $searchResults, $projectId);
             }
             
             
@@ -463,9 +463,15 @@ class ConvStateAPI extends Controller
     /**
      * Enhanced fallback response - AI sistemi simülasyonu
      */
-    private function generateEnhancedFallbackResponse(string $userMessage): array
+    private function generateEnhancedFallbackResponse(string $userMessage, int $projectId = null): array
     {
         $message = strtolower($userMessage);
+        
+        // Debug log
+        Log::info('generateEnhancedFallbackResponse called:', [
+            'userMessage' => $userMessage,
+            'projectId' => $projectId
+        ]);
         
         // Simulated intent detection
         $intent = $this->simulateIntentDetection($message);
@@ -483,7 +489,7 @@ class ConvStateAPI extends Controller
                     'intent' => $intent,
                     'confidence' => $confidence,
                     'data' => [
-                        'products' => $this->getRandomProductsFromKnowledgeBase(6)
+                        'products' => $this->getRandomProductsFromKnowledgeBase(6, $projectId)
                     ]
                 ];
                 
@@ -804,7 +810,7 @@ class ConvStateAPI extends Controller
                 'type' => 'product_recommendation',
                 'message' => 'Ürün önerileri için lütfen daha spesifik olun. Hangi kategoride ürün arıyorsunuz?',
                 'data' => [
-                    'products' => $this->getRandomProductsFromKnowledgeBase(6)
+                    'products' => $this->getRandomProductsFromKnowledgeBase(6, $projectId)
                 ]
             ];
         } elseif (strpos($message, 'yardım') !== false || strpos($message, 'help') !== false) {
@@ -997,13 +1003,14 @@ class ConvStateAPI extends Controller
     /**
      * Intent'e göre AI response oluşturur
      */
-    private function generateAIResponse(string $intent, string $userMessage, array $searchResults): array
+    private function generateAIResponse(string $intent, string $userMessage, array $searchResults, int $projectId = null): array
     {
         // Debug log
         Log::info('generateAIResponse called:', [
             'intent' => $intent,
             'userMessage' => $userMessage,
-            'hasSearchResults' => !empty($searchResults['results'])
+            'hasSearchResults' => !empty($searchResults['results']),
+            'projectId' => $projectId
         ]);
         
         // Intent detection servisini kullanarak detaylı intent bilgisini al
@@ -1016,7 +1023,7 @@ class ConvStateAPI extends Controller
                 // Açık uçlu ürün araması kontrolü
                 if (isset($intentData['search_type']) && $intentData['search_type'] === 'open_ended_product') {
                     Log::info('Calling generateOpenEndedProductSearchResponse', ['intentData' => $intentData]);
-                    return $this->generateOpenEndedProductSearchResponse($userMessage, $searchResults);
+                    return $this->generateOpenEndedProductSearchResponse($userMessage, $searchResults, $projectId);
                 }
            
                 Log::info('Calling generateProductSearchResponse');
@@ -1249,8 +1256,15 @@ class ConvStateAPI extends Controller
     /**
      * Açık uçlu ürün arama response'u (mavi tshirt, kırmızı ayakkabı vb.)
      */
-    private function generateOpenEndedProductSearchResponse(string $userMessage, array $searchResults): array
+    private function generateOpenEndedProductSearchResponse(string $userMessage, array $searchResults, int $projectId = null): array
     {
+        // Debug log
+        Log::info('generateOpenEndedProductSearchResponse called:', [
+            'userMessage' => $userMessage,
+            'hasSearchResults' => !empty($searchResults['results']),
+            'projectId' => $projectId
+        ]);
+        
         $products = [];
         $message = '';
         
@@ -1391,7 +1405,7 @@ class ConvStateAPI extends Controller
         } else {
             if ($isPersonalizedRequest) {
                 // Kişiselleştirilmiş istek için knowledge base'den rastgele ürünler getir
-                $products = $this->getRandomProductsFromKnowledgeBase(6);
+                $products = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
                 if (!empty($products)) {
                     $message = "Size özel olarak " . count($products) . " ürün öneriyorum:";
                 } else {
@@ -1407,7 +1421,7 @@ class ConvStateAPI extends Controller
                 }
             } else {
                 // Genel arama için de knowledge base'den rastgele ürünler getir
-                $products = $this->getRandomProductsFromKnowledgeBase(6);
+                $products = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
                 if (!empty($products)) {
                     $message = "Aradığınız kriterlere uygun " . count($products) . " ürün buldum:";
                 } else {
@@ -1496,7 +1510,7 @@ class ConvStateAPI extends Controller
             
             if ($isRandomRequest) {
                 // Rastgele ürün önerisi için özel handling
-                $randomProducts = $this->getRandomProductsFromKnowledgeBase();
+                $randomProducts = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
                 
                 if (!empty($randomProducts)) {
                     return [
@@ -1553,7 +1567,7 @@ class ConvStateAPI extends Controller
             \Log::error('Product recommendation error: ' . $e->getMessage());
             
             // Fallback response - knowledge base'den rastgele ürünler getir
-            $fallbackProducts = $this->getRandomProductsFromKnowledgeBase(6);
+            $fallbackProducts = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
             
             if (!empty($fallbackProducts)) {
                 return [
@@ -1581,20 +1595,29 @@ class ConvStateAPI extends Controller
 
     
     /**
-     * Knowledge base'den rastgele ürünler çeker
+     * Knowledge base'den rastgele ürünler çeker (project-specific)
      */
-    private function getRandomProductsFromKnowledgeBase(int $limit = 6): array
+    private function getRandomProductsFromKnowledgeBase(int $limit = 6, int $projectId = null): array
     {
         try {
-            $chunks = KnowledgeChunk::where('content_type', 'product')
-                ->with('knowledgeBase')
-                ->inRandomOrder()
-                ->limit($limit)
-                ->get();
+            $query = KnowledgeChunk::where('content_type', 'product')
+                ->with('knowledgeBase');
+            
+            // Project-specific filtreleme ekle
+            if ($projectId) {
+                $query->whereHas('knowledgeBase', function($q) use ($projectId) {
+                    $q->where('project_id', $projectId);
+                });
+            }
+            
+            $chunks = $query->inRandomOrder()->limit($limit)->get();
             
             // Eğer knowledge base'de ürün yoksa boş array döndür
             if ($chunks->isEmpty()) {
-                Log::info('No products found in knowledge base');
+                Log::info('No products found in knowledge base', [
+                    'project_id' => $projectId,
+                    'limit' => $limit
+                ]);
                 return [];
             }
             
@@ -1634,24 +1657,40 @@ class ConvStateAPI extends Controller
                 ];
             }
             
+            Log::info('Random products fetched from knowledge base', [
+                'project_id' => $projectId,
+                'products_count' => count($products),
+                'requested_limit' => $limit
+            ]);
+            
             return $products;
             
         } catch (\Exception $e) {
-            Log::error('Random products fetch error: ' . $e->getMessage());
+            Log::error('Random products fetch error: ' . $e->getMessage(), [
+                'project_id' => $projectId,
+                'limit' => $limit
+            ]);
             return [];
         }
     }
     
     
     /**
-     * Rastgele ürünler ekler
+     * Rastgele ürünler ekler (project-specific)
      */
-    private function addRandomProducts(array &$products): void
+    private function addRandomProducts(array &$products, int $projectId = null): void
     {
-        $allChunks = KnowledgeChunk::with('knowledgeBase')
-            ->where('content_type', 'product')
-            ->get()
-            ->toArray();
+        $query = KnowledgeChunk::with('knowledgeBase')
+            ->where('content_type', 'product');
+        
+        // Project-specific filtreleme ekle
+        if ($projectId) {
+            $query->whereHas('knowledgeBase', function($q) use ($projectId) {
+                $q->where('project_id', $projectId);
+            });
+        }
+        
+        $allChunks = $query->get()->toArray();
         
         if (!empty($allChunks)) {
             shuffle($allChunks);
@@ -2514,7 +2553,7 @@ class ConvStateAPI extends Controller
         
         // Eğer kullanıcı ürün ile ilgili bir şey soruyorsa, knowledge base'den rastgele ürünler getir
         if (preg_match('/(ürün|product|fiyat|price|satın|buy|öner|recommend|tavsiye|suggest)/i', $userMessage)) {
-            $products = $this->getRandomProductsFromKnowledgeBase(6);
+            $products = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
             if (!empty($products)) {
                 $message = 'Size özel olarak ' . count($products) . ' ürün öneriyorum:';
             }
