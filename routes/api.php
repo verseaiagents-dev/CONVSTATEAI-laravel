@@ -118,7 +118,7 @@ Route::post('/order-tracking', [ConvStateAPI::class, 'handleOrderTracking']);
 // Enhanced Chat Session & Product Interaction Routes
 Route::get('/check-daily-limit', [ConvStateAPI::class, 'checkDailyViewLimit']);
 Route::post('/init-widget', [ConvStateAPI::class, 'initWidget']);
-Route::post('/product-interaction', [ConvStateAPI::class, 'handleProductInteraction']);
+
 Route::post('/product-details', [ConvStateAPI::class, 'getProductDetails']);
 Route::post('/price-comparison', [ConvStateAPI::class, 'getPriceComparison']);
 Route::get('/chat-session/{session_id}/analytics', [ConvStateAPI::class, 'getSessionAnalytics']);

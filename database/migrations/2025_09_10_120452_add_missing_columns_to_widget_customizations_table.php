@@ -40,10 +40,6 @@ return new class extends Migration
             if (!Schema::hasColumn('widget_customizations', 'theme_color')) {
                 $table->string('theme_color', 7)->default('#3b82f6')->after('order_not_found_message');
             }
-            
-            if (!Schema::hasColumn('widget_customizations', 'logo_url')) {
-                $table->string('logo_url')->nullable()->after('theme_color');
-            }
         });
     }
 
@@ -60,8 +56,7 @@ return new class extends Migration
                 'feature_disabled_message',
                 'error_message_template',
                 'order_not_found_message',
-                'theme_color',
-                'logo_url'
+                'theme_color'
             ]);
         });
     }

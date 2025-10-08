@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'ConvStateAI - Yapay Zeka Çözümleri')</title>
+    <title>@yield('title', 'ConvStateAI - Satış odaklı Müşteri Asistanı')</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>

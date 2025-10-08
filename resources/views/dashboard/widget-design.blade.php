@@ -587,7 +587,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <!-- Font Ailesi -->
                         <div>
                             <label for="font_family" class="block text-sm font-medium text-gray-300 mb-2">
@@ -605,20 +605,6 @@
                                 <option value="Times New Roman, serif">Times New Roman</option>
                                 <option value="Roboto, sans-serif">Roboto</option>
                             </select>
-                        </div>
-                        
-                        <!-- Logo URL -->
-                        <div>
-                            <label for="logo_url" class="block text-sm font-medium text-gray-300 mb-2">
-                                Logo URL
-                            </label>
-                            <input 
-                                type="url" 
-                                id="logo_url" 
-                                name="logo_url"
-                                placeholder="https://example.com/logo.png"
-                                class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-                            >
                         </div>
                     </div>
                 </div>
@@ -1137,9 +1123,6 @@ function populateFormFields(data) {
         }
         if (customization.font_family) {
             document.getElementById('font_family').value = customization.font_family;
-        }
-        if (customization.logo_url) {
-            document.getElementById('logo_url').value = customization.logo_url;
         }
         
         // Gelişmiş Ayarlar

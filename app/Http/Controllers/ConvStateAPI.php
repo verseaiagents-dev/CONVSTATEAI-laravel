@@ -135,7 +135,7 @@ class ConvStateAPI extends Controller
             $session = EnhancedChatSession::where('session_id', $sessionId)->first();
             if ($session) {
                 // Daily limits'i kontrol et ve gerekirse sıfırla
-                $session->refreshDailyLimits();
+             
                 
                 // Limit kontrolü
                 if (!$session->canViewMore()) {
@@ -2817,8 +2817,7 @@ class ConvStateAPI extends Controller
                 'daily_view_limit' => 10
             ]);
 
-            // Daily limits'i kontrol et ve gerekirse sıfırla
-            $session->refreshDailyLimits();
+        
             
             // Check daily view limits
             if (!$session->canViewMore()) {

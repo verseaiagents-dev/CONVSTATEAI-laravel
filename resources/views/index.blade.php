@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>ConvStateAI - Yapay Zeka Çözümleri</title>
+    <title>ConvStateAI - Satış odaklı Müşteri Asistanı</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -933,6 +933,6 @@ window.convstateaiConfig = {
  projectId: "1",
  customizationToken: "7ad7f50cafe54fa113a60425fd7abeef257b6194ef18e65d71db0e65d40d2dea"
 };
-
+</script>
 </body>
 </html>

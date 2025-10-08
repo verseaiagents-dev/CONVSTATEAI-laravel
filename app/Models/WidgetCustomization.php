@@ -20,7 +20,6 @@ class WidgetCustomization extends Model
         'error_message_template',
         'order_not_found_message',
         'theme_color',
-        'logo_url',
         'font_family',
         'primary_color',
         'secondary_color',
