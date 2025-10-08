@@ -129,6 +129,7 @@ class ConvStateAPI extends Controller
                     }
                 }
             }
+            
             $sessionId = $this->getOrCreateSessionId($request);
             
             // Session daily limit kontrolü
@@ -2925,13 +2926,25 @@ class ConvStateAPI extends Controller
                 'action' => 'required|string|in:get_details,view,compare'
             ]);
 
-            // Find session
+            // Find session or create if not exists
             $session = EnhancedChatSession::where('session_id', $validated['session_id'])->first();
             if (!$session) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Session not found'
-                ], 404);
+                // Session bulunamadıysa yeni session oluştur
+                $session = EnhancedChatSession::create([
+                    'session_id' => $validated['session_id'],
+                    'user_id' => 0, // Guest user
+                    'project_id' => $request->input('project_id', 1),
+                    'daily_view_limit' => 10,
+                    'daily_view_count' => 0,
+                    'status' => 'active',
+                    'last_activity' => now(),
+                    'expires_at' => now()->addHours(24)
+                ]);
+                
+                Log::info('New session created for product-details API', [
+                    'session_id' => $validated['session_id'],
+                    'project_id' => $request->input('project_id', 1)
+                ]);
             }
 
             // Check daily limits
@@ -3301,13 +3314,25 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
                 'comparison_type' => 'sometimes|string|in:similar_products,price_range,competitors'
             ]);
 
-            // Session kontrolü
+            // Session kontrolü veya oluşturma
             $session = EnhancedChatSession::where('session_id', $validated['session_id'])->first();
             if (!$session) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Session not found'
-                ], 404);
+                // Session bulunamadıysa yeni session oluştur
+                $session = EnhancedChatSession::create([
+                    'session_id' => $validated['session_id'],
+                    'user_id' => 0, // Guest user
+                    'project_id' => $request->input('project_id', 1),
+                    'daily_view_limit' => 10,
+                    'daily_view_count' => 0,
+                    'status' => 'active',
+                    'last_activity' => now(),
+                    'expires_at' => now()->addHours(24)
+                ]);
+                
+                Log::info('New session created for price-comparison API', [
+                    'session_id' => $validated['session_id'],
+                    'project_id' => $request->input('project_id', 1)
+                ]);
             }
 
             // Daily limits kontrolü
