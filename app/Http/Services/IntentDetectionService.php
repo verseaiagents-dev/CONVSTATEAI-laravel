@@ -459,7 +459,7 @@ class IntentDetectionService {
                 'confidence_threshold' => 0.25
             ],
             'product_recommendation' => [
-                'keywords' => ['ürün öner', 'tavsiye et', 'öner', 'öneri', 'hangisini almalıyım', 'ne önerirsin', 'hangi ürün', 'size uygun', 'kişisel öneri', 'özel öneri', 'bana öner', 'bana tavsiye', 'ürün tavsiye', 'tavsiye', 'öneri ver', 'öneri yap', 'tavsiye yap', 'öneri al', 'tavsiye al', 'hangi', 'ne almalı', 'ne öneriyorsun', 'ne tavsiye edersin', 'hangi marka', 'hangi model', 'en iyi', 'en kaliteli', 'en uygun', 'rastgele', 'rastgele ürün', 'rastgele öner', 'rastgele tavsiye', 'random', 'random product', 'random öner', 'herhangi bir', 'herhangi bir ürün', 'herhangi bir şey', 'ne olursa olsun', 'fark etmez'],
+                'keywords' => ['ürün öner', 'tavsiye et', 'öner', 'öneri', 'bir ürün öner', 'bir şey öner', 'bir ürün', 'önerebilir', 'hangisini almalıyım', 'ne önerirsin', 'hangi ürün', 'size uygun', 'kişisel öneri', 'özel öneri', 'bana öner', 'bana tavsiye', 'ürün tavsiye', 'tavsiye', 'öneri ver', 'öneri yap', 'tavsiye yap', 'öneri al', 'tavsiye al', 'hangi', 'ne almalı', 'ne öneriyorsun', 'ne tavsiye edersin', 'hangi marka', 'hangi model', 'en iyi', 'en kaliteli', 'en uygun', 'rastgele', 'rastgele ürün', 'rastgele öner', 'rastgele tavsiye', 'random', 'random product', 'random öner', 'herhangi bir', 'herhangi bir ürün', 'herhangi bir şey', 'ne olursa olsun', 'fark etmez'],
                 'response' => 'Size kişisel ürün önerileri sunuyorum...',
                 'confidence_threshold' => 0.1
             ],

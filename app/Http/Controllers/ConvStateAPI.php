@@ -1422,10 +1422,34 @@ class ConvStateAPI extends Controller
             }
         } elseif (!empty($searchResults['results'])) {
             // Chunk'lardan ürün bilgilerini çıkar
-            foreach (array_slice($searchResults['results'], 0, 5) as $result) {
+            foreach (array_slice($searchResults['results'], 0, 10) as $result) {
                 $product = $this->extractProductFromChunk($result);
                 if ($product) {
                     $products[] = $product;
+                }
+            }
+            
+            Log::info('Product extraction from search results', [
+                'chunks_count' => count($searchResults['results']),
+                'products_extracted' => count($products)
+            ]);
+            
+            // ✅ FALLBACK: Chunk'lar var ama products çıkmadıysa direkt KB'den al
+            if (empty($products)) {
+                Log::info('Products not extracted from chunks, using fallback', [
+                    'project_id' => $projectId
+                ]);
+                
+                $allProducts = $this->getProductsFromKnowledgeBase(null, $projectId);
+                
+                if (!empty($allProducts)) {
+                    shuffle($allProducts);
+                    $products = array_slice($allProducts, 0, 6);
+                    
+                    Log::info('Fallback products loaded', [
+                        'count' => count($products),
+                        'total_available' => count($allProducts)
+                    ]);
                 }
             }
             
@@ -2237,6 +2261,13 @@ class ConvStateAPI extends Controller
             $content = $chunk['content'];
             $metadata = $chunk['metadata'] ?? [];
             
+            Log::debug('extractProductFromChunk called', [
+                'chunk_id' => $chunk['id'] ?? 'unknown',
+                'has_content' => !empty($content),
+                'has_metadata' => !empty($metadata),
+                'metadata_keys' => !empty($metadata) ? array_keys($metadata) : []
+            ]);
+            
             // JSON content ise parse et
             if (is_string($content) && $this->isJson($content)) {
                 $jsonData = json_decode($content, true);
@@ -2246,7 +2277,17 @@ class ConvStateAPI extends Controller
                     
                     // Eğer ürün adı yoksa null döndür
                     $productName = $productData['title'] ?? $productData['name'] ?? null;
+                    
+                    Log::debug('JSON parsing result', [
+                        'productName' => $productName,
+                        'productData_keys' => array_keys($productData)
+                    ]);
+                    
                     if (empty($productName)) {
+                        Log::warning('Product name not found in JSON content', [
+                            'chunk_id' => $chunk['id'] ?? 'unknown',
+                            'available_keys' => array_keys($productData)
+                        ]);
                         return null;
                     }
                     
@@ -2265,8 +2306,19 @@ class ConvStateAPI extends Controller
             
             // Metadata'dan ürün bilgilerini al
             if (!empty($metadata)) {
-                $productName = $metadata['product_title'] ?? null;
+                // ✅ Hem product_title hem de product_name kontrol et (WooCommerce uyumluluğu)
+                $productName = $metadata['product_title'] ?? $metadata['product_name'] ?? null;
+                
+                Log::debug('Metadata parsing', [
+                    'productName' => $productName,
+                    'metadata_keys' => array_keys($metadata)
+                ]);
+                
                 if (empty($productName)) {
+                    Log::warning('Product name not found in metadata', [
+                        'chunk_id' => $chunk['id'] ?? 'unknown',
+                        'metadata_keys' => array_keys($metadata)
+                    ]);
                     return null;
                 }
                 
