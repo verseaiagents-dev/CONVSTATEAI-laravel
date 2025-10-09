@@ -685,6 +685,7 @@ class KnowledgeBaseController extends Controller
             
             $chunkModels[] = KnowledgeChunk::create([
                 'knowledge_base_id' => $knowledgeBase->id,
+                'project_id' => $knowledgeBase->project_id, // Proje ID'sini ekle
                 'chunk_index' => $chunkData['chunk_index'],
                 'content' => $chunkData['content'],
                 'content_hash' => $chunkData['content_hash'],

@@ -463,15 +463,9 @@ class ConvStateAPI extends Controller
     /**
      * Enhanced fallback response - AI sistemi simülasyonu
      */
-    private function generateEnhancedFallbackResponse(string $userMessage, int $projectId = null): array
+    private function generateEnhancedFallbackResponse(string $userMessage, ?int $projectId = null): array
     {
         $message = strtolower($userMessage);
-        
-        // Debug log
-        Log::info('generateEnhancedFallbackResponse called:', [
-            'userMessage' => $userMessage,
-            'projectId' => $projectId
-        ]);
         
         // Simulated intent detection
         $intent = $this->simulateIntentDetection($message);
@@ -626,10 +620,14 @@ class ConvStateAPI extends Controller
     /**
      * Knowledge base'den ürün verilerini çeker
      */
-    private function getProductsFromKnowledgeBase(?string $category = null): array
+    private function getProductsFromKnowledgeBase(?string $category = null, ?int $projectId = null): array
     {
         try {
             $query = KnowledgeChunk::where('content_type', 'product');
+            
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
             
             if ($category) {
                 $query->where('content', 'like', '%' . $category . '%');
@@ -673,11 +671,16 @@ class ConvStateAPI extends Controller
     /**
      * Knowledge base'den kategori bilgilerini çeker
      */
-    private function getCategoriesFromKnowledgeBase(): array
+    private function getCategoriesFromKnowledgeBase(?int $projectId = null): array
     {
         try {
-            $chunks = KnowledgeChunk::where('content_type', 'product')
-                ->with('knowledgeBase')
+            $query = KnowledgeChunk::where('content_type', 'product');
+            
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
+            
+            $chunks = $query->with('knowledgeBase')
                 ->get();
             
             $categories = [];
@@ -713,12 +716,17 @@ class ConvStateAPI extends Controller
     /**
      * Knowledge base'den kategori detaylarını çeker
      */
-    private function getCategoryDetailsFromKnowledgeBase($categoryName): ?array
+    private function getCategoryDetailsFromKnowledgeBase($categoryName, ?int $projectId = null): ?array
     {
         try {
-            $chunks = KnowledgeChunk::where('content_type', 'product')
-                ->where('content', 'like', '%' . $categoryName . '%')
-                ->with('knowledgeBase')
+            $query = KnowledgeChunk::where('content_type', 'product')
+                ->where('content', 'like', '%' . $categoryName . '%');
+            
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
+            
+            $chunks = $query->with('knowledgeBase')
                 ->get();
             
             if ($chunks->isEmpty()) {
@@ -770,10 +778,10 @@ class ConvStateAPI extends Controller
     /**
      * Knowledge base'den kategori önerilerini çeker
      */
-    private function getCategoryRecommendationsFromKnowledgeBase($limit = 5): array
+    private function getCategoryRecommendationsFromKnowledgeBase($limit = 5, ?int $projectId = null): array
     {
         try {
-            $categories = $this->getCategoriesFromKnowledgeBase();
+            $categories = $this->getCategoriesFromKnowledgeBase($projectId);
             
             // Ürün sayısına göre sırala
             usort($categories, function($a, $b) {
@@ -792,7 +800,7 @@ class ConvStateAPI extends Controller
     /**
      * OpenAI olmadan fallback response oluşturur (eski method)
      */
-    private function generateFallbackResponse(string $userMessage): array
+    private function generateFallbackResponse(string $userMessage, ?int $projectId = null): array
     {
         $message = strtolower($userMessage);
         
@@ -1003,14 +1011,13 @@ class ConvStateAPI extends Controller
     /**
      * Intent'e göre AI response oluşturur
      */
-    private function generateAIResponse(string $intent, string $userMessage, array $searchResults, int $projectId = null): array
+    private function generateAIResponse(string $intent, string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         // Debug log
         Log::info('generateAIResponse called:', [
             'intent' => $intent,
             'userMessage' => $userMessage,
-            'hasSearchResults' => !empty($searchResults['results']),
-            'projectId' => $projectId
+            'hasSearchResults' => !empty($searchResults['results'])
         ]);
         
         // Intent detection servisini kullanarak detaylı intent bilgisini al
@@ -1027,23 +1034,23 @@ class ConvStateAPI extends Controller
                 }
            
                 Log::info('Calling generateProductSearchResponse');
-                return $this->generateProductSearchResponse($userMessage, $searchResults);
+                return $this->generateProductSearchResponse($userMessage, $searchResults, $projectId);
                 
             case 'price_inquiry':
                 Log::info('Calling generatePriceInquiryResponse');
-                return $this->generatePriceInquiryResponse($userMessage, $searchResults);
+                return $this->generatePriceInquiryResponse($userMessage, $searchResults, $projectId);
                 
             case 'product_recommendation': // Özel case
                 Log::info('Calling generateProductRecommendationResponse');
-                return $this->generateProductRecommendationResponse($userMessage, $searchResults);
+                return $this->generateProductRecommendationResponse($userMessage, $searchResults, $projectId);
                 
             case 'product_recommendations': // Funnel intent değil, özel ürün önerisi
                 Log::info('Calling generateProductRecommendationResponse for product_recommendations');
-                return $this->generateProductRecommendationResponse($userMessage, $searchResults);
+                return $this->generateProductRecommendationResponse($userMessage, $searchResults, $projectId);
                 
             case 'contextual_recommendation': // Context-aware recommendation
                 Log::info('Calling generateContextualRecommendationResponse');
-                return $this->generateContextualRecommendationResponse($userMessage, $searchResults);
+                return $this->generateContextualRecommendationResponse($userMessage, $searchResults, $projectId);
                 
             case 'category_browse':
                 Log::info('Calling generateCategoryResponse');
@@ -1194,7 +1201,7 @@ class ConvStateAPI extends Controller
                 
             case 'cart_add':
                 Log::info('Calling generateCartAddResponse');
-                return $this->generateCartAddResponse($userMessage, $searchResults);
+                return $this->generateCartAddResponse($userMessage, $searchResults, $projectId);
                 
             case 'greeting':
                 Log::info('Calling generateGreetingResponse');
@@ -1212,24 +1219,24 @@ class ConvStateAPI extends Controller
             case 'demo_request':
             case 'contact_request':
                 Log::info('Funnel intent detected, returning general response: ' . $intent);
-                return $this->generateGeneralResponse($userMessage, $searchResults);
+                return $this->generateGeneralResponse($userMessage, $searchResults, $projectId);
                 
             default:
                 Log::info('Calling generateGeneralResponse (default case)');
-                return $this->generateGeneralResponse($userMessage, $searchResults);
+                return $this->generateGeneralResponse($userMessage, $searchResults, $projectId);
         }
     }
 
     /**
      * Fiyat sorgulama response'u
      */
-    private function generatePriceInquiryResponse(string $userMessage, array $searchResults): array
+    private function generatePriceInquiryResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         $products = [];
         $message = '';
         
         // Knowledge base'den ürünleri al
-        $allProducts = $this->getProductsFromKnowledgeBase();
+        $allProducts = $this->getProductsFromKnowledgeBase(null, $projectId);
         
         if (!empty($allProducts)) {
             $products = array_slice($allProducts, 0, 6);
@@ -1256,15 +1263,8 @@ class ConvStateAPI extends Controller
     /**
      * Açık uçlu ürün arama response'u (mavi tshirt, kırmızı ayakkabı vb.)
      */
-    private function generateOpenEndedProductSearchResponse(string $userMessage, array $searchResults, int $projectId = null): array
+    private function generateOpenEndedProductSearchResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
-        // Debug log
-        Log::info('generateOpenEndedProductSearchResponse called:', [
-            'userMessage' => $userMessage,
-            'hasSearchResults' => !empty($searchResults['results']),
-            'projectId' => $projectId
-        ]);
-        
         $products = [];
         $message = '';
         
@@ -1273,13 +1273,13 @@ class ConvStateAPI extends Controller
         
         if (!empty($keywords)) {
             // Knowledge base'den benzer ürünleri ara
-            $products = $this->searchProductsByKeywords($keywords);
+            $products = $this->searchProductsByKeywords($keywords, $projectId);
             
             if (!empty($products)) {
                 $message = "Aradığınız kriterlere uygun " . count($products) . " ürün buldum:";
             } else {
                 // Fuzzy search yap (sadece belirli koşullarda)
-                $products = $this->fuzzyProductSearch($keywords);
+                $products = $this->fuzzyProductSearch($keywords, $projectId);
                 if (!empty($products)) {
                     $message = "Benzer kriterlere uygun " . count($products) . " ürün buldum:";
                 } else {
@@ -1321,7 +1321,7 @@ class ConvStateAPI extends Controller
     /**
      * Ürün arama response'u
      */
-    private function generateProductSearchResponse(string $userMessage, array $searchResults): array
+    private function generateProductSearchResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         $products = [];
         $message = '';
@@ -1356,7 +1356,7 @@ class ConvStateAPI extends Controller
             // Knowledge base'den kategoriye göre ürünleri al
             $allProducts = [];
             foreach ($searchCategories as $searchCategory) {
-                $categoryProducts = $this->getProductsFromKnowledgeBase($searchCategory);
+                $categoryProducts = $this->getProductsFromKnowledgeBase($searchCategory, $projectId);
                 $allProducts = array_merge($allProducts, $categoryProducts);
             }
             
@@ -1458,7 +1458,7 @@ class ConvStateAPI extends Controller
     /**
      * Ürün önerisi response'u - ÖZEL
      */
-    private function generateProductRecommendationResponse(string $userMessage, array $searchResults): array
+    private function generateProductRecommendationResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         try {
             // Önce searchResults'dan ürünleri parse et
@@ -1595,29 +1595,25 @@ class ConvStateAPI extends Controller
 
     
     /**
-     * Knowledge base'den rastgele ürünler çeker (project-specific)
+     * Knowledge base'den rastgele ürünler çeker
      */
-    private function getRandomProductsFromKnowledgeBase(int $limit = 6, int $projectId = null): array
+    private function getRandomProductsFromKnowledgeBase(int $limit = 6, ?int $projectId = null): array
     {
         try {
-            $query = KnowledgeChunk::where('content_type', 'product')
-                ->with('knowledgeBase');
+            $query = KnowledgeChunk::where('content_type', 'product');
             
-            // Project-specific filtreleme ekle
             if ($projectId) {
-                $query->whereHas('knowledgeBase', function($q) use ($projectId) {
-                    $q->where('project_id', $projectId);
-                });
+                $query->where('project_id', $projectId);
             }
             
-            $chunks = $query->inRandomOrder()->limit($limit)->get();
+            $chunks = $query->with('knowledgeBase')
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
             
             // Eğer knowledge base'de ürün yoksa boş array döndür
             if ($chunks->isEmpty()) {
-                Log::info('No products found in knowledge base', [
-                    'project_id' => $projectId,
-                    'limit' => $limit
-                ]);
+                Log::info('No products found in knowledge base');
                 return [];
             }
             
@@ -1657,40 +1653,24 @@ class ConvStateAPI extends Controller
                 ];
             }
             
-            Log::info('Random products fetched from knowledge base', [
-                'project_id' => $projectId,
-                'products_count' => count($products),
-                'requested_limit' => $limit
-            ]);
-            
             return $products;
             
         } catch (\Exception $e) {
-            Log::error('Random products fetch error: ' . $e->getMessage(), [
-                'project_id' => $projectId,
-                'limit' => $limit
-            ]);
+            Log::error('Random products fetch error: ' . $e->getMessage());
             return [];
         }
     }
     
     
     /**
-     * Rastgele ürünler ekler (project-specific)
+     * Rastgele ürünler ekler
      */
-    private function addRandomProducts(array &$products, int $projectId = null): void
+    private function addRandomProducts(array &$products): void
     {
-        $query = KnowledgeChunk::with('knowledgeBase')
-            ->where('content_type', 'product');
-        
-        // Project-specific filtreleme ekle
-        if ($projectId) {
-            $query->whereHas('knowledgeBase', function($q) use ($projectId) {
-                $q->where('project_id', $projectId);
-            });
-        }
-        
-        $allChunks = $query->get()->toArray();
+        $allChunks = KnowledgeChunk::with('knowledgeBase')
+            ->where('content_type', 'product')
+            ->get()
+            ->toArray();
         
         if (!empty($allChunks)) {
             shuffle($allChunks);
@@ -1800,12 +1780,12 @@ class ConvStateAPI extends Controller
     /**
      * Anahtar kelimelere göre ürünleri arar
      */
-    private function searchProductsByKeywords(array $keywords): array
+    private function searchProductsByKeywords(array $keywords, ?int $projectId = null): array
     {
         $products = [];
         
         // Knowledge base'den tüm ürünleri al
-        $allProducts = $this->getProductsFromKnowledgeBase();
+        $allProducts = $this->getProductsFromKnowledgeBase(null, $projectId);
         
         foreach ($allProducts as $product) {
             $matches = 0;
@@ -1851,10 +1831,10 @@ class ConvStateAPI extends Controller
     /**
      * Fuzzy search ile ürünleri arar
      */
-    private function fuzzyProductSearch(array $keywords): array
+    private function fuzzyProductSearch(array $keywords, ?int $projectId = null): array
     {
         $products = [];
-        $allProducts = $this->getProductsFromKnowledgeBase();
+        $allProducts = $this->getProductsFromKnowledgeBase(null, $projectId);
         
         foreach ($allProducts as $product) {
             $score = 0;
@@ -2449,7 +2429,7 @@ class ConvStateAPI extends Controller
     /**
      * Sepete ekle response'u
      */
-    private function generateCartAddResponse(string $userMessage, array $searchResults): array
+    private function generateCartAddResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         // Ürün adını çıkar
         preg_match('/(iphone|telefon|bilgisayar|macbook|samsung|nike|adidas)/i', $userMessage, $matches);
@@ -2457,9 +2437,14 @@ class ConvStateAPI extends Controller
         
         if ($productName) {
             // Knowledge base'den ürünü bul
-            $product = KnowledgeChunk::where('content_type', 'product')
-                ->where('content', 'like', '%' . $productName . '%')
-                ->first();
+            $query = KnowledgeChunk::where('content_type', 'product')
+                ->where('content', 'like', '%' . $productName . '%');
+            
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
+            
+            $product = $query->first();
             
             if ($product) {
                 $metadata = is_string($product->metadata) ? json_decode($product->metadata, true) ?? [] : [];
@@ -2546,7 +2531,7 @@ class ConvStateAPI extends Controller
     /**
      * Genel response
      */
-    private function generateGeneralResponse(string $userMessage, array $searchResults): array
+    private function generateGeneralResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         $message = 'Anlıyorum. Size daha iyi yardımcı olabilmem için biraz daha detay verebilir misiniz?';
         $products = [];
@@ -3397,7 +3382,8 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
             ];
 
             // Benzer ürünleri bul (KnowledgeBase'den)
-            $similarProducts = $this->findSimilarProducts($validated);
+            $projectId = $request->input('project_id') ?: $request->header('X-Project-ID');
+            $similarProducts = $this->findSimilarProducts($validated, $projectId);
             
             // Fiyat analizi
             $priceAnalysis = $this->analyzePrice($validated['product_price'], $similarProducts);
@@ -3430,14 +3416,19 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
     /**
      * Benzer ürünleri bul
      */
-    private function findSimilarProducts($productData)
+    private function findSimilarProducts($productData, ?int $projectId = null)
     {
         try {
             // KnowledgeBase'den benzer ürünleri ara
-            $chunks = KnowledgeChunk::where('content_type', 'product')
+            $query = KnowledgeChunk::where('content_type', 'product')
                 ->where('id', '!=', $productData['product_id'])
-                ->where('content', 'like', '%' . $productData['product_category'] . '%')
-                ->limit(5)
+                ->where('content', 'like', '%' . $productData['product_category'] . '%');
+            
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
+            
+            $chunks = $query->limit(5)
                 ->get();
 
             $products = [];
@@ -4314,9 +4305,10 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
     /**
      * Get all categories with analysis
      */
-    public function getAllCategories() {
+    public function getAllCategories(Request $request) {
         try {
-            $categories = $this->getCategoriesFromKnowledgeBase();
+            $projectId = $request->input('project_id') ?: $request->header('X-Project-ID');
+            $categories = $this->getCategoriesFromKnowledgeBase($projectId);
             
             return response()->json([
                 'success' => true,
@@ -4339,9 +4331,10 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
     /**
      * Get detailed analysis for a specific category
      */
-    public function getCategoryDetails($category) {
+    public function getCategoryDetails(Request $request, $category) {
         try {
-            $categoryDetails = $this->getCategoryDetailsFromKnowledgeBase($category);
+            $projectId = $request->input('project_id') ?: $request->header('X-Project-ID');
+            $categoryDetails = $this->getCategoryDetailsFromKnowledgeBase($category, $projectId);
             
             if (!$categoryDetails) {
                 return response()->json([
@@ -4370,9 +4363,10 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
     /**
      * Get category recommendations
      */
-    public function getCategoryRecommendations() {
+    public function getCategoryRecommendations(Request $request) {
         try {
-            $recommendations = $this->getCategoryRecommendationsFromKnowledgeBase(10);
+            $projectId = $request->input('project_id') ?: $request->header('X-Project-ID');
+            $recommendations = $this->getCategoryRecommendationsFromKnowledgeBase(10, $projectId);
             
             return response()->json([
                 'success' => true,
@@ -4820,7 +4814,7 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
     /**
      * Context-aware recommendation response oluştur
      */
-    private function generateContextualRecommendationResponse($userMessage, $searchResults)
+    private function generateContextualRecommendationResponse($userMessage, $searchResults, ?int $projectId = null)
     {
         try {
             // Context'ten önerilen ürünü al
@@ -4831,7 +4825,7 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
             
             if (!$recommendedProduct) {
                 // Fallback to general recommendation
-                return $this->generateProductRecommendationResponse($userMessage, $searchResults);
+                return $this->generateProductRecommendationResponse($userMessage, $searchResults, $projectId);
             }
             
             // Context-aware response oluştur
@@ -4868,7 +4862,7 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
             Log::error('Contextual recommendation error: ' . $e->getMessage());
             
             // Fallback to general recommendation
-            return $this->generateProductRecommendationResponse($userMessage, $searchResults);
+            return $this->generateProductRecommendationResponse($userMessage, $searchResults, $projectId);
         }
     }
 

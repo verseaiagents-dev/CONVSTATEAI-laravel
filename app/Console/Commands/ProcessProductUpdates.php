@@ -146,9 +146,11 @@ class ProcessProductUpdates extends Command
             $this->info("Toplam " . count($chunks) . " test chunk oluşturuldu.");
             
             // Her chunk'ı veritabanına kaydet
+            $knowledgeBase = \App\Models\KnowledgeBase::find(2);
             foreach ($chunks as $chunk) {
                 \App\Models\KnowledgeChunk::create([
                     'knowledge_base_id' => 2, // Mevcut knowledge base ID
+                    'project_id' => $knowledgeBase->project_id ?? null, // Proje ID'sini ekle
                     'chunk_index' => $chunk['chunk_index'],
                     'content' => $chunk['content'],
                     'content_hash' => $chunk['content_hash'],
