@@ -666,13 +666,23 @@ class ConvStateAPI extends Controller
                 }
                 
                 // Metadata'dan ürün bilgilerini al
+                // Rating güvenli şekilde al - hem array hem de scalar değer olabilir
+                $rating = 5.0; // Default rating
+                if (isset($metadata['product_rating'])) {
+                    if (is_array($metadata['product_rating']) && isset($metadata['product_rating']['rate'])) {
+                        $rating = $metadata['product_rating']['rate'];
+                    } elseif (is_numeric($metadata['product_rating'])) {
+                        $rating = $metadata['product_rating'];
+                    }
+                }
+                
                 $products[] = [
                     'id' => $metadata['product_id'] ?? $chunk->id,
-                    'name' => $metadata['product_name'] ?? 'Ürün ' . $chunk->id,
+                    'name' => $metadata['product_name'] ?? $metadata['product_title'] ?? 'Ürün ' . $chunk->id,
                     'category' => $metadata['product_category'] ?? 'Genel',
                     'price' => $metadata['product_price'] ?? 0,
                     'brand' => $metadata['product_brand'] ?? 'Bilinmeyen',
-                    'rating' => $metadata['product_rating'] ?? 4.0,
+                    'rating' => $rating,
                     'stock' => $metadata['product_stock'] ?? 10,
                     'image' => ProductImageHelper::getImageWithFallback($metadata['product_image'] ?? null),
                     'description' => substr($chunk->content, 0, 200) . '...',
@@ -1501,7 +1511,9 @@ class ConvStateAPI extends Controller
                                     'category' => $productData['category'] ?? 'Genel',
                                     'price' => $productData['price'] ?? 0,
                                     'brand' => $productData['brand'] ?? 'Bilinmeyen',
-                                    'rating' => $productData['rating']['rate'] ?? 4.0,
+                                    'rating' => (is_array($productData['rating'] ?? null) && isset($productData['rating']['rate'])) 
+                                        ? $productData['rating']['rate'] 
+                                        : (is_numeric($productData['rating'] ?? null) ? $productData['rating'] : 5.0),
                                     'stock' => 10,
                                     'image' => \App\Helpers\ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
                                     'description' => $productData['description'] ?? substr($result['content'], 0, 200) . '...',
@@ -1665,7 +1677,9 @@ class ConvStateAPI extends Controller
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
                     'brand' => $productData['brand'] ?? 'Bilinmeyen',
-                    'rating' => $productData['rating']['rate'] ?? 4.0,
+                    'rating' => (is_array($productData['rating'] ?? null) && isset($productData['rating']['rate'])) 
+                        ? $productData['rating']['rate'] 
+                        : (is_numeric($productData['rating'] ?? null) ? $productData['rating'] : 5.0),
                     'stock' => 10, // Default stock
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
                     'description' => $productData['description'] ?? substr($chunk->content, 0, 200) . '...',
@@ -2242,6 +2256,16 @@ class ConvStateAPI extends Controller
                     return null;
                 }
                 
+                // Rating güvenli şekilde al - hem array hem de scalar değer olabilir
+                $rating = 5.0; // Default rating
+                if (isset($metadata['product_rating'])) {
+                    if (is_array($metadata['product_rating']) && isset($metadata['product_rating']['rate'])) {
+                        $rating = $metadata['product_rating']['rate'];
+                    } elseif (is_numeric($metadata['product_rating'])) {
+                        $rating = $metadata['product_rating'];
+                    }
+                }
+                
                 return [
                     'id' => $metadata['product_id'] ?? $chunk['id'] ?? uniqid(),
                     'name' => $productName,
@@ -2249,9 +2273,7 @@ class ConvStateAPI extends Controller
                     'price' => $metadata['product_price'] ?? 0,
                     'image' => $metadata['product_image'] ?? '/widgetcust/imgs/default-product.svg',
                     'category' => $metadata['product_category'] ?? 'Genel',
-                    'rating' => isset($metadata['product_rating']['rate']) 
-                        ? $metadata['product_rating']['rate'] 
-                        : ($metadata['product_rating'] ?? 4.0),
+                    'rating' => $rating,
                     'relevance_score' => $chunk['relevance_score'] ?? $chunk['fuzzy_score'] ?? 0
                 ];
             }
@@ -3479,12 +3501,22 @@ JSON formatında döndür: {\"ai_description\":\"...\", \"features\":[...], \"us
                 $metadata = is_string($chunk->metadata) ? json_decode($chunk->metadata, true) : $chunk->metadata;
                 
                 if ($metadata && isset($metadata['name']) && isset($metadata['price'])) {
+                    // Rating güvenli şekilde al
+                    $rating = 5.0;
+                    if (isset($metadata['rating'])) {
+                        if (is_array($metadata['rating']) && isset($metadata['rating']['rate'])) {
+                            $rating = $metadata['rating']['rate'];
+                        } elseif (is_numeric($metadata['rating'])) {
+                            $rating = $metadata['rating'];
+                        }
+                    }
+                    
                     $products[] = [
                         'id' => $chunk->id,
                         'name' => $metadata['name'],
                         'price' => (float)$metadata['price'],
                         'category' => $metadata['category'] ?? $productData['product_category'],
-                        'rating' => $metadata['rating'] ?? 4.0,
+                        'rating' => $rating,
                         'image' => $metadata['image'] ?? '/imgs/default-product.svg',
                         'is_main' => false
                     ];
