@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') - ConvStateAI</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('imgs/favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('imgs/favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('imgs/favicon.ico') }}">
+    
     <script>
         // Tailwind config'i önce tanımla
         window.tailwindConfig = {

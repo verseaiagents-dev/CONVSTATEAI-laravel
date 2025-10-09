@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Çerez Politikası - ConvStateAI</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
-    <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('imgs/ai-conversion-logo.svg') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('imgs/favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('imgs/favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('imgs/favicon.ico') }}">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
