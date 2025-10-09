@@ -1075,11 +1075,11 @@ class ConvStateAPI extends Controller
                 
             case 'category_browse':
                 Log::info('Calling generateCategoryResponse');
-                return $this->generateCategoryResponse($userMessage, $searchResults);
+                return $this->generateCategoryResponse($userMessage, $searchResults, $projectId);
                 
             case 'brand_search':
                 Log::info('Calling generateBrandResponse');
-                return $this->generateBrandResponse($userMessage, $searchResults);
+                return $this->generateBrandResponse($userMessage, $searchResults, $projectId);
                 
             case 'faq_search':
                 Log::info('Calling generateFAQResponse');
@@ -2245,11 +2245,13 @@ class ConvStateAPI extends Controller
                 return [
                     'id' => $metadata['product_id'] ?? $chunk['id'] ?? uniqid(),
                     'name' => $productName,
-                    'brand' => 'Marka',
+                    'brand' => $metadata['product_brand'] ?? 'Marka',
                     'price' => $metadata['product_price'] ?? 0,
-                    'image' => '/widgetcust/imgs/default-product.svg',
+                    'image' => $metadata['product_image'] ?? '/widgetcust/imgs/default-product.svg',
                     'category' => $metadata['product_category'] ?? 'Genel',
-                    'rating' => $metadata['product_rating']['rate'] ?? 4.0,
+                    'rating' => isset($metadata['product_rating']['rate']) 
+                        ? $metadata['product_rating']['rate'] 
+                        : ($metadata['product_rating'] ?? 4.0),
                     'relevance_score' => $chunk['relevance_score'] ?? $chunk['fuzzy_score'] ?? 0
                 ];
             }
@@ -2274,10 +2276,16 @@ class ConvStateAPI extends Controller
     /**
      * Kategori response'u
      */
-    private function generateCategoryResponse(string $userMessage, array $searchResults): array
+    private function generateCategoryResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         $products = [];
         $categoryName = $this->extractCategoryFromMessage($userMessage);
+        
+        Log::info('generateCategoryResponse called', [
+            'categoryName' => $categoryName,
+            'projectId' => $projectId,
+            'searchResults_count' => count($searchResults['results'] ?? [])
+        ]);
         
         if (!empty($searchResults['results'])) {
             foreach ($searchResults['results'] as $result) {
@@ -2292,10 +2300,19 @@ class ConvStateAPI extends Controller
         
         // Eğer search results'da ürün bulunamazsa, tüm ürünlerden kategoriye göre filtrele
         if (empty($products) && $categoryName) {
-            $allChunks = KnowledgeChunk::with('knowledgeBase')
-                ->where('content_type', 'product')
-                ->get()
-                ->toArray();
+            $query = KnowledgeChunk::with('knowledgeBase')
+                ->where('content_type', 'product');
+            
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
+            
+            $allChunks = $query->get()->toArray();
+            
+            Log::info('Fetched chunks for category', [
+                'projectId' => $projectId,
+                'chunks_count' => count($allChunks)
+            ]);
             
             foreach ($allChunks as $chunk) {
                 $product = $this->extractProductFromChunk($chunk);
@@ -2331,9 +2348,14 @@ class ConvStateAPI extends Controller
     /**
      * Marka response'u
      */
-    private function generateBrandResponse(string $userMessage, array $searchResults): array
+    private function generateBrandResponse(string $userMessage, array $searchResults, ?int $projectId = null): array
     {
         $brands = [];
+        
+        Log::info('generateBrandResponse called', [
+            'projectId' => $projectId,
+            'searchResults_count' => count($searchResults['results'] ?? [])
+        ]);
         
         if (!empty($searchResults['results'])) {
             foreach ($searchResults['results'] as $result) {
