@@ -41,16 +41,19 @@ class FieldMapping extends Model
     // Standard target fields
     const STANDARD_FIELDS = [
         'product_name' => ['name', 'product_name', 'title', 'product_title', 'item_name'],
-        'product_description' => ['description', 'product_description', 'desc', 'product_desc', 'details'],
-        'product_price' => ['price', 'cost', 'amount', 'product_price', 'sale_price'],
-        'product_category' => ['category', 'product_category', 'cat', 'type', 'product_type'],
-        'product_brand' => ['brand', 'product_brand', 'manufacturer', 'maker'],
+        'product_description' => ['description', 'product_description', 'desc', 'product_desc', 'details', 'short_description'],
+        'product_price' => ['price', 'cost', 'amount', 'product_price', 'sale_price', 'regular_price', 'price_html'],
+        'product_category' => ['category', 'product_category', 'cat', 'type', 'product_type', 'categories'],
+        'product_brand' => ['brand', 'product_brand', 'manufacturer', 'maker', 'brands'],
         'product_sku' => ['sku', 'product_sku', 'code', 'product_code', 'item_code'],
-        'product_stock' => ['stock', 'inventory', 'quantity', 'available', 'stock_quantity'],
-        'product_image' => ['image', 'image_url', 'photo', 'picture', 'img_url'],
+        'product_stock' => ['stock', 'inventory', 'quantity', 'available', 'stock_quantity', 'stock_status'],
+        'product_image' => ['image', 'image_url', 'photo', 'picture', 'img_url', 'images', 'thumbnail'],
         'product_tags' => ['tags', 'keywords', 'labels', 'attributes'],
-        'product_rating' => ['rating', 'score', 'stars', 'review_rating'],
-        'product_reviews' => ['reviews', 'review_count', 'total_reviews']
+        'product_rating' => ['rating', 'score', 'stars', 'review_rating', 'average_rating', 'product_rating', 'rating_average'],
+        'product_reviews' => ['reviews', 'review_count', 'total_reviews', 'rating_count', 'reviews_count'],
+        'product_url' => ['url', 'product_url', 'link', 'permalink', 'product_link'],
+        'product_slug' => ['slug', 'product_slug', 'url_key', 'seo_url'],
+        'product_status' => ['status', 'product_status', 'active', 'published']
     ];
 
     /**
