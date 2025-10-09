@@ -69,7 +69,14 @@ class KnowledgeBaseController extends Controller
             $projectId = $request->query('project_id');
             
             // Get knowledge bases
-            $knowledgeBases = KnowledgeBase::with('chunks')->orderBy('created_at', 'desc')->get();
+            $query = KnowledgeBase::with('chunks');
+            
+            // Filter by project_id if provided
+            if ($projectId) {
+                $query->where('project_id', $projectId);
+            }
+            
+            $knowledgeBases = $query->orderBy('created_at', 'desc')->get();
             
             // Get projects
             $projects = Project::where('created_by', $user->id)->orderBy('created_at', 'desc')->get();

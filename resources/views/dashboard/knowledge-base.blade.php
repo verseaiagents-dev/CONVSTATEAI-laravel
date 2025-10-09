@@ -1706,6 +1706,13 @@ function handleFileUpload(file) {
     const formData = new FormData();
     formData.append('file', file);
     
+    // Project ID'yi ekle (global-project dropdown'undan veya URL'den)
+    const projectSelect = document.getElementById('global-project');
+    const projectId = projectSelect ? projectSelect.value : '{{ $projectId ?? "" }}';
+    if (projectId) {
+        formData.append('project_id', projectId);
+    }
+    
     // CSRF token'ı güvenli şekilde al
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (csrfToken) {
@@ -1810,6 +1817,13 @@ function handleUrlFetch() {
     // Create form data
     const formData = new FormData();
     formData.append('url', url);
+    
+    // Project ID'yi ekle (global-project dropdown'undan veya URL'den)
+    const projectSelect = document.getElementById('global-project');
+    const projectId = projectSelect ? projectSelect.value : '{{ $projectId ?? "" }}';
+    if (projectId) {
+        formData.append('project_id', projectId);
+    }
     
     // CSRF token'ı güvenli şekilde al
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
