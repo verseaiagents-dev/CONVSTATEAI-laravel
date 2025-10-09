@@ -602,14 +602,15 @@ class AIService
             foreach ($chunks as $chunk) {
                 $relevanceScore = $this->calculateRelevanceScore($chunk, $expandedQuery);
                 
-                // Debug: Log scores for first few chunks (production'da kapatılabilir)
-                if (config('app.debug') && count($scoredChunks) < 3) {
-                    Log::debug('Chunk relevance score calculated', [
-                        'chunk_id' => $chunk['id'] ?? 'unknown',
-                        'content_preview' => mb_substr($chunk['content'], 0, 100),
-                        'relevance_score' => $relevanceScore
-                    ]);
-                }
+                // Debug: Log scores for all chunks (production'da her zaman açık)
+                Log::debug('Chunk relevance score calculated', [
+                    'chunk_id' => $chunk['id'] ?? 'unknown',
+                    'content_type' => $chunk['content_type'] ?? 'unknown',
+                    'content_preview' => mb_substr($chunk['content'], 0, 100),
+                    'relevance_score' => $relevanceScore,
+                    'threshold' => 0.3,
+                    'will_include' => $relevanceScore >= 0.3
+                ]);
                 
                 if ($relevanceScore >= 0.3) { // %30+ ilgili olanları al (daha düşük threshold)
                     $chunk['relevance_score'] = $relevanceScore;
@@ -623,12 +624,11 @@ class AIService
                 return $b['relevance_score'] <=> $a['relevance_score'];
             });
             
-            if (config('app.debug')) {
-                Log::debug('Chunk scoring completed', [
-                    'total_scored' => count($scoredChunks),
-                    'threshold' => 0.3
-                ]);
-            }
+            Log::debug('Chunk scoring completed', [
+                'total_chunks' => count($chunks),
+                'total_scored' => count($scoredChunks),
+                'threshold' => 0.3
+            ]);
             
             return [
                 'query' => $query,
@@ -659,16 +659,33 @@ class AIService
         $score = 0.0;
         $content = mb_strtolower($chunk['content']);
         
+        // ÖZEL: Eğer chunk product türündeyse ve generic ürün sorgusu yapılıyorsa base score ver
+        if (isset($chunk['content_type']) && $chunk['content_type'] === 'product') {
+            // Generic product queries için base score
+            $genericProductTerms = ['ürün', 'product', 'öneri', 'recommend', 'listele', 'list', 'göster', 'show'];
+            foreach ($expandedQuery['expanded_terms'] ?? [] as $term) {
+                if (in_array(mb_strtolower($term), $genericProductTerms)) {
+                    $score += 0.5; // Product chunk için yüksek base score
+                    break;
+                }
+            }
+            
+            // Eğer hala 0 ise, product olduğu için minimum score ver
+            if ($score === 0.0) {
+                $score = 0.4; // Product chunk'ları için minimum relevance
+            }
+        }
+        
         // Ana terimler için yüksek puan
         foreach ($expandedQuery['expanded_terms'] as $term) {
-            if (mb_strpos($content, $term) !== false) {
+            if (mb_strpos($content, mb_strtolower($term)) !== false) {
                 $score += 0.4; // Daha yüksek puan
             }
         }
         
         // Benzer kelimeler için orta puan
         foreach ($expandedQuery['similar_words'] as $word) {
-            if (mb_strpos($content, $word) !== false) {
+            if (mb_strpos($content, mb_strtolower($word)) !== false) {
                 $score += 0.25; // Daha yüksek puan
             }
         }
@@ -676,7 +693,7 @@ class AIService
         // İlgili kategoriler için bonus puan
         if (isset($chunk['content_type'])) {
             foreach ($expandedQuery['related_categories'] as $category) {
-                if (mb_strpos(mb_strtolower($chunk['content_type']), $category) !== false) {
+                if (mb_strpos(mb_strtolower($chunk['content_type']), mb_strtolower($category)) !== false) {
                     $score += 0.2; // Daha yüksek puan
                 }
             }
