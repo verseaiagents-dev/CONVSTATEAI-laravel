@@ -314,12 +314,47 @@ class KnowledgeBaseController extends Controller
             DB::beginTransaction();
 
             $url = $request->input('url');
-            $response = \Http::timeout(30)->get($url);
+            
+            // Proper headers ile HTTP request yap
+            $response = \Http::timeout(30)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept' => 'application/json, text/plain, */*',
+                    'Accept-Language' => 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+                    'Accept-Encoding' => 'gzip, deflate, br',
+                    'Connection' => 'keep-alive',
+                    'Upgrade-Insecure-Requests' => '1',
+                ])
+                ->withOptions([
+                    'verify' => false, // SSL sertifika hatalarını bypass et (gerekirse)
+                ])
+                ->get($url);
             
             if (!$response->successful()) {
+                // Daha detaylı hata mesajı
+                $errorMessage = 'URL\'den içerik alınamadı. HTTP Status: ' . $response->status();
+                
+                // HTTP status koduna göre özel mesajlar
+                if ($response->status() === 401) {
+                    $errorMessage .= ' - URL authentication gerektiriyor veya erişim izni yok.';
+                } elseif ($response->status() === 403) {
+                    $errorMessage .= ' - URL erişimi engellenmiş.';
+                } elseif ($response->status() === 404) {
+                    $errorMessage .= ' - URL bulunamadı.';
+                } elseif ($response->status() >= 500) {
+                    $errorMessage .= ' - Sunucu hatası.';
+                }
+                
+                \Log::error('URL fetch failed', [
+                    'url' => $url,
+                    'status' => $response->status(),
+                    'headers' => $response->headers(),
+                    'body' => substr($response->body(), 0, 500)
+                ]);
+                
                 return response()->json([
                     'success' => false,
-                    'message' => 'URL\'den içerik alınamadı. HTTP Status: ' . $response->status()
+                    'message' => $errorMessage
                 ], 400);
             }
 
@@ -1080,6 +1115,7 @@ class KnowledgeBaseController extends Controller
                 foreach ($chunks as $chunkData) {
                     $chunk = KnowledgeChunk::create([
                         'knowledge_base_id' => $id,
+                        'project_id' => $knowledgeBase->project_id, // Proje ID'sini ekle
                         'content' => $chunkData['content'],
                         'content_type' => $chunkData['content_type'] ?? 'text',
                         'chunk_index' => $chunkData['chunk_index'],
