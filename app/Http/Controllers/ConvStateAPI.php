@@ -919,20 +919,27 @@ class ConvStateAPI extends Controller
                 ];
             }
             
-            // AIService ile semantic search yap
-            $searchResults = $this->aiService->semanticSearch($query, $chunks);
+            // ✅ PRODUCT BYPASS: content_type='product' ise direkt relevance=1.0
+            // Puanlama yapmadan tüm ürünleri döndür
+            $productChunks = array_map(function($chunk) {
+                $chunk['relevance_score'] = 1.0; // Direkt maksimum skor
+                $chunk['search_type'] = 'product_direct_match';
+                return $chunk;
+            }, $chunks);
             
-            // ContentChunker ile de fuzzy search yap
-            $fuzzyResults = $this->contentChunker->fuzzyChunkSearch($chunks, $query, 0.6);
+            Log::info('Product chunks with direct relevance:', [
+                'count' => count($productChunks),
+                'first_chunk_score' => $productChunks[0]['relevance_score'] ?? null
+            ]);
             
-            // Sonuçları birleştir ve deduplicate yap
-            $combinedResults = $this->combineSearchResults($searchResults, $fuzzyResults);
-            
-            if (config('app.debug')) {
-                Log::info('Combined results:', $combinedResults);
-            }
-            
-            return $combinedResults;
+            return [
+                'query' => $query,
+                'results' => $productChunks,
+                'total_found' => count($productChunks),
+                'search_type' => 'product_direct_match',
+                'semantic_count' => 0,
+                'fuzzy_count' => 0
+            ];
             
         } catch (\Exception $e) {
             Log::error('Semantic search error: ' . $e->getMessage());
@@ -1434,36 +1441,43 @@ class ConvStateAPI extends Controller
                 $message = "Aradığınız kriterlere uygun ürün bulamadım.";
             }
         } else {
-            if ($isPersonalizedRequest) {
-                // Kişiselleştirilmiş istek için knowledge base'den rastgele ürünler getir
-                $products = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
-                if (!empty($products)) {
+            // ✅ FALLBACK: Search results boş ise direkt KB'den ürünleri al
+            Log::info('Search results empty, using fallback to get all products', [
+                'project_id' => $projectId,
+                'user_message' => $userMessage
+            ]);
+            
+            // Önce tüm ürünleri al
+            $allProducts = $this->getProductsFromKnowledgeBase(null, $projectId);
+            
+            if (!empty($allProducts)) {
+                // Rastgele seç (çeşitlilik için)
+                shuffle($allProducts);
+                $products = array_slice($allProducts, 0, 6);
+                
+                if ($isPersonalizedRequest) {
                     $message = "Size özel olarak " . count($products) . " ürün öneriyorum:";
                 } else {
-                    $message = "Size özel ürün önerisi yapmak için daha fazla bilgiye ihtiyacım var. Hangi kategoride ürün arıyorsunuz?";
-                    $suggestions = [
-                        "Elektronik ürünler",
-                        "Giyim ve aksesuar", 
-                        "Ev ve yaşam",
-                        "Spor ve outdoor",
-                        "Kitap ve medya",
-                        "Kozmetik ve kişisel bakım"
-                    ];
+                    $message = "Sizin için " . count($products) . " ürün buldum:";
                 }
+                
+                Log::info('Fallback products found', [
+                    'count' => count($products),
+                    'total_available' => count($allProducts)
+                ]);
             } else {
-                // Genel arama için de knowledge base'den rastgele ürünler getir
-                $products = $this->getRandomProductsFromKnowledgeBase(6, $projectId);
-                if (!empty($products)) {
-                    $message = "Aradığınız kriterlere uygun " . count($products) . " ürün buldum:";
-                } else {
-                    $message = "Aradığınız kriterlere uygun ürün bulunamadı. Farklı bir arama yapmayı deneyin.";
-                    $suggestions = [
-                        "Farklı kelimeler dene",
-                        "Kategori seç",
-                        "Marka belirle",
-                        "Fiyat aralığı belirle"
-                    ];
-                }
+                // Hiç ürün yoksa
+                $message = "Size özel ürün önerisi yapmak için daha fazla bilgiye ihtiyacım var. Hangi kategoride ürün arıyorsunuz?";
+                $suggestions = [
+                    "Elektronik ürünler",
+                    "Giyim ve aksesuar", 
+                    "Ev ve yaşam",
+                    "Spor ve outdoor",
+                    "Kitap ve medya",
+                    "Kozmetik ve kişisel bakım"
+                ];
+                
+                Log::warning('No products found in fallback', ['project_id' => $projectId]);
             }
         }
         
