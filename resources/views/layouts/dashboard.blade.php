@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') - ConvStateAI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
+        // Tailwind config'i önce tanımla
+        window.tailwindConfig = {
             theme: {
                 extend: {
                     colors: {
@@ -32,8 +32,13 @@
                 }
             }
         }
-
-
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind yüklendikten sonra config'i uygula
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = window.tailwindConfig;
+        }
     </script>
     <style>
         .gradient-text {
