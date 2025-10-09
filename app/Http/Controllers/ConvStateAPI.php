@@ -3151,26 +3151,33 @@ class ConvStateAPI extends Controller
 
     /**
      * AI ile ürün detayları üretir
+     * 
+     * YENİ SİSTEM: ProductDetailTemplateService kullanılıyor
      */
     private function generateAIProductDetails($productData)
     {
         try {
-            $productName = $productData['product_name'];
-            $productDescription = $productData['product_description'] ?? '';
-            $productPrice = $productData['product_price'] ?? 0;
-            $productCategory = $productData['product_category'] ?? 'Genel';
-
-            // Hybrid sistem - Template veya AI kullan
-            $response = $this->buildProductDetailsPrompt($productName, $productDescription, $productPrice, $productCategory);
+            // Yeni template service'i kullan
+            $templateService = app(\App\Services\ProductDetailTemplateService::class);
             
-            // Eğer response array ise (template'den geldi), direkt döndür
-            if (is_array($response)) {
-                return $response;
-            }
+            // Veriyi uygun formata dönüştür
+            $formattedData = [
+                'name' => $productData['product_name'] ?? '',
+                'description' => $productData['product_description'] ?? '',
+                'price' => $productData['product_price'] ?? 0,
+                'category' => $productData['product_category'] ?? 'Genel',
+                'brand' => $productData['brand'] ?? '',
+            ];
             
-            // Eğer string ise (AI prompt), AI'ya gönder
-            $aiResponse = $this->aiService->generateResponse($response, []);
-            return $this->parseAIProductResponse($aiResponse, $productData);
+            // Template service ile detayları oluştur
+            $details = $templateService->generateProductDetails($formattedData);
+            
+            \Log::info('Product details generated successfully', [
+                'product_name' => $formattedData['name'],
+                'method' => 'ProductDetailTemplateService'
+            ]);
+            
+            return $details;
 
         } catch (\Exception $e) {
             \Log::error('AI product details generation failed', [
