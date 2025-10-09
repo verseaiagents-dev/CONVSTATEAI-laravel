@@ -56,6 +56,16 @@ class ConvStateAPI extends Controller
             $userMessage = $request->input('message');
             $projectId = $request->input('project_id') ?: $request->header('X-Project-ID');
             
+            // DEBUG LOG - Request bilgilerini logla
+            Log::info('Chat API request received', [
+                'message' => $userMessage,
+                'project_id_from_body' => $request->input('project_id'),
+                'project_id_from_header' => $request->header('X-Project-ID'),
+                'final_project_id' => $projectId,
+                'all_headers' => $request->headers->all(),
+                'all_inputs' => $request->all()
+            ]);
+            
    
             
             
@@ -1600,6 +1610,13 @@ class ConvStateAPI extends Controller
     private function getRandomProductsFromKnowledgeBase(int $limit = 6, ?int $projectId = null): array
     {
         try {
+            // DEBUG LOG
+            Log::info('getRandomProductsFromKnowledgeBase called', [
+                'limit' => $limit,
+                'project_id' => $projectId,
+                'project_id_type' => gettype($projectId)
+            ]);
+            
             $query = KnowledgeChunk::where('content_type', 'product');
             
             if ($projectId) {
@@ -1610,6 +1627,14 @@ class ConvStateAPI extends Controller
                 ->inRandomOrder()
                 ->limit($limit)
                 ->get();
+            
+            // DEBUG LOG
+            Log::info('Knowledge chunks query result', [
+                'chunks_count' => $chunks->count(),
+                'project_id' => $projectId,
+                'total_chunks_in_db' => KnowledgeChunk::where('content_type', 'product')->count(),
+                'chunks_with_project_id' => KnowledgeChunk::where('content_type', 'product')->where('project_id', $projectId)->count()
+            ]);
             
             // Eğer knowledge base'de ürün yoksa boş array döndür
             if ($chunks->isEmpty()) {
