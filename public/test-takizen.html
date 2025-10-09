@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takizen.com Widget Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .embed-code {
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        pre {
+            color: #4ade80;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .success { background-color: #065f46; color: #d1fae5; }
+        .error { background-color: #7f1d1d; color: #fecaca; }
+        .info { background-color: #1e3a8a; color: #dbeafe; }
+        .debug-info {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #444;
+        }
+        .debug-info h4 {
+            margin-top: 0;
+            color: #60a5fa;
+        }
+        .debug-info pre {
+            color: #a5b4fc;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Takizen.com Widget Debug Test</h1>
+        
+        <div class="embed-code">
+            <h3>Takizen.com için Embed Kodu (Project ID: 6)</h3>
+            <pre id="embedScriptDisplay">&lt;script src="https://convstateai.com/embed/convstateai.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+window.convstateaiConfig = {
+    projectId: "6",
+    customizationToken: "66dce4adb02daf8cb5b326455d7afe79645c6f558270c359ee0c456372036c59"
+};
+&lt;/script&gt;</pre>
+        </div>
+        
+        <div class="status info" id="widget-status">
+            ⏳ Widget yükleniyor...
+        </div>
+        
+        <div class="debug-info">
+            <h4>🐛 Debug Bilgileri</h4>
+            <div id="debug-output">Yükleniyor...</div>
+        </div>
+        
+        <div class="embed-code">
+            <h3>📋 Test Adımları</h3>
+            <ol>
+                <li>Script yüklendi mi kontrol ediliyor</li>
+                <li>Config doğru set edildi mi kontrol ediliyor</li>
+                <li>Widget DOM'a eklendi mi kontrol ediliyor</li>
+                <li>API isteği gönderiliyor</li>
+                <li>Project ID doğru gönderiliyor mu kontrol ediliyor</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Embed Script - Production URL -->
+    <script src="https://convstateai.com/embed/convstateai.min.js"></script>
+    <script>
+        window.convstateaiConfig = {
+            projectId: "6",
+            customizationToken: "66dce4adb02daf8cb5b326455d7afe79645c6f558270c359ee0c456372036c59"
+        };
+        
+        // Debug helper
+        function updateDebug(message, type = 'info') {
+            const debugOutput = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f87171' : type === 'success' ? '#4ade80' : '#60a5fa';
+            debugOutput.innerHTML += `<div style="color: ${color};">[${timestamp}] ${message}</div>`;
+        }
+        
+        // Immediate checks
+        updateDebug('Script loaded', 'success');
+        updateDebug('Config set: ' + JSON.stringify(window.convstateaiConfig), 'success');
+        
+        // Widget yüklenme kontrolü
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDebug('DOM ready');
+            
+            setTimeout(function() {
+                const statusEl = document.getElementById('widget-status');
+                const widgetRoot = document.getElementById('convstateai-root');
+                
+                // Widget root kontrolü
+                if (widgetRoot) {
+                    updateDebug('Widget root element found', 'success');
+                    
+                    if (widgetRoot.children.length > 0) {
+                        statusEl.className = 'status success';
+                        statusEl.innerHTML = '✅ Widget başarıyla yüklendi!<br>Project ID: ' + window.convstateaiConfig.projectId;
+                        updateDebug('Widget rendered successfully with ' + widgetRoot.children.length + ' child elements', 'success');
+                    } else {
+                        statusEl.className = 'status error';
+                        statusEl.innerHTML = '⚠️ Widget root bulundu ama içerik yok!';
+                        updateDebug('Widget root found but empty', 'error');
+                    }
+                } else {
+                    statusEl.className = 'status error';
+                    statusEl.innerHTML = '❌ Widget yüklenemedi!<br>Config doğru ama widget render edilmedi.';
+                    updateDebug('Widget root element not found - Check console for errors', 'error');
+                }
+                
+                // Console log kontrolü için bilgi
+                updateDebug('Check browser console for any widget initialization errors', 'info');
+            }, 2000);
+            
+            // API isteği testi (5 saniye sonra)
+            setTimeout(function() {
+                updateDebug('Testing API request...', 'info');
+                
+                // Test mesajı gönder
+                const testMessage = 'Merhaba, test mesajı';
+                const browserUuid = localStorage.getItem('browser_uuid') || 'test-uuid';
+                
+                fetch('https://convstateai.com/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Browser-UUID': browserUuid,
+                        'X-Project-ID': window.convstateaiConfig.projectId,
+                        'X-IP-Based-Session': 'true'
+                    },
+                    body: JSON.stringify({
+                        message: testMessage,
+                        project_id: window.convstateaiConfig.projectId,
+                        browser_uuid: browserUuid,
+                        session_id: browserUuid
+                    })
+                })
+                .then(response => {
+                    updateDebug('API Response Status: ' + response.status, response.ok ? 'success' : 'error');
+                    return response.json();
+                })
+                .then(data => {
+                    updateDebug('API Response: ' + JSON.stringify(data, null, 2), 'success');
+                    if (data.success) {
+                        updateDebug('✅ API test successful - Project found!', 'success');
+                    } else {
+                        updateDebug('❌ API test failed: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    updateDebug('API Error: ' + error.message, 'error');
+                });
+            }, 5000);
+        });
+        
+        // Console log override to capture errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            updateDebug('Console Error: ' + args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+        
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            updateDebug('Console Warning: ' + args.join(' '), 'error');
+            originalWarn.apply(console, args);
+        };
+    </script>
+</body>
+</html>
+

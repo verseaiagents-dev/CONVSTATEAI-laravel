@@ -55,7 +55,7 @@
     </div>
 
     <!-- Embed Script -->
-    <script src="http://127.0.0.1:8000/build/convstateai.min.js"></script>
+    <script src="http://127.0.0.1:8000/embed/convstateai.min.js"></script>
     <script>
         window.convstateaiConfig = {
             projectId: "2",
@@ -66,11 +66,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 const widgetStatus = document.getElementById('widget-status');
-                if (window.convstateai) {
-                    widgetStatus.innerHTML = '✅ Widget başarıyla yüklendi!';
+                const widgetRoot = document.getElementById('convstateai-root');
+                if (widgetRoot && widgetRoot.children.length > 0) {
+                    widgetStatus.innerHTML = '✅ Widget başarıyla yüklendi!<br>Project ID: ' + window.convstateaiConfig.projectId;
                     widgetStatus.style.color = '#4ade80';
                 } else {
-                    widgetStatus.innerHTML = '❌ Widget yüklenemedi!';
+                    widgetStatus.innerHTML = '❌ Widget yüklenemedi! Lütfen console\'u kontrol edin.';
                     widgetStatus.style.color = '#ef4444';
                 }
             }, 2000);
