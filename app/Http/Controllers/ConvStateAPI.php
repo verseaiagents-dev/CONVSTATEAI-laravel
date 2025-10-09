@@ -2296,7 +2296,7 @@ class ConvStateAPI extends Controller
                         'name' => $productName,
                         'brand' => $productData['brand'] ?? 'Marka',
                         'price' => $productData['price'] ?? 0,
-                        'image' => $productData['image'] ?? url('/widgetcust/imgs/default-product.svg'),
+                        'image' => $productData['image'] ?? url('/imgs/default-product.svg'),
                         'category' => $productData['category'] ?? 'Genel',
                         'rating' => is_array($productData['rating']) ? ($productData['rating']['rate'] ?? 4.0) : ($productData['rating'] ?? 4.0),
                         'relevance_score' => $chunk['relevance_score'] ?? $chunk['fuzzy_score'] ?? 0
@@ -2337,7 +2337,7 @@ class ConvStateAPI extends Controller
                     'name' => $productName,
                     'brand' => $metadata['product_brand'] ?? 'Marka',
                     'price' => $metadata['product_price'] ?? 0,
-                    'image' => $metadata['product_image'] ?? url('/widgetcust/imgs/default-product.svg'),
+                    'image' => $metadata['product_image'] ?? url('/imgs/default-product.svg'),
                     'category' => $metadata['product_category'] ?? 'Genel',
                     'rating' => $rating,
                     'relevance_score' => $chunk['relevance_score'] ?? $chunk['fuzzy_score'] ?? 0

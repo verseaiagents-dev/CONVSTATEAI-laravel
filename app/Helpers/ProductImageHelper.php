@@ -11,7 +11,7 @@ class ProductImageHelper
      * @param string $defaultPath
      * @return string
      */
-    public static function getSafeImageUrl(?string $imagePath, string $defaultPath = '/widgetcust/imgs/default-product.svg'): string
+    public static function getSafeImageUrl(?string $imagePath, string $defaultPath = '/imgs/default-product.svg'): string
     {
         // Eğer resim yolu boş veya null ise default resmi döndür (base URL ile birleştir)
         if (empty($imagePath) || trim($imagePath) === '') {
@@ -57,7 +57,7 @@ class ProductImageHelper
      * @param string $defaultPath
      * @return string
      */
-    public static function getImageWithFallback(?string $imagePath, string $defaultPath = '/widgetcust/imgs/default-product.svg'): string
+    public static function getImageWithFallback(?string $imagePath, string $defaultPath = '/imgs/default-product.svg'): string
     {
         // Eğer resim yolu boş veya null ise default resmi döndür (base URL ile birleştir)
         if (empty($imagePath) || trim($imagePath) === '') {
