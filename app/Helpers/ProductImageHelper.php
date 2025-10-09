@@ -13,9 +13,9 @@ class ProductImageHelper
      */
     public static function getSafeImageUrl(?string $imagePath, string $defaultPath = '/widgetcust/imgs/default-product.svg'): string
     {
-        // Eğer resim yolu boş veya null ise default resmi döndür
+        // Eğer resim yolu boş veya null ise default resmi döndür (base URL ile birleştir)
         if (empty($imagePath) || trim($imagePath) === '') {
-            return $defaultPath;
+            return url($defaultPath);
         }
 
         // Eğer resim yolu zaten tam URL ise (http/https ile başlıyorsa) olduğu gibi döndür
@@ -59,9 +59,9 @@ class ProductImageHelper
      */
     public static function getImageWithFallback(?string $imagePath, string $defaultPath = '/widgetcust/imgs/default-product.svg'): string
     {
-        // Eğer resim yolu boş veya null ise default resmi döndür
+        // Eğer resim yolu boş veya null ise default resmi döndür (base URL ile birleştir)
         if (empty($imagePath) || trim($imagePath) === '') {
-            return $defaultPath;
+            return url($defaultPath);
         }
 
         // Eğer resim yolu zaten tam URL ise (http/https ile başlıyorsa) olduğu gibi döndür
@@ -77,9 +77,9 @@ class ProductImageHelper
         // Eğer resim yolu relative path ise başına / ekle
         $safeUrl = '/' . ltrim($imagePath, '/');
         
-        // Eğer dosya yoksa default'a dön
+        // Eğer dosya yoksa default'a dön (base URL ile birleştir)
         if (!self::imageExists($safeUrl)) {
-            return $defaultPath;
+            return url($defaultPath);
         }
 
         return $safeUrl;
