@@ -122,17 +122,13 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama</label>
-                        <textarea id="description" name="description" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="SSS için kısa açıklama"></textarea>
-                    </div>
-                    
-                    <div>
-                        <label for="project_id" class="block text-sm font-medium text-gray-300 mb-2">Proje ID</label>
-                        <input type="number" id="project_id" name="project_id" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="Opsiyonel">
-                    </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama</label>
+                    <textarea id="description" name="description" rows="2" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" placeholder="SSS için kısa açıklama"></textarea>
                 </div>
+                
+                <!-- Hidden project_id field - otomatik olarak doldurulacak -->
+                <input type="hidden" id="project_id" name="project_id">
 
                 <div>
                     <label for="answer" class="block text-sm font-medium text-gray-300 mb-2">Detaylı Cevap *</label>
@@ -213,8 +209,8 @@
 @push('scripts')
 <script>
 // Blade'den gelen project_id'yi JavaScript'e aktar
-const PROJECT_ID = {{ $projectId ?? 'null' }};
-const PROJECT_NAME = '{{ $project->name ?? '' }}';
+const PROJECT_ID = {!! json_encode($projectId ?? null) !!};
+const PROJECT_NAME = {!! json_encode($project->name ?? '') !!};
 
 let faqs = [];
 let currentFaqId = null;
@@ -357,6 +353,10 @@ function openCreateModal() {
     document.getElementById('faqForm').reset();
     document.getElementById('faqId').value = '';
     currentFaqId = null;
+    // Project ID'yi otomatik doldur
+    if (PROJECT_ID) {
+        document.getElementById('project_id').value = PROJECT_ID;
+    }
     document.getElementById('faqModal').classList.remove('hidden');
 }
 
@@ -400,6 +400,11 @@ document.getElementById('faqForm').addEventListener('submit', async function(e) 
     // Convert tags to array
     if (data.tags) {
         data.tags = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    }
+    
+    // Project ID'yi otomatik ekle
+    if (PROJECT_ID && !data.project_id) {
+        data.project_id = PROJECT_ID;
     }
     
     try {

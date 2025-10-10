@@ -96,6 +96,7 @@
                 <form id="campaignForm" class="space-y-4">
                     <input type="hidden" id="campaignId" name="id">
                     <input type="hidden" name="site_id" value="1">
+                    <input type="hidden" id="project_id" name="project_id">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -227,8 +228,8 @@
 @push('scripts')
 <script>
 // Blade'den gelen project_id'yi JavaScript'e aktar
-const PROJECT_ID = {{ $projectId ?? 'null' }};
-const PROJECT_NAME = '{{ $project->name ?? '' }}';
+const PROJECT_ID = {!! json_encode($projectId ?? null) !!};
+const PROJECT_NAME = {!! json_encode($project->name ?? '') !!};
 
 let campaigns = [];
 let currentCampaignId = null;
@@ -354,6 +355,10 @@ function openCreateModal() {
         campaignForm.reset();
         campaignId.value = '';
         currentCampaignId = null;
+        // Project ID'yi otomatik doldur
+        if (PROJECT_ID) {
+            document.getElementById('project_id').value = PROJECT_ID;
+        }
         campaignModal.classList.remove('hidden');
         
         console.log('Modal opened successfully');
@@ -403,6 +408,11 @@ document.getElementById('campaignForm').addEventListener('submit', async functio
     
     // Convert checkbox value
     data.is_active = formData.get('is_active') === 'on';
+    
+    // Project ID'yi otomatik ekle
+    if (PROJECT_ID && !data.project_id) {
+        data.project_id = PROJECT_ID;
+    }
     
     try {
         const url = currentCampaignId ? `/api/dashboard/campaigns/${currentCampaignId}` : '/api/dashboard/campaigns';

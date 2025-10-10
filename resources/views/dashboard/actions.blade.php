@@ -393,7 +393,7 @@ function completeLoading() {
 // Load content from server
 async function loadContent() {
     try {
-        const projectId = '{{ $projectId }}';
+        const projectId = {!! json_encode($projectId ?? null) !!};
         const url = '{{ route("dashboard.actions.load-content") }}' + (projectId ? `?project_id=${projectId}` : '');
         
         const response = await fetch(url, {
