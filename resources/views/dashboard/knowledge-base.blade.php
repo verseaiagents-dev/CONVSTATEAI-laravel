@@ -262,7 +262,7 @@
         <!-- Stats Overview Container -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Kampanya Yönetimi -->
-            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.campaigns.index') }}'">
+            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.campaigns.index') }}{{ $projectId ? '?project_id=' . $projectId : '' }}'"
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,7 +279,7 @@
             </div>
 
             <!-- SSS Yönetimi -->
-            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.faqs.index') }}'">
+            <div class="glass-effect rounded-2xl p-8 cursor-pointer hover:scale-105 transition-all duration-300" onclick="window.location.href='{{ route('dashboard.faqs.index') }}{{ $projectId ? '?project_id=' . $projectId : '' }}'">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
