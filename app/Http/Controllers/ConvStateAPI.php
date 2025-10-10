@@ -258,7 +258,7 @@ class ConvStateAPI extends Controller
             }
             
             // 2. Knowledge base'de semantic search yap
-            $searchResults = $this->performSemanticSearch($userMessage);
+            $searchResults = $this->performSemanticSearch($userMessage, $projectId);
             
             // 3. Funnel intent'ler için analytics tracking (özel cevaplandırma yok)
             $funnelIntents = [
@@ -490,7 +490,7 @@ class ConvStateAPI extends Controller
                     'intent' => $intent,
                     'confidence' => $confidence,
                     'data' => [
-                        'products' => $this->getRandomProductsFromKnowledgeBase(6, $projectId)
+                        'products' => $this->getRandomProductsFromKnowledgeBase(10, $projectId)
                     ]
                 ];
                 
@@ -890,18 +890,22 @@ class ConvStateAPI extends Controller
     /**
      * Semantic search yapar
      */
-    private function performSemanticSearch(string $query): array
+    private function performSemanticSearch(string $query, ?int $projectId = null): array
     {
         try {
             if (config('app.debug')) {
-                Log::info('Starting performSemanticSearch for query:', ['query' => $query]);
+                Log::info('Starting performSemanticSearch for query:', ['query' => $query, 'projectId' => $projectId]);
             }
             
             // Knowledge base'den chunk'ları al
-            $chunks = KnowledgeChunk::with('knowledgeBase')
-                ->where('content_type', 'product')
-                ->get()
-                ->toArray();
+            $queryBuilder = KnowledgeChunk::with('knowledgeBase')
+                ->where('content_type', 'product');
+            
+            if ($projectId) {
+                $queryBuilder->where('project_id', $projectId);
+            }
+            
+            $chunks = $queryBuilder->get()->toArray();
             
             if (config('app.debug')) {
                 Log::info('Found chunks:', ['count' => count($chunks)]);
@@ -1738,12 +1742,16 @@ class ConvStateAPI extends Controller
     /**
      * Rastgele ürünler ekler
      */
-    private function addRandomProducts(array &$products): void
+    private function addRandomProducts(array &$products, ?int $projectId = null): void
     {
-        $allChunks = KnowledgeChunk::with('knowledgeBase')
-            ->where('content_type', 'product')
-            ->get()
-            ->toArray();
+        $queryBuilder = KnowledgeChunk::with('knowledgeBase')
+            ->where('content_type', 'product');
+        
+        if ($projectId) {
+            $queryBuilder->where('project_id', $projectId);
+        }
+        
+        $allChunks = $queryBuilder->get()->toArray();
         
         if (!empty($allChunks)) {
             shuffle($allChunks);
