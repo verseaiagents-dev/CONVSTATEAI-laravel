@@ -19,15 +19,24 @@ class ActionsController extends Controller
         $user = Auth::user();
         $projectId = $request->query('project_id');
         
-        // If project_id is provided, validate it exists
-        if ($projectId) {
-            $project = Project::find($projectId);
-            if (!$project) {
-                abort(404, 'Project not found');
-            }
+        // Eğer project_id belirtilmemişse dashboard'a yönlendir
+        if (!$projectId) {
+            return redirect()->route('dashboard')
+                ->with('warning', 'Lütfen önce bir proje seçin.');
         }
         
-        return view('dashboard.actions', compact('user', 'projectId'));
+        // Project var mı kontrol et
+        $project = Project::find($projectId);
+        if (!$project) {
+            abort(404, 'Proje bulunamadı');
+        }
+        
+        // Kullanıcının bu projeye erişim yetkisi var mı kontrol et
+        if ($project->created_by !== $user->id) {
+            abort(403, 'Bu projeye erişim yetkiniz yok');
+        }
+        
+        return view('dashboard.actions', compact('user', 'projectId', 'project'));
     }
 
     /**
