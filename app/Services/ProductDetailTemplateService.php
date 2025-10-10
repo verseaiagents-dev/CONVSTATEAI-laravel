@@ -101,14 +101,18 @@ class ProductDetailTemplateService
         $text = implode(' ', [$name, $category, $description, $brand]);
         
         // Template'lerdeki keyword'leri kontrol et
+        // Word boundary kullanarak tam kelime eşleşmesi sağla
         foreach ($this->templates as $templateKey => $template) {
             if (isset($template['keywords'])) {
                 foreach ($template['keywords'] as $keyword) {
-                    if (str_contains($text, strtolower($keyword))) {
+                    $keywordLower = strtolower($keyword);
+                    // Word boundary (\b) kullanarak tam kelime eşleşmesi kontrol et
+                    // Bu sayede "gala" kelimesi "Galaxy" içinde eşleşmez
+                    if (preg_match('/\b' . preg_quote($keywordLower, '/') . '\b/u', $text)) {
                         Log::info('Category detected', [
                             'detected' => $templateKey,
                             'keyword' => $keyword,
-                            'product' => $productData['name']
+                            'product' => $productData['name'] ?? 'unknown'
                         ]);
                         return $templateKey;
                     }
