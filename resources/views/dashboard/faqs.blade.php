@@ -17,7 +17,7 @@
                         <span class="gradient-text">SSS Yönetimi</span>
                     </h1>
                     <p class="text-xl text-gray-300">
-                        Sık sorulan sorular yönetimi
+                        {{ $project->name ?? 'Proje' }} - Sık sorulan sorular yönetimi
                     </p>
                 </div>
                 
@@ -212,11 +212,24 @@
 
 @push('scripts')
 <script>
+// Blade'den gelen project_id'yi JavaScript'e aktar
+const PROJECT_ID = {{ $projectId ?? 'null' }};
+const PROJECT_NAME = '{{ $project->name ?? '' }}';
+
 let faqs = [];
 let currentFaqId = null;
 
 // Load FAQs on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Project ID kontrolü
+    if (!PROJECT_ID) {
+        showError('Proje ID\'si bulunamadı. Dashboard\'a yönlendiriliyorsunuz...');
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 2000);
+        return;
+    }
+    
     loadFAQs();
     
     // Setup search functionality
@@ -234,7 +247,8 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadFAQs() {
     try {
         showLoading();
-        const response = await fetch('/api/faqs?site_id=1', {
+        // Dinamik project_id kullan
+        const response = await fetch(`/api/faqs?project_id=${PROJECT_ID}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -266,7 +280,8 @@ async function loadFAQs() {
 async function searchFAQs(query) {
     try {
         showLoading();
-        const response = await fetch(`/api/faqs/search?q=${encodeURIComponent(query)}&site_id=1`, {
+        // Dinamik project_id kullan
+        const response = await fetch(`/api/faqs/search?q=${encodeURIComponent(query)}&project_id=${PROJECT_ID}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

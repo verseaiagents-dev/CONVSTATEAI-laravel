@@ -17,7 +17,7 @@
                         <span class="gradient-text">Kampanya Yönetimi</span>
                     </h1>
                     <p class="text-xl text-gray-300">
-                        Kampanya performansı ve yönetimi
+                        {{ $project->name ?? 'Proje' }} - Kampanya performansı ve yönetimi
                     </p>
                 </div>
                 
@@ -302,12 +302,25 @@
 
 @push('scripts')
 <script>
+// Blade'den gelen project_id'yi JavaScript'e aktar
+const PROJECT_ID = {{ $projectId ?? 'null' }};
+const PROJECT_NAME = '{{ $project->name ?? '' }}';
+
 let campaigns = [];
 let currentCampaignId = null;
 let currentAISuggestions = null; // AI suggestions for current session
 
 // Load campaigns on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Project ID kontrolü
+    if (!PROJECT_ID) {
+        showError('Proje ID\'si bulunamadı. Dashboard\'a yönlendiriliyorsunuz...');
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 2000);
+        return;
+    }
+    
     loadCampaigns();
 });
 
@@ -315,7 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadCampaigns() {
     try {
         showLoading();
-        const response = await fetch('/api/campaigns?site_id=1', {
+        // Dinamik project_id kullan
+        const response = await fetch(`/api/campaigns?project_id=${PROJECT_ID}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

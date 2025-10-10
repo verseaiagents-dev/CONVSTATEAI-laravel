@@ -18,7 +18,15 @@ class FAQController extends Controller
         if ($request->expectsJson()) {
             // API request - return JSON
             try {
-                $projectId = $request->get('project_id', 1); // Default project ID
+                // Sadece project_id kullan (site_id artık kullanılmıyor)
+                $projectId = $request->get('project_id');
+                
+                if (!$projectId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Project ID gerekli'
+                    ], 400);
+                }
                 
                 $faqs = FAQ::where('project_id', $projectId)
                     ->active()
@@ -39,8 +47,27 @@ class FAQController extends Controller
         }
 
         // Web request - return admin view
-        $faqs = FAQ::with('site')->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc')->get();
-        return view('dashboard.faqs', compact('faqs'));
+        $projectId = $request->query('project_id');
+        
+        // Eğer project_id belirtilmemişse dashboard'a yönlendir
+        if (!$projectId) {
+            return redirect()->route('dashboard')
+                ->with('warning', 'Lütfen önce bir proje seçin.');
+        }
+        
+        // Project var mı kontrol et
+        $project = \App\Models\Project::find($projectId);
+        if (!$project) {
+            abort(404, 'Proje bulunamadı');
+        }
+        
+        // Kullanıcının bu projeye erişim yetkisi var mı kontrol et
+        $user = auth()->user();
+        if ($project->created_by !== $user->id) {
+            abort(403, 'Bu projeye erişim yetkiniz yok');
+        }
+        
+        return view('dashboard.faqs', compact('projectId', 'project'));
     }
 
     /**
@@ -181,7 +208,14 @@ class FAQController extends Controller
     public function getByCategory(Request $request, $category): JsonResponse
     {
         try {
-            $projectId = $request->get('project_id', 1);
+            $projectId = $request->get('project_id');
+            
+            if (!$projectId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project ID gerekli'
+                ], 400);
+            }
             
             $faqs = FAQ::where('project_id', $projectId)
                 ->where('category', $category)
@@ -252,7 +286,8 @@ class FAQController extends Controller
     public function search(Request $request): JsonResponse
     {
         try {
-            $siteId = $request->get('site_id', 1);
+            // Sadece project_id kullan (site_id artık kullanılmıyor)
+            $projectId = $request->get('project_id');
             $query = $request->get('q', '');
             
             if (empty($query)) {
@@ -262,7 +297,14 @@ class FAQController extends Controller
                 ], 400);
             }
 
-            $faqs = FAQ::where('site_id', $siteId)
+            if (!$projectId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project ID gerekli'
+                ], 400);
+            }
+            
+            $faqs = FAQ::where('project_id', $projectId)
                 ->where('is_active', true)
                 ->where(function($q) use ($query) {
                     $q->where('title', 'like', "%{$query}%")
@@ -292,10 +334,18 @@ class FAQController extends Controller
     public function getPopular(Request $request): JsonResponse
     {
         try {
-            $siteId = $request->get('site_id', 1);
+            // Sadece project_id kullan (site_id artık kullanılmıyor)
+            $projectId = $request->get('project_id');
             $limit = $request->get('limit', 10);
             
-            $faqs = FAQ::where('site_id', $siteId)
+            if (!$projectId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project ID gerekli'
+                ], 400);
+            }
+            
+            $faqs = FAQ::where('project_id', $projectId)
                 ->active()
                 ->popular()
                 ->limit($limit)

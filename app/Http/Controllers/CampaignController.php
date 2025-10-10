@@ -28,7 +28,15 @@ class CampaignController extends Controller
         if ($request->expectsJson()) {
             // API request - return JSON
             try {
-                $projectId = $request->get('project_id', 1); // Default project ID
+                // Sadece project_id kullan (site_id artık kullanılmıyor)
+                $projectId = $request->get('project_id');
+                
+                if (!$projectId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Project ID gerekli'
+                    ], 400);
+                }
                 
                 $campaigns = Campaign::where('project_id', $projectId)
                     ->active()
@@ -50,8 +58,27 @@ class CampaignController extends Controller
         }
 
         // Web request - return admin view
-        $campaigns = Campaign::with('site')->orderBy('created_at', 'desc')->get();
-        return view('dashboard.campaigns', compact('campaigns'));
+        $projectId = $request->query('project_id');
+        
+        // Eğer project_id belirtilmemişse dashboard'a yönlendir
+        if (!$projectId) {
+            return redirect()->route('dashboard')
+                ->with('warning', 'Lütfen önce bir proje seçin.');
+        }
+        
+        // Project var mı kontrol et
+        $project = \App\Models\Project::find($projectId);
+        if (!$project) {
+            abort(404, 'Proje bulunamadı');
+        }
+        
+        // Kullanıcının bu projeye erişim yetkisi var mı kontrol et
+        $user = auth()->user();
+        if ($project->created_by !== $user->id) {
+            abort(403, 'Bu projeye erişim yetkiniz yok');
+        }
+        
+        return view('dashboard.campaigns', compact('projectId', 'project'));
     }
 
     /**
@@ -215,7 +242,14 @@ class CampaignController extends Controller
     public function getByCategory(Request $request, $category): JsonResponse
     {
         try {
-            $projectId = $request->get('project_id', 1);
+            $projectId = $request->get('project_id');
+            
+            if (!$projectId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project ID gerekli'
+                ], 400);
+            }
             
             $campaigns = Campaign::where('project_id', $projectId)
                 ->where('category', $category)
@@ -278,7 +312,14 @@ class CampaignController extends Controller
     public function getActiveCount(Request $request): JsonResponse
     {
         try {
-            $projectId = $request->get('project_id', 1);
+            $projectId = $request->get('project_id');
+            
+            if (!$projectId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project ID gerekli'
+                ], 400);
+            }
             
             $count = Campaign::where('project_id', $projectId)
                 ->active()
