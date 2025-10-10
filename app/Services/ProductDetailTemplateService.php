@@ -184,6 +184,21 @@ class ProductDetailTemplateService
             $result['pros_cons'] = $template['pros_cons'];
         }
         
+        // Care instructions varsa ekle
+        if (isset($template['care_instructions'])) {
+            $result['care_instructions'] = $template['care_instructions'];
+        }
+        
+        // Target audience varsa ekle
+        if (isset($template['target_audience'])) {
+            $result['target_audience'] = $template['target_audience'];
+        }
+        
+        // Warranty info varsa ekle
+        if (isset($template['warranty_info'])) {
+            $result['warranty_info'] = $template['warranty_info'];
+        }
+        
         return $result;
     }
     
@@ -301,16 +316,34 @@ Sadece JSON formatında cevap ver, başka açıklama ekleme.";
                 $parsed = json_decode($jsonString, true);
                 
                 if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
-                    // Zorunlu alanları kontrol et
-                    return [
+                    // Tüm alanları döndür
+                    $result = [
                         'ai_description' => $parsed['ai_description'] ?? '',
                         'features' => $parsed['features'] ?? [],
                         'usage_scenarios' => $parsed['usage_scenarios'] ?? [],
                         'specifications' => $parsed['specifications'] ?? [],
-                        'pros_cons' => $parsed['pros_cons'] ?? null,
                         'recommendations' => $parsed['recommendations'] ?? [],
                         'additional_info' => $parsed['additional_info'] ?? ''
                     ];
+                    
+                    // Opsiyonel alanlar
+                    if (isset($parsed['pros_cons'])) {
+                        $result['pros_cons'] = $parsed['pros_cons'];
+                    }
+                    
+                    if (isset($parsed['care_instructions'])) {
+                        $result['care_instructions'] = $parsed['care_instructions'];
+                    }
+                    
+                    if (isset($parsed['target_audience'])) {
+                        $result['target_audience'] = $parsed['target_audience'];
+                    }
+                    
+                    if (isset($parsed['warranty_info'])) {
+                        $result['warranty_info'] = $parsed['warranty_info'];
+                    }
+                    
+                    return $result;
                 }
             }
             

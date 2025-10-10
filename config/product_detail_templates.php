@@ -51,6 +51,8 @@ Bu giyim ürünü için detaylı analiz yap:
 - Hangi aksesuarlarla kombine edilebilir
 - Yıkama ve bakım talimatları
 - Beden seçimi ipuçları
+- Hedef kitle
+- Garanti ve iade bilgileri
 
 JSON formatında döndür:
 {
@@ -59,7 +61,8 @@ JSON formatında döndür:
         \"Kumaş bilgisi ve özellikleri\",
         \"Kesim ve kalıp detayları\",
         \"Renk ve desen özellikleri\",
-        \"Özel detaylar (yaka, cep, fermuar vb.)\"
+        \"Özel detaylar (yaka, cep, fermuar vb.)\",
+        \"Mevsim uygunluğu\"
     ],
     \"usage_scenarios\": [
         \"Günlük kullanım için\",
@@ -71,11 +74,29 @@ JSON formatında döndür:
         \"Kumaş\": \"Kumaş kompozisyonu\",
         \"Kesim\": \"Kalıp tipi\",
         \"Beden Aralığı\": \"Mevcut bedenler\",
-        \"Bakım\": \"Yıkama talimatı\"
+        \"Bakım\": \"Yıkama talimatı\",
+        \"Renk Seçenekleri\": \"Mevcut renkler\"
     },
     \"pros_cons\": {
-        \"pros\": [\"Konforlu kumaş\", \"Şık kesim\", \"Çok yönlü kullanım\"],
+        \"pros\": [\"Konforlu kumaş\", \"Şık kesim\", \"Çok yönlü kullanım\", \"Nefes alır yapı\"],
         \"cons\": [\"Beden farklılıkları olabilir\", \"Renk tonu ekrandan farklılık gösterebilir\"]
+    },
+    \"care_instructions\": [
+        \"30°C'de yıkayın\",
+        \"İlk yıkamada renk ayrımı yapın\",
+        \"Ters çevirerek yıkayın\",
+        \"Düşük ısıda ütüleyin\",
+        \"Kurutma makinesinde düşük ısıda kurutun\"
+    ],
+    \"target_audience\": {
+        \"description\": \"Bu ürün hangi kişiler için ideal\",
+        \"age_range\": \"Yaş aralığı\",
+        \"style_preference\": \"Stil tercihi (casual, formal, sporty vb.)\"
+    },
+    \"warranty_info\": {
+        \"warranty_period\": \"Üretici garantisi süresi\",
+        \"return_policy\": \"İade koşulları\",
+        \"exchange_policy\": \"Değişim şartları\"
     },
     \"recommendations\": [
         \"Beden tablosunu kontrol edin\",
@@ -92,21 +113,41 @@ Sadece JSON döndür.",
             'Kaliteli kumaş ve işçilik',
             'Rahat ve modern kesim',
             'Çok yönlü kullanım',
-            'Dayanıklı dikiş'
+            'Dayanıklı dikiş',
+            'Nefes alır yapı'
         ],
         'usage_scenarios' => [
             'Günlük kullanım için',
             'İş ve sosyal ortamlar için',
-            'Rahat ve şık görünüm için'
+            'Rahat ve şık görünüm için',
+            'Seyahat için ideal'
         ],
         'specifications' => [
-            'Kumaş' => 'Kaliteli kumaş',
+            'Kumaş' => 'Kaliteli kumaş karışımı',
             'Beden' => 'S-XXL arası',
-            'Bakım' => '30°C yıkama'
+            'Bakım' => '30°C yıkama',
+            'Renk' => 'Çeşitli renk seçenekleri'
         ],
         'pros_cons' => [
-            'pros' => ['Konforlu', 'Şık', 'Dayanıklı'],
+            'pros' => ['Konforlu', 'Şık', 'Dayanıklı', 'Nefes alır'],
             'cons' => ['Beden farklılıkları olabilir', 'Renk tonu farklılık gösterebilir']
+        ],
+        'care_instructions' => [
+            '30°C\'de yıkayın',
+            'İlk yıkamada renk ayrımı yapın',
+            'Ters çevirerek yıkayın',
+            'Düşük ısıda ütüleyin',
+            'Kurutma makinesinden kaçının veya düşük ısıda kurutun'
+        ],
+        'target_audience' => [
+            'description' => 'Modern ve konforlu giyimi tercih eden, kaliteye önem veren kullanıcılar için ideal',
+            'age_range' => 'Tüm yaş grupları',
+            'style_preference' => 'Casual ve şık kombinler'
+        ],
+        'warranty_info' => [
+            'warranty_period' => '2 yıl üretim hatalarına karşı garanti',
+            'return_policy' => '14 gün içinde iade hakkı',
+            'exchange_policy' => 'Beden ve renk değişimi mümkün'
         ],
         'recommendations' => [
             'Beden tablosunu inceleyin',
