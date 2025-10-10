@@ -91,84 +91,8 @@
                 </button>
             </div>
             
-            <!-- AI Campaign Creation Tab -->
-            <div class="mb-6">
-                <div class="flex space-x-1 bg-gray-800 rounded-lg p-1">
-                    <button id="aiTab" onclick="switchTab('ai')" class="flex-1 py-2 px-4 rounded-md text-sm font-medium text-white bg-purple-600 transition-all duration-200">
-                        🤖 AI ile Kampanya Oluştur
-                    </button>
-                    <button id="manualTab" onclick="switchTab('manual')" class="flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-300 hover:text-white transition-all duration-200">
-                        ✏️ Manuel Oluştur
-                    </button>
-                </div>
-            </div>
-
-            <!-- AI Campaign Creation Form -->
-            <div id="aiForm" class="space-y-6">
-                <!-- Step 1: Product Selection -->
-                <div id="step1" class="step-content">
-                    <h4 class="text-lg font-semibold text-white mb-4">1. Ürün Seçimi</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Ürün Kategorisi</label>
-                            <select id="productCategory" onchange="filterProducts()" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                <option value="">Tüm Kategoriler</option>
-                                <option value="men's clothing">Erkek Giyim</option>
-                                <option value="women's clothing">Kadın Giyim</option>
-                                <option value="jewelery">Takı</option>
-                                <option value="electronics">Elektronik</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Stok Durumu</label>
-                            <select id="stockFilter" onchange="filterProducts()" class="form-input w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                <option value="">Tüm Stoklar</option>
-                                <option value="high">Yüksek Stok (>50)</option>
-                                <option value="medium">Orta Stok (10-50)</option>
-                                <option value="low">Düşük Stok (<10)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Ürünleri Seçin (Çoklu seçim için Ctrl tuşu ile tıklayın)</label>
-                        <div class="max-h-60 overflow-y-auto border border-gray-600 rounded-lg p-3 bg-gray-800">
-                            <div id="productList" class="space-y-2">
-                                <!-- Products will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Product Campaign Settings -->
-                <div id="step2" class="step-content hidden">
-                    <h4 class="text-lg font-semibold text-white mb-4">2. Ürün Kampanya Ayarları</h4>
-                    <div id="productSettingsContainer" class="space-y-6 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-                        <!-- Her ürün için ayrı ayar alanları buraya dinamik olarak eklenecek -->
-                    </div>
-                </div>
-
-                <!-- Step 3: AI Suggestions -->
-                <div id="step3" class="step-content hidden">
-                    <h4 class="text-lg font-semibold text-white mb-4">3. AI Kampanya Önerileri</h4>
-                    <div id="aiSuggestions" class="space-y-4">
-                        <!-- AI suggestions will be loaded here -->
-                    </div>
-                </div>
-
-                <!-- Navigation Buttons -->
-                <div class="flex justify-between pt-6">
-                    <button type="button" id="prevBtn" onclick="previousStep()" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all duration-200 hidden">
-                        ← Önceki
-                    </button>
-                    <button type="button" id="nextBtn" onclick="nextStep()" class="px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105">
-                        Sonraki →
-                    </button>
-                </div>
-            </div>
-
             <!-- Manual Campaign Creation Form -->
-            <div id="manualForm" class="hidden space-y-4">
+            <div id="manualForm" class="space-y-4">
                 <form id="campaignForm" class="space-y-4">
                     <input type="hidden" id="campaignId" name="id">
                     <input type="hidden" name="site_id" value="1">
@@ -431,7 +355,6 @@ function openCreateModal() {
         campaignId.value = '';
         currentCampaignId = null;
         campaignModal.classList.remove('hidden');
-        switchTab('manual'); // Open manual tab by default
         
         console.log('Modal opened successfully');
     } catch (error) {
@@ -464,7 +387,6 @@ function editCampaign(id) {
     document.getElementById('is_active').checked = campaign.is_active;
     
     document.getElementById('campaignModal').classList.remove('hidden');
-    switchTab('manual'); // Ensure manual tab is active for editing
 }
 
 // Close modal
@@ -545,85 +467,6 @@ async function confirmDelete() {
     }
 }
 
-
-// Tab switching functions
-function switchTab(tab) {
-    try {
-        console.log('Switching to tab:', tab);
-        
-        const aiForm = document.getElementById('aiForm');
-        const manualForm = document.getElementById('manualForm');
-        const aiTab = document.getElementById('aiTab');
-        const manualTab = document.getElementById('manualTab');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const generateBtn = document.getElementById('generateBtn');
-
-        if (!aiForm || !manualForm || !aiTab || !manualTab) {
-            console.error('Required tab elements not found');
-            return;
-        }
-
-        if (tab === 'ai') {
-            aiForm.classList.remove('hidden');
-            manualForm.classList.add('hidden');
-            aiTab.classList.add('bg-purple-600', 'text-white');
-            manualTab.classList.remove('bg-purple-600', 'text-white');
-            aiTab.classList.add('text-gray-300');
-            manualTab.classList.add('text-gray-300');
-            if (prevBtn) prevBtn.classList.remove('hidden');
-            if (nextBtn) nextBtn.classList.remove('hidden');
-            if (generateBtn) generateBtn.classList.remove('hidden');
-            currentStep = 1;
-            resetAIForm();
-        } else {
-            aiForm.classList.add('hidden');
-            manualForm.classList.remove('hidden');
-            aiTab.classList.remove('bg-purple-600', 'text-white');
-            manualTab.classList.add('bg-purple-600', 'text-white');
-            aiTab.classList.add('text-gray-300');
-            manualTab.classList.add('text-gray-300');
-            if (prevBtn) prevBtn.classList.add('hidden');
-            if (nextBtn) nextBtn.classList.add('hidden');
-            if (generateBtn) generateBtn.classList.add('hidden');
-        }
-        
-        console.log('Tab switched successfully');
-    } catch (error) {
-        console.error('Error switching tab:', error);
-    }
-}
-
-// Reset AI form to initial state
-function resetAIForm() {
-    try {
-        currentStep = 1;
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const productList = document.getElementById('productList');
-        const aiSuggestions = document.getElementById('aiSuggestions');
-        const productSettingsContainer = document.getElementById('productSettingsContainer');
-        
-        if (step1) step1.classList.remove('hidden');
-        if (step2) step2.classList.add('hidden');
-        if (step3) step3.classList.add('hidden');
-        if (prevBtn) prevBtn.classList.add('hidden');
-        if (nextBtn) {
-            nextBtn.classList.remove('hidden');
-            nextBtn.textContent = 'Sonraki →';
-        }
-        if (productList) productList.innerHTML = '';
-        if (aiSuggestions) aiSuggestions.innerHTML = '';
-        if (productSettingsContainer) productSettingsContainer.innerHTML = '';
-        productSettings = {};
-    } catch (error) {
-        console.error('Error resetting AI form:', error);
-    }
-}
-
 // Add missing utility functions
 function showLoading() {
     const loadingState = document.getElementById('loadingState');
@@ -657,56 +500,6 @@ function showError(message) {
                 </button>
             </div>
         `;
-    }
-}
-
-
-
-// Product filtering and loading
-async function filterProducts() {
-    const productCategory = document.getElementById('productCategory').value;
-    const stockFilter = document.getElementById('stockFilter').value;
-    const productList = document.getElementById('productList');
-
-    productList.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div><p class="text-gray-400 mt-2">Ürünler yükleniyor...</p></div>';
-
-    if (!productCategory) {
-        productList.innerHTML = '<p class="text-gray-400 text-center">Lütfen bir kategori seçin.</p>';
-        return;
-    }
-
-    try {
-        const response = await fetch(`/dashboard/campaigns/products/list?category=${productCategory}&stock_status=${stockFilter}`, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        const result = await response.json();
-
-        if (result.success) {
-            if (result.data.length === 0) {
-                productList.innerHTML = '<p class="text-gray-400 text-center">Bu kategori ve stok durumunda ürün bulunamadı.</p>';
-            } else {
-                productList.innerHTML = result.data.map(product => `
-                    <div class="flex items-center space-x-3 p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors duration-200">
-                        <input type="checkbox" 
-                               value="${product.id}" 
-                               name="product_ids[]" 
-                               class="form-checkbox h-4 w-4 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500 focus:ring-2">
-                        <div class="flex-1">
-                            <label class="text-sm font-medium text-white cursor-pointer">${product.name}</label>
-                            <div class="text-xs text-gray-400">
-                                Kategori: ${product.category ? product.category.name : 'Genel'} | Fiyat: ${product.price} TL | Stok: ${product.stock || 0}
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        } else {
-            productList.innerHTML = '<p class="text-red-400 text-center">Ürünler yüklenirken hata oluştu: ' + result.message + '</p>';
-        }
-    } catch (error) {
-        productList.innerHTML = '<p class="text-red-400 text-center">Ürünler yüklenirken hata oluştu: ' + error.message + '</p>';
     }
 }
 
