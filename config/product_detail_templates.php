@@ -24,18 +24,30 @@ return [
     'giyim' => [
         'keywords' => [
             // Kadın
-            'kadın', 'bayan', 'women', 'kadın giyim',
+            'kadın', 'bayan', 'women', "women's", 'womens', 'kadın giyim', 'female',
             // Erkek
-            'erkek', 'men', 'erkek giyim',
-            // Genel
-            'tişört', 'gömlek', 'bluz', 'shirt', 'tshirt',
-            'pantolon', 'kot', 'jean', 'denim', 'pants',
-            'elbise', 'dress', 'tulum', 'jumpsuit',
+            'erkek', 'men', "men's", 'mens', 'erkek giyim', 'male',
+            // Genel Giyim Terimleri
+            'clothing', 'apparel', 'wear', 'fashion', 'garment',
+            // Üst Giyim
+            'tişört', 'gömlek', 'bluz', 'shirt', 'tshirt', 't-shirt', 'top', 'blouse',
+            'sweater', 'sweatshirt', 'hoodie', 'cardigan', 'pullover',
+            // Alt Giyim
+            'pantolon', 'kot', 'jean', 'denim', 'pants', 'trousers', 'jeans',
             'etek', 'skirt', 'şort', 'shorts',
-            'ceket', 'jacket', 'yelek', 'hırka',
-            'eşofman', 'sportswear', 'spor giyim',
-            'iç giyim', 'iç çamaşır', 'underwear', 'sütyen', 'boxer',
-            'takım elbise', 'suit', 'blazer', 'smokin'
+            // Elbise & Tulum
+            'elbise', 'dress', 'tulum', 'jumpsuit', 'romper', 'gown',
+            // Dış Giyim
+            'ceket', 'jacket', 'coat', 'blazer', 'yelek', 'vest', 'hırka',
+            'parka', 'windbreaker', 'raincoat', 'trench',
+            // Spor
+            'eşofman', 'sportswear', 'spor giyim', 'tracksuit', 'joggers',
+            'activewear', 'athletic', 'gym wear',
+            // İç Giyim
+            'iç giyim', 'iç çamaşır', 'underwear', 'sütyen', 'bra', 'boxer', 'brief',
+            'lingerie', 'nightwear', 'sleepwear', 'pyjama', 'pijama',
+            // Formal
+            'takım elbise', 'suit', 'blazer', 'smokin', 'tuxedo', 'formal'
         ],
         'use_ai' => true,
         'ai_prompt_template' => "Giyim Ürünü: {name}
@@ -233,10 +245,17 @@ Sadece JSON döndür.",
 
     'ayakkabi' => [
         'keywords' => [
-            'ayakkabı', 'bot', 'terlik', 'sandalet', 'shoes',
-            'spor ayakkabı', 'sneaker', 'koşu ayakkabısı', 'running',
-            'topuklu', 'babet', 'oxford', 'loafer', 'çizme',
-            'çocuk ayakkabı', 'bebek ayakkabı'
+            // Türkçe
+            'ayakkabı', 'bot', 'çizme', 'terlik', 'sandalet', 'topuklu', 'babet',
+            'spor ayakkabı', 'koşu ayakkabısı', 'çocuk ayakkabı', 'bebek ayakkabı',
+            // English
+            'shoes', 'shoe', 'footwear', 'boots', 'boot', 'sandals', 'sandal',
+            'slippers', 'slipper', 'sneakers', 'sneaker', 'trainers', 'trainer',
+            'running shoes', 'running', 'athletic shoes',
+            'heels', 'high heels', 'pumps', 'stiletto',
+            'flats', 'ballet flats', 'loafers', 'loafer',
+            'oxford', 'derby', 'moccasin', 'espadrille',
+            'kids shoes', 'baby shoes', 'toddler shoes'
         ],
         'use_ai' => true,
         'ai_prompt_template' => "Ayakkabı: {name}
@@ -322,9 +341,15 @@ JSON formatında döndür...",
 
     'taki' => [
         'keywords' => [
+            // Türkçe
             'kolye', 'küpe', 'yüzük', 'bilezik', 'takı', 'altın', 'gümüş',
-            'pırlanta', 'mücevher', 'jewelry', 'necklace', 'ring', 'earring',
-            'bracelet', 'zincir', 'şans', 'halhal', 'broş', 'piercing'
+            'pırlanta', 'mücevher', 'zincir', 'şans', 'halhal', 'broş', 'piercing',
+            // English
+            'jewelry', 'jewellery', 'necklace', 'ring', 'earring', 'earrings',
+            'bracelet', 'bangle', 'anklet', 'brooch', 'pendant',
+            'diamond', 'diamonds', 'platinum', 'gold', 'silver',
+            'wedding ring', 'engagement ring', 'band ring', 'band',
+            'gemstone', 'precious', 'carat', 'stone'
         ],
         'use_ai' => true,
         'ai_prompt_template' => "Ürün: {name}
@@ -675,8 +700,16 @@ Sadece JSON döndür, başka açıklama ekleme.",
 
     'telefon' => [
         'keywords' => [
-            'telefon', 'akıllı telefon', 'smartphone', 'iPhone',
-            'Samsung', 'Xiaomi', 'Android', 'iOS', 'mobile'
+            // Türkçe
+            'telefon', 'akıllı telefon', 'cep telefonu', 'mobil',
+            // English
+            'phone', 'smartphone', 'mobile phone', 'cell phone', 'cellphone',
+            'iPhone', 'android phone', 'mobile', 'handset',
+            // Markalar
+            'Samsung', 'Xiaomi', 'Huawei', 'Oppo', 'Realme', 'OnePlus',
+            'Google Pixel', 'Motorola', 'Nokia', 'Sony Xperia',
+            // İşletim Sistemleri
+            'Android', 'iOS', 'iPhone'
         ],
         'use_ai' => true,
         'ai_description' => '{name}, son teknoloji özellikleri ve güçlü performansı ile günlük hayatınızı kolaylaştıran bir akıllı telefondur.',
@@ -712,9 +745,19 @@ Sadece JSON döndür, başka açıklama ekleme.",
 
     'bilgisayar' => [
         'keywords' => [
-            'laptop', 'notebook', 'bilgisayar', 'computer',
-            'MacBook', 'ultrabook', 'gaming laptop',
-            'tablet', 'iPad', 'tab'
+            // Türkçe
+            'bilgisayar', 'dizüstü', 'masaüstü', 'tablet', 'PC',
+            // English - Laptops
+            'laptop', 'notebook', 'ultrabook', 'netbook', 'chromebook',
+            'gaming laptop', 'business laptop', 'portable computer',
+            // English - Desktop
+            'computer', 'desktop', 'desktop computer', 'PC', 'workstation',
+            'gaming PC', 'all-in-one', 'AIO',
+            // English - Tablets
+            'tablet', 'tab', 'iPad', 'android tablet', 'tablet PC',
+            // Markalar
+            'MacBook', 'Mac', 'iMac', 'Dell', 'HP', 'Lenovo', 'Asus',
+            'Acer', 'MSI', 'Razer', 'Microsoft Surface'
         ],
         'use_ai' => true,
         'ai_description' => '{name}, güçlü donanımı ve taşınabilir tasarımı ile iş ve eğlence ihtiyaçlarınızı karşılayan bir bilgisayardır.',
