@@ -149,12 +149,14 @@ class EnhancedChatSession extends Model
     public function canViewMore(): bool
     {
         // Development için limit kontrolünü devre dışı bırak
-        if (app()->environment('local', 'development')) {
+       /* if (app()->environment('local', 'development')) {
             return true;
         }
         
         return $this->isActive() && 
                $this->daily_view_count < $this->daily_view_limit;
+               */
+        return true;
     }
 
     /**

@@ -30,7 +30,7 @@ class ProductDetailTemplateService
     /**
      * Cache süresi (saniye)
      */
-    protected $cacheTime = 3600; // 1 saat
+    protected $cacheTime = 86400; // 24 saat
     
     /**
      * Constructor
@@ -85,7 +85,13 @@ class ProductDetailTemplateService
     }
     
     /**
-     * Kategori tespiti - Akıllı algoritma
+     * Kategori tespiti - Akıllı algoritma (UPDATED)
+     * 
+     * ÖNCELİK SIRASI:
+     * 1. Önce category field'ına bak (en güvenilir)
+     * 2. Sonra name field'ına bak
+     * 3. Description ve brand'e bak
+     * 4. Varsayılan olarak 'genel' döndür
      * 
      * @param array $productData
      * @return string
@@ -97,30 +103,70 @@ class ProductDetailTemplateService
         $description = strtolower($productData['description'] ?? '');
         $brand = strtolower($productData['brand'] ?? '');
         
-        // Tüm metni birleştir
-        $text = implode(' ', [$name, $category, $description, $brand]);
+        // 1. ÖNCELİK: Category field'ına bak (en güvenilir kaynak)
+        if (!empty($category)) {
+            foreach ($this->templates as $templateKey => $template) {
+                if (isset($template['keywords'])) {
+                    foreach ($template['keywords'] as $keyword) {
+                        $keywordLower = strtolower($keyword);
+                        if (preg_match('/\b' . preg_quote($keywordLower, '/') . '\b/u', $category)) {
+                            Log::info('Category detected from category field', [
+                                'detected' => $templateKey,
+                                'keyword' => $keyword,
+                                'category_value' => $category,
+                                'product' => $productData['name'] ?? 'unknown'
+                            ]);
+                            return $templateKey;
+                        }
+                    }
+                }
+            }
+        }
         
-        // Template'lerdeki keyword'leri kontrol et
-        // Word boundary kullanarak tam kelime eşleşmesi sağla
-        foreach ($this->templates as $templateKey => $template) {
-            if (isset($template['keywords'])) {
-                foreach ($template['keywords'] as $keyword) {
-                    $keywordLower = strtolower($keyword);
-                    // Word boundary (\b) kullanarak tam kelime eşleşmesi kontrol et
-                    // Bu sayede "gala" kelimesi "Galaxy" içinde eşleşmez
-                    if (preg_match('/\b' . preg_quote($keywordLower, '/') . '\b/u', $text)) {
-                        Log::info('Category detected', [
-                            'detected' => $templateKey,
-                            'keyword' => $keyword,
-                            'product' => $productData['name'] ?? 'unknown'
-                        ]);
-                        return $templateKey;
+        // 2. İKİNCİL: Name field'ına bak
+        if (!empty($name)) {
+            foreach ($this->templates as $templateKey => $template) {
+                if (isset($template['keywords'])) {
+                    foreach ($template['keywords'] as $keyword) {
+                        $keywordLower = strtolower($keyword);
+                        if (preg_match('/\b' . preg_quote($keywordLower, '/') . '\b/u', $name)) {
+                            Log::info('Category detected from name field', [
+                                'detected' => $templateKey,
+                                'keyword' => $keyword,
+                                'name_value' => $name,
+                                'product' => $productData['name'] ?? 'unknown'
+                            ]);
+                            return $templateKey;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 3. ÜÇÜNCÜL: Description ve brand'e bak
+        $text = implode(' ', [$description, $brand]);
+        if (!empty($text)) {
+            foreach ($this->templates as $templateKey => $template) {
+                if (isset($template['keywords'])) {
+                    foreach ($template['keywords'] as $keyword) {
+                        $keywordLower = strtolower($keyword);
+                        if (preg_match('/\b' . preg_quote($keywordLower, '/') . '\b/u', $text)) {
+                            Log::info('Category detected from description/brand', [
+                                'detected' => $templateKey,
+                                'keyword' => $keyword,
+                                'product' => $productData['name'] ?? 'unknown'
+                            ]);
+                            return $templateKey;
+                        }
                     }
                 }
             }
         }
         
         // Varsayılan kategori
+        Log::warning('No category detected, using default', [
+            'product_data' => $productData
+        ]);
         return 'genel';
     }
     
@@ -136,7 +182,10 @@ class ProductDetailTemplateService
     }
     
     /**
-     * Template'den detay oluştur
+     * Template'den detay oluştur (UPDATED)
+     * 
+     * OPTİMİZASYON: Önce statik template'i kullan, AI'yi fallback olarak kullan
+     * Bu sayede cache hit rate artar ve AI maliyeti azalır
      * 
      * @param string $category
      * @param array $productData
@@ -146,13 +195,21 @@ class ProductDetailTemplateService
     {
         $template = $this->templates[$category];
         
-        // Eğer AI prompt varsa, AI ile oluştur (daha dinamik)
+        // ÖNCELİK: Statik template'i kullan (maliyet yok, hızlı)
+        // AI sadece template yoksa veya özel durumlarda kullanılır
+        if (isset($template['ai_description']) && !empty($template['ai_description'])) {
+            Log::info('Using static template', ['category' => $category]);
+            return $this->fillTemplate($template, $productData);
+        }
+        
+        // FALLBACK: Template yoksa AI kullan
         if (isset($template['use_ai']) && $template['use_ai'] === true) {
+            Log::info('Using AI generation (no static template)', ['category' => $category]);
             return $this->generateWithAI($category, $productData);
         }
         
-        // Statik template'i doldur
-        return $this->fillTemplate($template, $productData);
+        // SON ÇARE: Fallback detaylar
+        return $this->getFallbackDetails($productData);
     }
     
     /**
@@ -382,15 +439,17 @@ Sadece JSON formatında cevap ver, başka açıklama ekleme.";
     /**
      * Cache key oluştur
      * 
+     * UPDATED: Kategori bazlı cache (daha verimli, aynı kategorideki ürünler aynı template'i kullanır)
+     * 
      * @param array $productData
      * @param string $category
      * @return string
      */
     protected function getCacheKey(array $productData, string $category): string
     {
-        $name = $productData['name'] ?? 'unknown';
-        $hash = md5(json_encode($productData));
-        return "product_details_{$category}_{$hash}";
+        // Kategori bazlı cache: Aynı kategorideki tüm ürünler aynı template'i kullanır
+        // Bu sayede AI maliyeti azalır ve cache hit rate artar
+        return "product_details_template_{$category}";
     }
     
     /**

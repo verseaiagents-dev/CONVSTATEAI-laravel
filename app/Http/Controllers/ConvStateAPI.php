@@ -145,6 +145,7 @@ class ConvStateAPI extends Controller
                 // Daily limits'i kontrol et ve gerekirse sıfırla
              
                 
+
                 // Limit kontrolü
                 if (!$session->canViewMore()) {
                     return response()->json([
