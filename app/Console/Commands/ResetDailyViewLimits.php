@@ -30,12 +30,23 @@ class ResetDailyViewLimits extends Command
         $this->info('Starting comprehensive daily view limits reset...');
         
         try {
-            // Reset ALL sessions (not just active ones)
-            $allSessions = EnhancedChatSession::all();
+            // ✅ FIX: Önce önceki günlerin session'larını inactive yap
+            $inactivatedCount = EnhancedChatSession::where('status', 'active')
+                ->whereDate('last_activity', '<', today())
+                ->update(['status' => 'inactive']);
+            
+            if ($inactivatedCount > 0) {
+                $this->info("Inactivated {$inactivatedCount} old sessions from previous days.");
+            }
+            
+            // Reset ONLY today's active sessions (bugün aktif olanları sıfırla)
+            $todaySessions = EnhancedChatSession::where('status', 'active')
+                ->whereDate('last_activity', today())
+                ->get();
             $resetCount = 0;
             $fixedLimitCount = 0;
             
-            foreach ($allSessions as $session) {
+            foreach ($todaySessions as $session) {
                 // ✅ Eğer daily_view_limit 0 veya null ise, default 20 yap
                 $dailyViewLimit = $session->daily_view_limit > 0 ? $session->daily_view_limit : 20;
                 
@@ -45,13 +56,14 @@ class ResetDailyViewLimits extends Command
                     $this->warn("Fixed session {$session->session_id}: limit was {$session->daily_view_limit}, now {$dailyViewLimit}");
                 }
                 
-                // Reset daily view count and update activity
+                // Reset daily view count - last_activity'yi GÜNCELLEMEDEN
+                // ✅ FIX: last_activity bugüne taşınmamalı yoksa IP kontrolü yanlış çalışır
                 $session->update([
-                    'view_count' => 0,
                     'daily_view_count' => 0, // ✅ Günlük view sayacını sıfırla
-                    'daily_view_limit' => $dailyViewLimit, // ✅ Limit'i de güncelle (0 ise 20 yap)
-                    'last_activity' => now(),
-                    'status' => 'active' // Ensure session is active
+                    'daily_view_limit' => $dailyViewLimit // ✅ Limit'i de güncelle (0 ise 20 yap)
+                    // last_activity => now() kaldırıldı - IP kontrolü için önemli!
+                    // status => 'active' kaldırıldı - zaten aktif olanları alıyoruz
+                    // view_count kaldırıldı - veritabanında yok
                 ]);
                 
                 $resetCount++;
@@ -60,16 +72,20 @@ class ResetDailyViewLimits extends Command
             // Also clear any cached session data
             \Cache::flush();
             
-            $this->info("Successfully reset daily view limits for ALL {$resetCount} sessions.");
-            if ($fixedLimitCount > 0) {
-                $this->info("Fixed {$fixedLimitCount} sessions with 0 or null daily_view_limit.");
+            $this->info("✅ Successfully reset daily view limits for {$resetCount} today's active sessions.");
+            if ($inactivatedCount > 0) {
+                $this->info("✅ Inactivated {$inactivatedCount} old sessions from previous days.");
             }
-            $this->info("Cache cleared to ensure fresh start.");
+            if ($fixedLimitCount > 0) {
+                $this->info("✅ Fixed {$fixedLimitCount} sessions with 0 or null daily_view_limit.");
+            }
+            $this->info("✅ Cache cleared to ensure fresh start.");
             
             // Log the reset
             \Log::info('Comprehensive daily view limits reset completed', [
                 'reset_count' => $resetCount,
                 'fixed_limit_count' => $fixedLimitCount,
+                'inactivated_count' => $inactivatedCount,
                 'timestamp' => now(),
                 'cache_cleared' => true
             ]);
