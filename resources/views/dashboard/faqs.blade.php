@@ -244,7 +244,7 @@ async function loadFAQs() {
     try {
         showLoading();
         // Dinamik project_id kullan
-        const response = await fetch(`/api/faqs?project_id=${PROJECT_ID}`, {
+        const response = await fetch(`/api/dashboard/faqs?project_id=${PROJECT_ID}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

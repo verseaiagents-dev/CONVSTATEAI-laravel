@@ -197,8 +197,10 @@ Route::prefix('dashboard')->group(function () {
     Route::put('/campaigns/{id}', [App\Http\Controllers\CampaignController::class, 'update']);
     Route::delete('/campaigns/{id}', [App\Http\Controllers\CampaignController::class, 'destroy']);
     
-    // FAQ Management
+    // FAQ Management - Dashboard CRUD Operations
+    Route::get('/faqs', [App\Http\Controllers\FAQController::class, 'index']);
     Route::post('/faqs', [App\Http\Controllers\FAQController::class, 'store']);
+    Route::get('/faqs/{id}', [App\Http\Controllers\FAQController::class, 'show']);
     Route::put('/faqs/{id}', [App\Http\Controllers\FAQController::class, 'update']);
     Route::delete('/faqs/{id}', [App\Http\Controllers\FAQController::class, 'destroy']);
 });

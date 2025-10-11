@@ -247,6 +247,13 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
     // Knowledge Base Prompts
     Route::get('/admin/knowledge-base-prompts', [\App\Http\Controllers\Admin\KnowledgeBasePromptsController::class, 'index'])->name('admin.knowledge-base-prompts');
     
+    // Token Calculator & AI Price Recommendation
+    Route::get('/admin/token-calculator', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'index'])->name('admin.token-calculator');
+    Route::post('/admin/token-calculator/calculate', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'calculate'])->name('admin.token-calculator.calculate');
+    Route::post('/admin/token-calculator/ai-price', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'aiPriceRecommendation'])->name('admin.token-calculator.ai-price');
+    Route::post('/admin/token-calculator/save-plan', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'savePlan'])->name('admin.token-calculator.save-plan');
+    Route::post('/admin/token-calculator/export', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'exportCalculation'])->name('admin.token-calculator.export');
+    
 });
 
 Route::get('/admin/demo-requests', [\App\Http\Controllers\Admin\DemoRequestController::class, 'index'])->name('admin.demo-requests.index');

@@ -84,8 +84,7 @@ class FAQController extends Controller
                 'answer' => 'required|string',
                 'category' => 'nullable|string|max:100',
                 'is_active' => 'boolean',
-                'site_id' => 'required|exists:sites,id',
-                'project_id' => 'nullable|integer',
+                'project_id' => 'required|integer|exists:projects,id',
                 'sort_order' => 'nullable|integer|min:0',
                 'tags' => 'nullable|array',
                 'tags.*' => 'string|max:50'
@@ -99,7 +98,20 @@ class FAQController extends Controller
                 ], 422);
             }
 
-            $faq = FAQ::create($request->all());
+            // Prepare data for creation
+            $data = $request->all();
+            
+            // Ensure description has a default value if not provided
+            if (empty($data['description'])) {
+                $data['description'] = '-';
+            }
+            
+            // Set site_id to 1 as fallback (legacy support)
+            if (!isset($data['site_id'])) {
+                $data['site_id'] = 1;
+            }
+
+            $faq = FAQ::create($data);
 
             return response()->json([
                 'success' => true,
@@ -152,7 +164,7 @@ class FAQController extends Controller
                 'answer' => 'sometimes|required|string',
                 'category' => 'nullable|string|max:100',
                 'is_active' => 'sometimes|boolean',
-                'project_id' => 'nullable|integer',
+                'project_id' => 'sometimes|integer|exists:projects,id',
                 'sort_order' => 'nullable|integer|min:0',
                 'tags' => 'nullable|array',
                 'tags.*' => 'string|max:50'
@@ -166,7 +178,15 @@ class FAQController extends Controller
                 ], 422);
             }
 
-            $faq->update($request->all());
+            // Prepare data for update
+            $data = $request->all();
+            
+            // Ensure description has a value if provided as null/empty
+            if (array_key_exists('description', $data) && empty($data['description'])) {
+                $data['description'] = '-';
+            }
+
+            $faq->update($data);
 
             return response()->json([
                 'success' => true,
