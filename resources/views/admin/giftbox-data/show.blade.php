@@ -24,7 +24,7 @@
                     <a href="{{ route('admin.giftbox-data.index') }}" class="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg text-white font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105">
                         ← Geri Dön
                     </a>
-                    <form method="POST" action="{{ route('admin.giftbox-data.destroy', $giftboxUser) }}" class="inline" onsubmit="return confirm('Bu lead\'i silmek istediğinizden emin misiniz?')">
+                    <form method="POST" action="{{ route('admin.giftbox-data.destroy', $giftboxUser) }}" class="inline" onsubmit="return confirmDelete('{{ $giftboxUser->name }} {{ $giftboxUser->surname }}')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-lg text-white font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
@@ -178,4 +178,10 @@
         </div>
     </div>
 </div>
+
+<script>
+function confirmDelete(userName) {
+    return confirm(`"${userName}" adlı lead'i silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`);
+}
+</script>
 @endsection

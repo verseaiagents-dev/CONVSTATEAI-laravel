@@ -525,11 +525,17 @@ class ContentChunker
                 // Chunk content'ini oluştur
                 $chunkContent = json_encode($chunk, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
                 
-                // Content type'ı belirle
+                // Content type'ı belirle - fiyat bilgisi olmasa bile ürün olarak tanı
                 $contentType = 'json';
                 if (isset($chunk[0]['category'])) {
                     $contentType = 'product';
                 } elseif (isset($chunk[0]['title'])) {
+                    $contentType = 'product';
+                } elseif (isset($chunk[0]['name'])) {
+                    $contentType = 'product';
+                } elseif (isset($chunk[0]['id']) && (isset($chunk[0]['name']) || isset($chunk[0]['title']))) {
+                    $contentType = 'product';
+                } elseif (isset($chunk[0]['description']) && (isset($chunk[0]['name']) || isset($chunk[0]['title']))) {
                     $contentType = 'product';
                 }
                 

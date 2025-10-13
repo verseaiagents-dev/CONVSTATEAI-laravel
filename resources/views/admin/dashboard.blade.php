@@ -27,9 +27,7 @@
                 <a href="{{ route('admin.payment-settings.index') }}" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105">
                     Ödeme Ayarları
                 </a>
-                <a href="{{ route('admin.giftbox-data.index') }}" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg text-white font-semibold hover:from-pink-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105">
-                    🎁 Giftbox Lead Yönetimi
-                </a>
+             
             </div>
         </div>
     </div>
@@ -275,19 +273,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('admin.giftbox-data.index') }}" class="p-4 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-all duration-200 group">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center group-hover:bg-pink-500/30 transition-all duration-200">
-                        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-white font-medium">🎁 Giftbox Leadleri</p>
-                        <p class="text-gray-400 text-sm">Lead verilerini görüntüle ve yönet</p>
-                    </div>
-                </div>
-            </a>
+          
         </div>
     </div>
 </div>

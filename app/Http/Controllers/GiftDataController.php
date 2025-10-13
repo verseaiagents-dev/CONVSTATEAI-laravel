@@ -170,10 +170,17 @@ class GiftDataController extends Controller
      */
     public function adminDestroy(GiftboxUsers $giftboxUser)
     {
-        $giftboxUser->delete();
-        
-        return redirect()->route('admin.giftbox-data.index')
-            ->with('success', 'Giftbox kullanıcısı başarıyla silindi.');
+        try {
+            $giftboxUser->delete();
+            
+            return redirect()->route('admin.giftbox-data.index')
+                ->with('success', 'Giftbox kullanıcısı başarıyla silindi.');
+        } catch (\Exception $e) {
+            \Log::error('Giftbox user deletion failed: ' . $e->getMessage());
+            
+            return redirect()->route('admin.giftbox-data.index')
+                ->with('error', 'Kullanıcı silinirken bir hata oluştu. Lütfen tekrar deneyin.');
+        }
     }
 
     /**

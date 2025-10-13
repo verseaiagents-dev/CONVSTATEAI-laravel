@@ -1543,16 +1543,24 @@ class KnowledgeBaseController extends Controller
             }
         }
         
-        // Product detection patterns - more comprehensive
+        // Product detection patterns - more comprehensive (fiyat bilgisi zorunlu değil)
         $productPatterns = [
-            // Basic product structure
-            ['"id":', ['"name":', '"title":'], ['"price":', '"category":', '"description":']],
-            // Flexible product structure
-            ['"id":', ['"name":', '"title":'], ['"brand":', '"category":', '"price":']],
-            // Title-based product
-            ['"title":', '"price":', '"category":'],
+            // Basic product structure - fiyat olmadan da çalışır
+            ['"id":', ['"name":', '"title":'], ['"category":', '"description":', '"brand":', '"price":']],
+            // Flexible product structure - fiyat olmadan da çalışır
+            ['"id":', ['"name":', '"title":'], ['"brand":', '"category":', '"description":', '"price":']],
+            // Title-based product - fiyat olmadan da çalışır
+            ['"title":', ['"category":', '"description":', '"price":']],
+            // Name-based product - fiyat olmadan da çalışır
+            ['"name":', ['"category":', '"description":', '"brand":', '"price":']],
             // Plan/Package detection
-            ['"name":', ['plan', 'package', 'starter', 'professional', 'enterprise', 'premium', 'basic']]
+            ['"name":', ['plan', 'package', 'starter', 'professional', 'enterprise', 'premium', 'basic']],
+            // ID + Name/Title pattern (en temel ürün yapısı)
+            ['"id":', ['"name":', '"title":']],
+            // Name/Title + Category pattern
+            [['"name":', '"title":'], '"category":'],
+            // Description-based detection
+            ['"description":', ['"name":', '"title":']]
         ];
         
         foreach ($productPatterns as $pattern) {
@@ -1571,7 +1579,7 @@ class KnowledgeBaseController extends Controller
     private function matchesProductPattern(string $content, array $pattern): bool
     {
         if (count($pattern) === 3 && is_array($pattern[1]) && is_array($pattern[2])) {
-            // Pattern: ["id":, ["name":, "title":], ["price":, "category":]]
+            // Pattern: ["id":, ["name":, "title":], ["category":, "description":, "brand":, "price":]]
             if (!str_contains($content, $pattern[0])) return false;
             
             $hasNameOrTitle = false;
@@ -1599,7 +1607,7 @@ class KnowledgeBaseController extends Controller
                    str_contains($content, $pattern[2]);
                    
         } elseif (count($pattern) === 2 && is_string($pattern[0]) && is_array($pattern[1])) {
-            // Pattern: ["name":, ["plan", "package", ...]]
+            // Pattern: ["name":, ["plan", "package", ...]] veya ["name":, ["category":, "description":]]
             if (!str_contains($content, $pattern[0])) return false;
             
             foreach ($pattern[1] as $keyword) {
@@ -1608,6 +1616,19 @@ class KnowledgeBaseController extends Controller
                 }
             }
             return false;
+            
+        } elseif (count($pattern) === 2 && is_array($pattern[0]) && is_string($pattern[1])) {
+            // Pattern: [["name":, "title":], "category":]
+            $hasNameOrTitle = false;
+            foreach ($pattern[0] as $namePattern) {
+                if (str_contains($content, $namePattern)) {
+                    $hasNameOrTitle = true;
+                    break;
+                }
+            }
+            if (!$hasNameOrTitle) return false;
+            
+            return str_contains($content, $pattern[1]);
         }
         
         return false;

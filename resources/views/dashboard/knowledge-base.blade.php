@@ -446,30 +446,6 @@
         <div id="knowledge-bases-container" class="glass-effect rounded-2xl p-8">
             <h2 class="text-2xl font-bold mb-6 text-white">Mevcut Bilgi Tabanları</h2>
             
-            <!-- Search Container -->
-            <div class="mb-8 p-6 bg-gray-800/30 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-semibold mb-4 text-white">Bilgi Tabanı Arama</h3>
-                
-                <div class="space-y-4">
-                    <div class="flex space-x-4">
-                        <input type="text" id="search-query" placeholder="Ürün arama, kategori bilgisi, yardım..." class="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-glow focus:outline-none focus:ring-2 focus:ring-purple-glow/20">
-                        <button id="search-btn" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105">
-                            AI ile Ara
-                        </button>
-                    </div>
-                    
-                    <p class="text-sm text-gray-400">
-                        AI destekli intent detection ile bilgi tabanında arama yapın. Sistem otomatik olarak en uygun yanıtı üretecektir.
-                    </p>
-                </div>
-                
-                <!-- Search Results -->
-                <div id="search-results" class="hidden mt-6">
-                    <div id="search-content" class="space-y-4">
-                        <!-- Search results will be populated here -->
-                    </div>
-                </div>
-            </div>
             
             <!-- Knowledge Bases List -->
             <div id="knowledge-bases-list" class="space-y-4">

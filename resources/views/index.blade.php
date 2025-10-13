@@ -376,6 +376,8 @@ src="https://www.facebook.com/tr?id=24557115803931045&ev=PageView&noscript=1"
         </div>
     </section>
 
+    
+
     <!-- Demo Section -->
     <section id="demo" class="py-20 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -569,7 +571,252 @@ src="https://www.facebook.com/tr?id=24557115803931045&ev=PageView&noscript=1"
     </section>
 
    
+    <!-- Pricing Cards Section -->
+    <section id="pricing-cards" class="py-20 relative">
+     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div class="text-center mb-16">
+             <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                 <span class="gradient-text">Fiyatlandırma</span> Planları
+             </h2>
+             <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                 İşletmenizin büyüklüğüne göre en uygun planı seçin
+             </p>
+         </div>
+         
+         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+             <!-- Start Plan -->
+             <div class="glass-effect rounded-2xl p-8 pricing-card relative">
+                 <div class="text-center">
+                     <h3 class="text-2xl font-bold mb-4">Start</h3>
+                     <div class="mb-6">
+                         <span class="text-5xl font-bold gradient-text">₺99</span>
+                         <span class="text-gray-400">/ay</span>
+                     </div>
+                 
+                     
+                     <ul class="space-y-4 mb-8 text-left">
+                      <li class="flex items-center">
+                           <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                           </svg>
+                           <span class="text-gray-300">1.000 Mesaj Limiti</span>
+                       </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Temel AI Chat</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Widget Entegrasyonu</span>
+                         </li>
+                      
+                       
+                     </ul>
+                     
+                     <a href="{{ route('register') }}" class="w-full px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg font-semibold text-white hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 block text-center">
+                         Başla
+                     </a>
+                 </div>
+             </div>
 
+             <!-- Pro Plan (Most Popular) -->
+             <div class="glass-effect rounded-2xl p-8 pricing-card relative border-2 border-purple-glow">
+                 <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                     <span class="popular-badge px-4 py-2 rounded-full text-white text-sm font-semibold">
+                         En Popüler
+                     </span>
+                 </div>
+                 
+                 <div class="text-center">
+                     <h3 class="text-2xl font-bold mb-4">Pro</h3>
+                     <div class="mb-6">
+                         <span class="text-5xl font-bold gradient-text">₺299</span>
+                         <span class="text-gray-400">/ay</span>
+                     </div>
+                   
+                     
+                     <ul class="space-y-4 mb-8 text-left">
+                      <li class="flex items-center">
+                           <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                           </svg>
+                           <span class="text-gray-300">5.000 Mesaj Limiti</span>
+                       </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Gelişmiş AI Chat</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Kampanya Yönetimi</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Ürün Önerileri</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Kargo Takip</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Detaylı Raporlama</span>
+                         </li>
+                        
+                     </ul>
+                     
+                     <a href="{{ route('register') }}" class="w-full px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg font-semibold text-white hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 block text-center">
+                         Başla
+                     </a>
+                 </div>
+             </div>
+
+             <!-- Scale Plan -->
+             <div class="glass-effect rounded-2xl p-8 pricing-card relative">
+                 <div class="text-center">
+                     <h3 class="text-2xl font-bold mb-4">Scale</h3>
+                     <div class="mb-6">
+                         <span class="text-5xl font-bold gradient-text">₺599</span>
+                         <span class="text-gray-400">/ay</span>
+                     </div>
+                   
+                     
+                     <ul class="space-y-4 mb-8 text-left">
+                        <li class="flex items-center">
+                           <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                           </svg>
+                           <span class="text-gray-300">15.000 Mesaj Limiti</span>
+                       </li>
+                         <li class="flex items-center">
+                           <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                           </svg>
+                           <span class="text-gray-300">Çoklu Proje Desteği</span>
+                       </li>
+                      
+                        
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Özel Entegrasyonlar</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">7/24 Telefon Desteği</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Gelişmiş Analitik</span>
+                         </li>
+                     </ul>
+                     
+                     <a href="{{ route('register') }}" class="w-full px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg font-semibold text-white hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 block text-center">
+                         Başla
+                     </a>
+                 </div>
+             </div>
+
+             <!-- Enterprise Plan -->
+             <div class="glass-effect rounded-2xl p-8 pricing-card relative">
+                 <div class="text-center">
+                     <h3 class="text-2xl font-bold mb-4">Enterprise</h3>
+                     <div class="mb-6">
+                         <span class="text-5xl font-bold gradient-text">Özel</span>
+                     </div>
+                     <p class="text-gray-300 mb-8">Özel Sistem Kurulumu</p>
+                     
+                     <ul class="space-y-4 mb-8 text-left">
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Tüm Scale Özellikler</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Sınırsız Token</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Özel AI Modeli</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Dedicated Support</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">SLA Garantisi</span>
+                         </li>
+                         <li class="flex items-center">
+                             <svg class="w-5 h-5 feature-check mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                             </svg>
+                             <span class="text-gray-300">Özel Kurulum</span>
+                         </li>
+                     </ul>
+                     
+                     <a href="#" class="w-full px-6 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg font-semibold text-white hover:from-purple-dark hover:to-purple-glow transition-all duration-300 transform hover:scale-105 block text-center">
+                         İletişime Geç
+                     </a>
+                 </div>
+             </div>
+         </div>
+         
+         <!-- Additional Info -->
+         <div class="mt-16 text-center">
+             <div class="glass-effect rounded-2xl p-8 max-w-4xl mx-auto">
+                 <h3 class="text-2xl font-bold mb-4 gradient-text">Sık Sorulan Sorular</h3>
+                 <div class="grid md:grid-cols-2 gap-8 text-left">
+                     <div>
+                         <h4 class="font-semibold mb-2 text-purple-glow">Token nedir?</h4>
+                         <p class="text-gray-300 text-sm">Token, AI'ın müşterilerinizle yaptığı her konuşmada kullandığı birimdir. Mesaj uzunluğuna göre değişir.</p>
+                     </div>
+                     <div>
+                         <h4 class="font-semibold mb-2 text-purple-glow">Plan değişikliği yapabilir miyim?</h4>
+                         <p class="text-gray-300 text-sm">Evet, istediğiniz zaman planınızı yükseltebilir veya düşürebilirsiniz. Değişiklik anında geçerli olur.</p>
+                     </div>
+                     <div>
+                         <h4 class="font-semibold mb-2 text-purple-glow">İptal edebilir miyim?</h4>
+                         <p class="text-gray-300 text-sm">Evet, istediğiniz zaman aboneliğinizi iptal edebilirsiniz. İptal sonrası dönem sonuna kadar hizmet almaya devam edersiniz.</p>
+                     </div>
+                     <div>
+                         <h4 class="font-semibold mb-2 text-purple-glow">Token limitimi aştığımda ne olur?</h4>
+                         <p class="text-gray-300 text-sm">Token limitinizi aştığınızda otomatik olarak ek token satın alma seçeneği sunulur. Token limitiniz dolduğunda hizmet geçici olarak durur.</p>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ </section>
 
     <!-- CTA Section (Action Stage) -->
     <section class="py-20 relative">

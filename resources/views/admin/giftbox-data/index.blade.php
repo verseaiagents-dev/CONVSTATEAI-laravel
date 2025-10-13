@@ -4,6 +4,29 @@
 
 @section('content')
 <div class="space-y-6">
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+    <div class="glass-effect rounded-xl p-4 border border-green-500/50 bg-green-500/10">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-green-400 font-medium">{{ session('success') }}</span>
+        </div>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="glass-effect rounded-xl p-4 border border-red-500/50 bg-red-500/10">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-red-400 font-medium">{{ session('error') }}</span>
+        </div>
+    </div>
+    @endif
+
     <!-- Header -->
     <div class="glass-effect rounded-2xl p-8 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
@@ -159,7 +182,7 @@
                                 <a href="{{ route('admin.giftbox-data.show', $user) }}" class="text-blue-400 hover:text-blue-300 transition-colors">
                                     👁️ Görüntüle
                                 </a>
-                                <form method="POST" action="{{ route('admin.giftbox-data.destroy', $user) }}" class="inline" onsubmit="return confirm('Bu lead\'i silmek istediğinizden emin misiniz?')">
+                                <form method="POST" action="{{ route('admin.giftbox-data.destroy', $user) }}" class="inline" onsubmit="return confirmDelete('{{ $user->name }} {{ $user->surname }}')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-400 hover:text-red-300 transition-colors">
@@ -194,4 +217,10 @@
         @endif
     </div>
 </div>
+
+<script>
+function confirmDelete(userName) {
+    return confirm(`"${userName}" adlı lead'i silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`);
+}
+</script>
 @endsection
