@@ -945,7 +945,7 @@ function populateKnowledgeBasesList() {
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <h3 class="text-lg font-semibold text-white mb-2">${kb.name}</h3>
-                    ${kb.description ? `<p class="text-gray-300 text-sm mb-3">${kb.description}</p>` : ''}
+                    ${kb.description && !kb.description.includes('URL:') ? `<p class="text-gray-300 text-sm mb-3">${kb.description}</p>` : ''}
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
@@ -2149,7 +2149,7 @@ async function refreshKnowledgeBase(kbId) {
         // Get CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
         
-        const response = await fetch(`/dashboard/knowledge-base/${kbId}/refresh-chunks`, {
+        const response = await fetch(`{{ route('dashboard.knowledge-base.refresh-chunks', '') }}/${kbId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
