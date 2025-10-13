@@ -945,7 +945,7 @@ function populateKnowledgeBasesList() {
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <h3 class="text-lg font-semibold text-white mb-2">${kb.name}</h3>
-                    ${kb.description ? `<p class="text-gray-300 text-sm mb-3">${kb.description}</p>` : ''}
+                    ${kb.description ? `<p class="text-gray-300 text-sm mb-3">${truncateUrlInDescription(kb.description)}</p>` : ''}
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
@@ -1552,14 +1552,7 @@ function displayChunks(chunks, knowledgeBase, currentPage = 1) {
                     <span class="text-white ml-2">${new Date(knowledgeBase.created_at).toLocaleDateString('tr-TR')}</span>
                 </div>
             </div>
-            ${knowledgeBase.source_type === 'url' && knowledgeBase.source_path ? `
-                <div class="mt-4 text-sm">
-                    <span class="text-gray-400">URL:</span>
-                    <a href="${knowledgeBase.source_path}" target="_blank" class="text-blue-400 hover:text-blue-300 ml-2 transition-colors duration-200">
-                        ${knowledgeBase.source_path.length > 20 ? knowledgeBase.source_path.substring(0, 20) + '...' : knowledgeBase.source_path}
-                    </a>
-                </div>
-            ` : ''}
+       
         </div>
     `;
     
@@ -2123,6 +2116,19 @@ function showErrorMessage(message) {
     setTimeout(() => {
         errorDiv.remove();
     }, 5000);
+}
+
+// URL'yi description içinde kısalt
+function truncateUrlInDescription(description) {
+    if (!description) return '';
+    
+    // URL pattern'ini bul (http/https ile başlayan)
+    const urlPattern = /(https?:\/\/[^\s|]+)/g;
+    
+    return description.replace(urlPattern, (url) => {
+        // URL'yi 20 karakter + "..." şeklinde kısalt
+        return url.length > 20 ? url.substring(0, 20) + '...' : url;
+    });
 }
 </script>
 @endsection
