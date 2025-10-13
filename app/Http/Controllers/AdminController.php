@@ -33,11 +33,7 @@ class AdminController extends Controller
             'total_demo_requests' => DemoRequest::count(),
             'pending_demo_requests' => DemoRequest::where('status', 'pending')->count(),
             'total_giftbox_users' => GiftboxUsers::count(),
-            'recent_giftbox_users' => GiftboxUsers::latest()->take(5)->get(),
-            'giftbox_sector_stats' => GiftboxUsers::selectRaw('sector, COUNT(*) as count')
-                ->groupBy('sector')
-                ->orderBy('count', 'desc')
-                ->get(),
+            'recent_giftbox_users' => GiftboxUsers::where('created_at', '>=', now()->subWeek())->count(),
             'recent_users' => User::latest()->take(5)->get(),
             'recent_campaigns' => Campaign::latest()->take(5)->get(),
             'recent_demo_requests' => DemoRequest::latest()->take(5)->get(),

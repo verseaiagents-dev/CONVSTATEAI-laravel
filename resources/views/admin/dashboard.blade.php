@@ -27,6 +27,9 @@
                 <a href="{{ route('admin.payment-settings.index') }}" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105">
                     Ödeme Ayarları
                 </a>
+                <a href="{{ route('admin.giftbox-data.index') }}" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg text-white font-semibold hover:from-pink-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105">
+                    🎁 Giftbox Lead Yönetimi
+                </a>
             </div>
         </div>
     </div>
@@ -133,28 +136,28 @@
         <div class="glass-effect rounded-xl p-6 border border-gray-700 hover:border-pink-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/10">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Giftbox Verileri</p>
-                    <p class="mt-2 text-3xl font-bold text-white">{{ $stats['total_giftbox_users'] }}</p>
-                    @if($stats['giftbox_sector_stats']->count() > 0)
-                        <p class="text-sm text-pink-400 font-medium">{{ $stats['giftbox_sector_stats']->first()->sector }} lider</p>
+                    <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Giftbox Leadleri</p>
+                    <p class="mt-2 text-3xl font-bold text-white">{{ $stats['total_giftbox_users'] ?? 0 }}</p>
+                    @if(isset($stats['recent_giftbox_users']) && $stats['recent_giftbox_users'] > 0)
+                        <p class="text-sm text-pink-400 font-medium">{{ $stats['recent_giftbox_users'] }} bu hafta</p>
                     @endif
                 </div>
                 <div class="p-3 bg-pink-500/20 rounded-full">
                     <svg class="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
                     </svg>
                 </div>
             </div>
             <div class="mt-4 flex items-center text-sm">
                 <a href="{{ route('admin.giftbox-data.index') }}" class="text-pink-400 hover:text-pink-300 transition-colors">
-                    Giftbox verilerini görüntüle →
+                    Lead verilerini görüntüle →
                 </a>
             </div>
         </div>
     </div>
 
     <!-- Recent Activity -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Recent Users -->
         <div class="glass-effect rounded-xl p-6">
             <h3 class="text-xl font-semibold text-white mb-4">Son Kayıt Olan Kullanıcılar</h3>
@@ -238,48 +241,6 @@
                 @endforelse
             </div>
         </div>
-
-        <!-- Recent Giftbox Users -->
-        <div class="glass-effect rounded-xl p-6">
-            <h3 class="text-xl font-semibold text-white mb-4">Son Giftbox Verileri</h3>
-            <div class="space-y-3">
-                @forelse($stats['recent_giftbox_users'] as $giftboxUser)
-                <div class="flex items-center space-x-3 p-3 bg-gray-800/30 rounded-lg">
-                    <div class="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center">
-                        <span class="text-pink-400 font-medium">{{ substr($giftboxUser->name, 0, 1) }}</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-white font-medium">{{ $giftboxUser->name }} {{ $giftboxUser->surname }}</p>
-                        <p class="text-gray-400 text-sm">{{ $giftboxUser->mail }}</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            @php
-                                $sectorColors = [
-                                    'fashion' => 'bg-pink-500/20 text-pink-400',
-                                    'furniture' => 'bg-brown-500/20 text-brown-400',
-                                    'home-appliances' => 'bg-blue-500/20 text-blue-400',
-                                    'health-beauty' => 'bg-green-500/20 text-green-400',
-                                    'electronics' => 'bg-purple-500/20 text-purple-400'
-                                ];
-                                $sectorLabels = [
-                                    'fashion' => 'Moda',
-                                    'furniture' => 'Mobilya',
-                                    'home-appliances' => 'Ev Aletleri',
-                                    'health-beauty' => 'Sağlık & Güzellik',
-                                    'electronics' => 'Elektronik'
-                                ];
-                            @endphp
-                            <span class="px-2 py-1 text-xs rounded-full {{ $sectorColors[$giftboxUser->sector] ?? 'bg-gray-500/20 text-gray-400' }}">
-                                {{ $sectorLabels[$giftboxUser->sector] ?? ucfirst($giftboxUser->sector) }}
-                            </span>
-                        </div>
-                    </div>
-                    <span class="text-xs text-gray-500">{{ $giftboxUser->created_at->diffForHumans() }}</span>
-                </div>
-                @empty
-                <p class="text-gray-400 text-center py-4">Henüz giftbox verisi yok</p>
-                @endforelse
-            </div>
-        </div>
     </div>
 
     <!-- Quick Actions -->
@@ -318,11 +279,11 @@
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center group-hover:bg-pink-500/30 transition-all duration-200">
                         <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
                         </svg>
                     </div>
                     <div>
-                        <p class="text-white font-medium">Giftbox Verileri</p>
+                        <p class="text-white font-medium">🎁 Giftbox Leadleri</p>
                         <p class="text-gray-400 text-sm">Lead verilerini görüntüle ve yönet</p>
                     </div>
                 </div>

@@ -1,253 +1,197 @@
 @extends('layouts.admin')
 
-@section('title', 'Giftbox Verileri')
+@section('title', 'Giftbox Lead Yönetimi - ConvStateAI')
 
 @section('content')
 <div class="space-y-6">
     <!-- Header -->
-    <div class="flex justify-between items-center">
-        <div>
-            <h1 class="text-3xl font-bold text-white">Giftbox Verileri</h1>
-            <p class="text-gray-400 mt-2">Gift formlarından gelen lead verilerini yönetin</p>
-        </div>
-        <div class="flex items-center space-x-4">
-            <div class="bg-gray-800 rounded-lg px-4 py-2">
-                <span class="text-sm text-gray-400">Toplam:</span>
-                <span class="text-white font-semibold">{{ $totalCount }}</span>
+    <div class="glass-effect rounded-2xl p-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
+        <div class="absolute bottom-0 left-0 w-40 h-40 bg-rose-500 rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
+        
+        <div class="relative z-10">
+            <h1 class="text-4xl font-bold mb-4">
+                🎁 <span class="gradient-text">Giftbox Lead Yönetimi</span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-6">
+                Gift formlarından gelen lead verilerini görüntüleyin ve yönetin.
+            </p>
+            
+            <div class="flex flex-wrap gap-4">
+                <a href="{{ route('admin.giftbox-data.export') }}" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105">
+                    📊 CSV Export
+                </a>
+                <a href="{{ route('admin.dashboard') }}" class="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg text-white font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105">
+                    ← Admin Dashboard
+                </a>
             </div>
-            <a href="{{ route('admin.giftbox-data.export', request()->query()) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                CSV İndir
-            </a>
         </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div class="bg-gray-800 rounded-lg p-6">
-            <div class="flex items-center">
-                <div class="p-3 bg-purple-500/20 rounded-lg">
-                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Leads -->
+        <div class="glass-effect rounded-xl p-6 border border-gray-700 hover:border-pink-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Toplam Lead</p>
+                    <p class="mt-2 text-3xl font-bold text-white">{{ $totalCount }}</p>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-400">Toplam</p>
-                    <p class="text-2xl font-bold text-white">{{ $totalCount }}</p>
+                <div class="p-3 bg-pink-500/20 rounded-full">
+                    <svg class="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
+                    </svg>
                 </div>
             </div>
         </div>
-        
+
+        <!-- Sector Stats -->
         @foreach($sectorStats as $stat)
-            @php
-                $sectorColors = [
-                    'fashion' => 'bg-pink-500/20 text-pink-400',
-                    'furniture' => 'bg-brown-500/20 text-brown-400',
-                    'home-appliances' => 'bg-blue-500/20 text-blue-400',
-                    'health-beauty' => 'bg-green-500/20 text-green-400',
-                    'electronics' => 'bg-purple-500/20 text-purple-400'
-                ];
-                $sectorLabels = [
-                    'fashion' => 'Moda',
-                    'furniture' => 'Mobilya',
-                    'home-appliances' => 'Ev Aletleri',
-                    'health-beauty' => 'Sağlık & Güzellik',
-                    'electronics' => 'Elektronik'
-                ];
-                $sectorIcons = [
-                    'fashion' => 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z',
-                    'furniture' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z',
-                    'home-appliances' => 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16',
-                    'health-beauty' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-                    'electronics' => 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'
-                ];
-            @endphp
-            <div class="bg-gray-800 rounded-lg p-6">
-                <div class="flex items-center">
-                    <div class="p-3 {{ $sectorColors[$stat->sector] }} rounded-lg">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sectorIcons[$stat->sector] }}"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-400">{{ $sectorLabels[$stat->sector] ?? ucfirst($stat->sector) }}</p>
-                        <p class="text-2xl font-bold text-white">{{ $stat->count }}</p>
-                    </div>
+        <div class="glass-effect rounded-xl p-6 border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">{{ ucfirst($stat->sector) }}</p>
+                    <p class="mt-2 text-3xl font-bold text-white">{{ $stat->count }}</p>
+                </div>
+                <div class="p-3 bg-blue-500/20 rounded-full">
+                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
                 </div>
             </div>
+        </div>
         @endforeach
     </div>
 
-    <!-- Filters -->
-    <div class="bg-gray-800 rounded-lg p-6">
-        <form method="GET" class="flex flex-wrap gap-4">
+    <!-- Filters and Search -->
+    <div class="glass-effect rounded-xl p-6">
+        <form method="GET" action="{{ route('admin.giftbox-data.index') }}" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-64">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Ad, soyad, email veya telefon ile ara..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Arama</label>
+                <input type="text" name="search" value="{{ $request->search }}" placeholder="Ad, soyad, email veya telefon ile ara..." class="w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-pink-500 focus:ring-1 focus:ring-pink-500">
             </div>
+            
             <div class="min-w-48">
-                <select name="sector" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Sektör</label>
+                <select name="sector" class="w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-pink-500 focus:ring-1 focus:ring-pink-500">
                     <option value="">Tüm Sektörler</option>
-                    <option value="fashion" {{ request('sector') == 'fashion' ? 'selected' : '' }}>Moda</option>
-                    <option value="furniture" {{ request('sector') == 'furniture' ? 'selected' : '' }}>Mobilya</option>
-                    <option value="home-appliances" {{ request('sector') == 'home-appliances' ? 'selected' : '' }}>Ev Aletleri</option>
-                    <option value="health-beauty" {{ request('sector') == 'health-beauty' ? 'selected' : '' }}>Sağlık & Güzellik</option>
-                    <option value="electronics" {{ request('sector') == 'electronics' ? 'selected' : '' }}>Elektronik</option>
+                    <option value="fashion" {{ $request->sector == 'fashion' ? 'selected' : '' }}>Fashion</option>
+                    <option value="furniture" {{ $request->sector == 'furniture' ? 'selected' : '' }}>Furniture</option>
+                    <option value="home-appliances" {{ $request->sector == 'home-appliances' ? 'selected' : '' }}>Home Appliances</option>
+                    <option value="health-beauty" {{ $request->sector == 'health-beauty' ? 'selected' : '' }}>Health & Beauty</option>
+                    <option value="electronics" {{ $request->sector == 'electronics' ? 'selected' : '' }}>Electronics</option>
                 </select>
             </div>
+            
+            <div class="min-w-48">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Sıralama</label>
+                <select name="sort_by" class="w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-pink-500 focus:ring-1 focus:ring-pink-500">
+                    <option value="created_at" {{ $request->sort_by == 'created_at' ? 'selected' : '' }}>Kayıt Tarihi</option>
+                    <option value="name" {{ $request->sort_by == 'name' ? 'selected' : '' }}>Ad</option>
+                    <option value="surname" {{ $request->sort_by == 'surname' ? 'selected' : '' }}>Soyad</option>
+                    <option value="mail" {{ $request->sort_by == 'mail' ? 'selected' : '' }}>Email</option>
+                    <option value="sector" {{ $request->sort_by == 'sector' ? 'selected' : '' }}>Sektör</option>
+                </select>
+            </div>
+            
             <div class="min-w-32">
-                <select name="sort_by" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
-                    <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Tarih</option>
-                    <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Ad</option>
-                    <option value="surname" {{ request('sort_by') == 'surname' ? 'selected' : '' }}>Soyad</option>
-                    <option value="mail" {{ request('sort_by') == 'mail' ? 'selected' : '' }}>Email</option>
-                    <option value="sector" {{ request('sort_by') == 'sector' ? 'selected' : '' }}>Sektör</option>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Sıra</label>
+                <select name="sort_order" class="w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-pink-500 focus:ring-1 focus:ring-pink-500">
+                    <option value="desc" {{ $request->sort_order == 'desc' ? 'selected' : '' }}>Azalan</option>
+                    <option value="asc" {{ $request->sort_order == 'asc' ? 'selected' : '' }}>Artan</option>
                 </select>
             </div>
-            <div class="min-w-32">
-                <select name="sort_order" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
-                    <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Azalan</option>
-                    <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Artan</option>
-                </select>
-            </div>
-            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors">
-                Filtrele
+            
+            <button type="submit" class="px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-colors">
+                🔍 Filtrele
             </button>
-            @if(request()->hasAny(['search', 'sector', 'sort_by', 'sort_order']))
-                <a href="{{ route('admin.giftbox-data.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">
-                    Temizle
-                </a>
+            
+            @if($request->hasAny(['search', 'sector', 'sort_by', 'sort_order']))
+            <a href="{{ route('admin.giftbox-data.index') }}" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                🗑️ Temizle
+            </a>
             @endif
         </form>
     </div>
 
-    <!-- Giftbox Users Table -->
-    <div class="bg-gray-800 rounded-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-700">
-            <h3 class="text-lg font-semibold text-white">Giftbox Kullanıcıları</h3>
+    <!-- Leads Table -->
+    <div class="glass-effect rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-800/50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Ad Soyad</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Telefon</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Ziyaretçi</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Sektör</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Kayıt Tarihi</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    @forelse($giftboxUsers as $user)
+                    <tr class="hover:bg-gray-800/30 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{{ $user->id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-white">{{ $user->name }} {{ $user->surname }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-300">{{ $user->mail }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-300">{{ $user->phone ?? '-' }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-300">{{ $user->visitors ?? '-' }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {{ ucfirst($user->sector) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {{ $user->created_at->format('d.m.Y H:i') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{{ route('admin.giftbox-data.show', $user) }}" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                    👁️ Görüntüle
+                                </a>
+                                <form method="POST" action="{{ route('admin.giftbox-data.destroy', $user) }}" class="inline" onsubmit="return confirm('Bu lead\'i silmek istediğinizden emin misiniz?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-400 hover:text-red-300 transition-colors">
+                                        🗑️ Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center text-gray-400">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-12 h-12 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
+                                </svg>
+                                <p class="text-lg font-medium">Henüz lead verisi bulunmuyor</p>
+                                <p class="text-sm">Gift formlarından gelen veriler burada görüntülenecek.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
         
-        @if($giftboxUsers->count() > 0)
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Kişi</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">İletişim</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ziyaretçi Sayısı</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Sektör</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Kayıt Tarihi</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        @foreach($giftboxUsers as $user)
-                            <tr class="hover:bg-gray-700/50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div>
-                                        <div class="text-sm font-medium text-white">{{ $user->name }} {{ $user->surname }}</div>
-                                        <div class="text-sm text-gray-400">ID: {{ $user->id }}</div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div>
-                                        <div class="text-sm text-white">{{ $user->mail }}</div>
-                                        @if($user->phone)
-                                            <div class="text-sm text-gray-400">{{ $user->phone }}</div>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($user->visitors)
-                                        <span class="text-sm text-white">{{ $user->visitors }}</span>
-                                    @else
-                                        <span class="text-sm text-gray-400">Belirtilmemiş</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @php
-                                        $sectorColors = [
-                                            'fashion' => 'bg-pink-500/20 text-pink-400',
-                                            'furniture' => 'bg-brown-500/20 text-brown-400',
-                                            'home-appliances' => 'bg-blue-500/20 text-blue-400',
-                                            'health-beauty' => 'bg-green-500/20 text-green-400',
-                                            'electronics' => 'bg-purple-500/20 text-purple-400'
-                                        ];
-                                        $sectorLabels = [
-                                            'fashion' => 'Moda',
-                                            'furniture' => 'Mobilya',
-                                            'home-appliances' => 'Ev Aletleri',
-                                            'health-beauty' => 'Sağlık & Güzellik',
-                                            'electronics' => 'Elektronik'
-                                        ];
-                                    @endphp
-                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full {{ $sectorColors[$user->sector] ?? 'bg-gray-500/20 text-gray-400' }}">
-                                        {{ $sectorLabels[$user->sector] ?? ucfirst($user->sector) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                    {{ $user->created_at->format('d.m.Y H:i') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('admin.giftbox-data.show', $user) }}" class="text-purple-400 hover:text-purple-300 transition-colors" title="Detayları Görüntüle">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                            </svg>
-                                        </a>
-                                        <button onclick="deleteUser({{ $user->id }})" class="text-red-400 hover:text-red-300 transition-colors" title="Sil">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-700">
-                {{ $giftboxUsers->appends(request()->query())->links() }}
-            </div>
-        @else
-            <div class="px-6 py-12 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-400">Henüz giftbox verisi yok</h3>
-                <p class="mt-1 text-sm text-gray-500">Gift formlarından gelen veriler burada görünecek.</p>
-            </div>
+        <!-- Pagination -->
+        @if($giftboxUsers->hasPages())
+        <div class="px-6 py-4 border-t border-gray-700">
+            {{ $giftboxUsers->appends($request->query())->links() }}
+        </div>
         @endif
     </div>
 </div>
-
-<script>
-function deleteUser(userId) {
-    if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
-        fetch(`/admin/giftbox-data/${userId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                alert('Silme işlemi sırasında bir hata oluştu.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Bir hata oluştu.');
-        });
-    }
-}
-</script>
 @endsection

@@ -124,8 +124,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/knowledge-base/image-status', [KnowledgeBaseController::class, 'getImageAnalysisStatus'])->name('dashboard.knowledge-base.image-status');
     Route::delete('/dashboard/knowledge-base/{id}', [KnowledgeBaseController::class, 'destroy'])->name('dashboard.knowledge-base.destroy');
     Route::get('/dashboard/knowledge-base/{id}/detail', [KnowledgeBaseController::class, 'getDetail'])->name('dashboard.knowledge-base.detail');
-    Route::get('/dashboard/knowledge-base/{id}/chunks', [KnowledgeBaseController::class, 'getChunks'])->name('dashboard.knowledge-base.chunks');
-    Route::post('/dashboard/knowledge-base/{id}/refresh-chunks', [KnowledgeBaseController::class, 'refreshChunks'])->name('dashboard.knowledge-base.refresh-chunks');
     
     
     Route::get('/dashboard/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('dashboard.analytics');
@@ -256,6 +254,14 @@ Route::get('/admin/analytics/load-content', [AdminController::class, 'loadAnalyt
     Route::post('/admin/token-calculator/save-plan', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'savePlan'])->name('admin.token-calculator.save-plan');
     Route::post('/admin/token-calculator/export', [\App\Http\Controllers\Admin\TokenCalculatorController::class, 'exportCalculation'])->name('admin.token-calculator.export');
     
+    // Giftbox Data Management
+    Route::prefix('admin/giftbox-data')->name('admin.giftbox-data.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\GiftDataController::class, 'adminIndex'])->name('index');
+        Route::get('/{giftboxUser}', [\App\Http\Controllers\GiftDataController::class, 'adminShow'])->name('show');
+        Route::delete('/{giftboxUser}', [\App\Http\Controllers\GiftDataController::class, 'adminDestroy'])->name('destroy');
+        Route::get('/export', [\App\Http\Controllers\GiftDataController::class, 'adminExport'])->name('export');
+    });
+    
 });
 
 Route::get('/admin/demo-requests', [\App\Http\Controllers\Admin\DemoRequestController::class, 'index'])->name('admin.demo-requests.index');
@@ -341,10 +347,3 @@ Route::get('/gift', function () {
  Route::post('/gift/home', [GiftDataController::class, 'storeHomeAppliancesSector'])->name('gift-data.home-appliances-sector.store');
  Route::post('/gift/health', [GiftDataController::class, 'storeHealthBeautySector'])->name('gift-data.health-beauty-sector.store');
  Route::post('/gift/electronics', [GiftDataController::class, 'storeElectronicsSector'])->name('gift-data.electronics-sector.store');
-     // Giftbox Data Management
-  Route::prefix('admin/giftbox-data')->name('admin.giftbox-data.')->group(function () {
-         Route::get('/', [\App\Http\Controllers\GiftDataController::class, 'adminIndex'])->name('index');
-         Route::get('/{giftboxUser}', [\App\Http\Controllers\GiftDataController::class, 'adminShow'])->name('show');
-         Route::delete('/{giftboxUser}', [\App\Http\Controllers\GiftDataController::class, 'adminDestroy'])->name('destroy');
-         Route::get('/export', [\App\Http\Controllers\GiftDataController::class, 'adminExport'])->name('export');
-     });
