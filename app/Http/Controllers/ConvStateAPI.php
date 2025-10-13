@@ -677,9 +677,18 @@ class ConvStateAPI extends Controller
                     }
                 }
                 
+                // ✅ FIX: Ürün adı yoksa bu ürünü skip et (dummy data önleme)
+                if (empty($metadata['product_name']) && empty($metadata['product_title'])) {
+                    Log::warning('Product without name skipped', [
+                        'chunk_id' => $chunk->id,
+                        'project_id' => $projectId
+                    ]);
+                    continue; // İsimsiz ürünü gösterme
+                }
+                
                 $products[] = [
                     'id' => $metadata['product_id'] ?? $chunk->id,
-                    'name' => $metadata['product_name'] ?? $metadata['product_title'] ?? 'Ürün ' . $chunk->id,
+                    'name' => $metadata['product_name'] ?? $metadata['product_title'], // Artık fallback yok
                     'category' => $metadata['product_category'] ?? 'Genel',
                     'price' => $metadata['product_price'] ?? 0,
                     'brand' => $metadata['product_brand'] ?? 'Bilinmeyen',
@@ -1702,9 +1711,13 @@ class ConvStateAPI extends Controller
                     continue; // JSON parse edilemezse skip et
                 }
                 
-                // Eğer ürün verisi eksikse veya geçersizse skip et
+                // ✅ FIX: Ürün adı yoksa bu ürünü skip et (dummy data önleme)
                 if (empty($productData['name']) && empty($productData['title'])) {
-                    continue;
+                    Log::warning('Random product without name skipped', [
+                        'chunk_id' => $chunk->id,
+                        'project_id' => $projectId
+                    ]);
+                    continue; // İsimsiz ürünü gösterme
                 }
                 
                 // Metadata'nın zaten array olup olmadığını kontrol et
@@ -1716,7 +1729,7 @@ class ConvStateAPI extends Controller
                 
                 $products[] = [
                     'id' => $productData['id'] ?? $chunk->id,
-                    'name' => $productData['name'] ?? $productData['title'] ?? 'Ürün',
+                    'name' => $productData['name'] ?? $productData['title'], // Artık fallback yok
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
                     'brand' => $productData['brand'] ?? 'Bilinmeyen',
