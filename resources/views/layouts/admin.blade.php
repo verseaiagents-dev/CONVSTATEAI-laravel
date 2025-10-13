@@ -169,6 +169,13 @@
                     <span>Demo Talepleri</span>
                 </a>
 
+                <a href="{{ route('admin.giftbox-data.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-purple-glow/10 hover:text-purple-glow transition-all duration-200 {{ request()->routeIs('admin.giftbox-data*') ? 'bg-purple-glow/20 text-purple-glow' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <span>Giftbox Verileri</span>
+                </a>
+
                 <!-- Kullanıcı Paneline Geç -->
                 <div class="pt-4 border-t border-gray-800">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-blue-500/10 hover:text-blue-400 transition-all duration-200">
