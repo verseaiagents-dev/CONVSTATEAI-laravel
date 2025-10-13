@@ -677,13 +677,13 @@ class ConvStateAPI extends Controller
                     }
                 }
                 
-                // ✅ FIX: Ürün adı yoksa bu ürünü skip et (dummy data önleme)
+                // ✅ FIX: İsimsiz ürünleri skip et (dummy data önleme)
                 if (empty($metadata['product_name']) && empty($metadata['product_title'])) {
-                    Log::warning('Product without name skipped', [
+                    Log::info('Skipping product without name', [
                         'chunk_id' => $chunk->id,
-                        'project_id' => $projectId
+                        'metadata' => $metadata
                     ]);
-                    continue; // İsimsiz ürünü gösterme
+                    continue; // Bu ürünü atla
                 }
                 
                 $products[] = [
@@ -791,7 +791,7 @@ class ConvStateAPI extends Controller
                     'name' => $metadata['name'] ?? 'Ürün ' . $chunk->id,
                     'price' => $metadata['price'] ?? 0,
                     'rating' => $metadata['rating'] ?? 4.0,
-                    'brand' => $metadata['brand'] ?? 'Bilinmeyen',
+                    'brand' => $metadata['brand'] ?? ' ',
                     'stock' => $metadata['stock'] ?? 0
                 ];
                 
@@ -1562,7 +1562,7 @@ class ConvStateAPI extends Controller
                                     'name' => $productData['title'] ?? $productData['name'] ?? 'Ürün',
                                     'category' => $productData['category'] ?? 'Genel',
                                     'price' => $productData['price'] ?? 0,
-                                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                                    'brand' => $productData['brand'] ?? ' ',
                                     'rating' => (is_array($productData['rating'] ?? null) && isset($productData['rating']['rate'])) 
                                         ? $productData['rating']['rate'] 
                                         : (is_numeric($productData['rating'] ?? null) ? $productData['rating'] : 5.0),
@@ -1711,13 +1711,9 @@ class ConvStateAPI extends Controller
                     continue; // JSON parse edilemezse skip et
                 }
                 
-                // ✅ FIX: Ürün adı yoksa bu ürünü skip et (dummy data önleme)
+                // Eğer ürün verisi eksikse veya geçersizse skip et
                 if (empty($productData['name']) && empty($productData['title'])) {
-                    Log::warning('Random product without name skipped', [
-                        'chunk_id' => $chunk->id,
-                        'project_id' => $projectId
-                    ]);
-                    continue; // İsimsiz ürünü gösterme
+                    continue;
                 }
                 
                 // Metadata'nın zaten array olup olmadığını kontrol et
