@@ -2149,7 +2149,7 @@ async function refreshKnowledgeBase(kbId) {
         // Get CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
         
-        const response = await fetch(`{{ route('dashboard.knowledge-base.refresh-chunks', '') }}/${kbId}`, {
+        const response = await fetch(`/dashboard/knowledge-base/${kbId}/refresh-chunks`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
