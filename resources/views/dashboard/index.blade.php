@@ -53,34 +53,51 @@
                     Tüm Projeleri Gör
                 </a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @forelse($projectStats as $project)
-                    <div class="p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-200">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-white font-medium">{{ $project->name ?? 'İsimsiz Proje' }}</h4>
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ ($project->status ?? '') === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400' }}">
-                                {{ ($project->status ?? '') === 'active' ? 'Aktif' : 'Pasif' }}
-                            </span>
-                        </div>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Knowledge Base:</span>
-                                <span class="text-white">{{ $project->knowledge_bases_count ?? 0 }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Chat Sessions:</span>
-                                <span class="text-white">{{ $project->chat_sessions_count ?? 0 }}</span>
-                            </div>
-                        </div>
+            
+            <!-- Horizontal Scroll Container -->
+            <div class="overflow-x-auto pb-4">
+                <div class="flex space-x-4 min-w-max">
+                    <!-- Proje Ekle Butonu -->
+                    <div class="flex-shrink-0">
+                        <button onclick="openCreateProjectModal()" class="w-64 h-32 bg-gradient-to-br from-purple-glow/20 to-neon-purple/20 rounded-lg border-2 border-dashed border-purple-500/50 hover:border-purple-500 hover:from-purple-glow/30 hover:to-neon-purple/30 transition-all duration-300 flex flex-col items-center justify-center group">
+                            <svg class="w-8 h-8 text-purple-400 group-hover:text-purple-300 transition-colors mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            <span class="text-purple-400 group-hover:text-purple-300 font-medium">Yeni Proje Ekle</span>
+                        </button>
                     </div>
-                @empty
-                    <div class="col-span-full text-center py-8">
-                        <p class="text-gray-400 mb-4">Henüz proje oluşturmadınız</p>
-                        <a href="{{ route('dashboard.projects') }}" class="px-6 py-3 bg-purple-glow hover:bg-purple-dark text-white font-medium rounded-lg transition-all duration-200">
-                            İlk Projeyi Oluştur
-                        </a>
-                    </div>
-                @endforelse
+                    
+                    <!-- Proje Kartları -->
+                    @forelse($projectStats as $project)
+                        <div class="flex-shrink-0 w-64 h-32 p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-200 cursor-pointer" onclick="window.location.href='{{ route('dashboard.knowledge-base', ['project_id' => $project->id]) }}'">
+                            <div class="flex flex-col justify-between h-full">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="text-white font-medium text-sm truncate">{{ $project->name ?? 'İsimsiz Proje' }}</h4>
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ ($project->status ?? '') === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400' }}">
+                                        {{ ($project->status ?? '') === 'active' ? 'Aktif' : 'Pasif' }}
+                                    </span>
+                                </div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">KB:</span>
+                                        <span class="text-white">{{ $project->knowledge_bases_count ?? 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Chat:</span>
+                                        <span class="text-white">{{ $project->chat_sessions_count ?? 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="flex-shrink-0 w-64 h-32 flex items-center justify-center text-center">
+                            <div>
+                                <p class="text-gray-400 text-sm mb-2">Henüz proje yok</p>
+                                <p class="text-gray-500 text-xs">Yeni proje eklemek için sol butona tıklayın</p>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
 
@@ -369,4 +386,174 @@
             </div>
         </div>
 </div>
+
+<!-- Create Project Modal -->
+<div id="createProjectModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50">
+    <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-6 border border-gray-700 w-96 shadow-2xl rounded-xl glass-effect">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-white">Yeni Proje Oluştur</h3>
+            <button onclick="closeCreateProjectModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="createProjectForm" class="space-y-4">
+            @csrf
+            <div>
+                <label for="project_name" class="block text-sm font-medium text-gray-300 mb-2">Proje Adı</label>
+                <input type="text" id="project_name" name="name" required class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700">
+            </div>
+            
+            <div>
+                <label for="project_description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama</label>
+                <textarea id="project_description" name="description" rows="3" class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700 resize-none"></textarea>
+            </div>
+            
+            <div>
+                <label for="project_url" class="block text-sm font-medium text-gray-300 mb-2">URL <span class="text-red-400">*</span></label>
+                <div class="flex space-x-2">
+                    <input type="url" id="project_url" name="url" required placeholder="https://example.com" class="form-input flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-400 bg-gray-800/50 border border-gray-700">
+                    <button type="button" id="test_url_btn" class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="test_url_text">Test Et</span>
+                        <span id="test_url_loading" class="hidden">Test Ediliyor...</span>
+                    </button>
+                </div>
+                <div id="url_test_result" class="mt-2 text-sm hidden"></div>
+            </div>
+            
+            <div>
+                <label for="project_status" class="block text-sm font-medium text-gray-300 mb-2">Durum</label>
+                <select id="project_status" name="status" required class="form-select w-full px-4 py-3 rounded-lg text-white bg-gray-800/50 border border-gray-700">
+                    <option value="active">Aktif</option>
+                    <option value="inactive">Pasif</option>
+                    <option value="completed">Tamamlandı</option>
+                    <option value="archived">Arşivlendi</option>
+                </select>
+            </div>
+            
+            <div class="flex items-center space-x-3 pt-4">
+                <button type="submit" class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white font-semibold hover:from-purple-dark hover:to-neon-purple transition-all duration-300">
+                    Proje Oluştur
+                </button>
+                <button type="button" onclick="closeCreateProjectModal()" class="px-4 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold transition-colors">
+                    İptal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Create Project Modal Functions
+function openCreateProjectModal() {
+    document.getElementById('createProjectModal').classList.remove('hidden');
+}
+
+function closeCreateProjectModal() {
+    document.getElementById('createProjectModal').classList.add('hidden');
+    document.getElementById('createProjectForm').reset();
+}
+
+// Form submission
+document.getElementById('createProjectForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('/dashboard/projects', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeCreateProjectModal();
+            // Başarılı ekleme sonrası knowledge base sayfasına yönlendir
+            window.location.href = `/dashboard/knowledge-base?project_id=${data.project.id}`;
+        } else {
+            alert('Proje oluşturulurken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Proje oluşturulurken hata oluştu');
+    });
+});
+
+// URL Test functionality
+function testUrl(url, testBtn, textSpan, loadingSpan, resultDiv) {
+    if (!url || url.trim() === '') {
+        showUrlTestResult(resultDiv, 'Lütfen bir URL girin.', 'error');
+        return;
+    }
+
+    // Show loading state
+    testBtn.disabled = true;
+    textSpan.classList.add('hidden');
+    loadingSpan.classList.remove('hidden');
+
+    fetch('/api/test-url', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ url: url })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showUrlTestResult(resultDiv, data.message, 'success');
+        } else {
+            showUrlTestResult(resultDiv, data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showUrlTestResult(resultDiv, 'Test sırasında hata oluştu: ' + error.message, 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        testBtn.disabled = false;
+        textSpan.classList.remove('hidden');
+        loadingSpan.classList.add('hidden');
+    });
+}
+
+function showUrlTestResult(resultDiv, message, type) {
+    resultDiv.textContent = message;
+    resultDiv.classList.remove('hidden', 'text-green-400', 'text-red-400');
+    
+    if (type === 'success') {
+        resultDiv.classList.add('text-green-400');
+    } else {
+        resultDiv.classList.add('text-red-400');
+    }
+}
+
+// Add event listener for URL test button
+document.getElementById('test_url_btn').addEventListener('click', function() {
+    const url = document.getElementById('project_url').value;
+    const testBtn = this;
+    const textSpan = document.getElementById('test_url_text');
+    const loadingSpan = document.getElementById('test_url_loading');
+    const resultDiv = document.getElementById('url_test_result');
+    
+    testUrl(url, testBtn, textSpan, loadingSpan, resultDiv);
+});
+
+// Close modal when clicking outside
+document.getElementById('createProjectModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCreateProjectModal();
+    }
+});
+</script>
+
 @endsection
