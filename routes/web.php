@@ -124,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/knowledge-base/image-status', [KnowledgeBaseController::class, 'getImageAnalysisStatus'])->name('dashboard.knowledge-base.image-status');
     Route::delete('/dashboard/knowledge-base/{id}', [KnowledgeBaseController::class, 'destroy'])->name('dashboard.knowledge-base.destroy');
     Route::get('/dashboard/knowledge-base/{id}/detail', [KnowledgeBaseController::class, 'getDetail'])->name('dashboard.knowledge-base.detail');
+    Route::post('/dashboard/knowledge-base/{id}/refresh-chunks', [KnowledgeBaseController::class, 'refreshChunks'])->name('dashboard.knowledge-base.refresh-chunks');
     
     
     Route::get('/dashboard/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('dashboard.analytics');

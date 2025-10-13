@@ -972,6 +972,26 @@ function populateKnowledgeBasesList() {
                         </div>
                     </div>
                     
+                    ${kb.source_type === 'url' && kb.source_path ? `
+                        <div class="mt-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <span class="text-gray-400 text-xs">URL:</span>
+                                    <span class="text-blue-400 text-sm ml-2 font-mono" title="${kb.source_path}">
+                                        ${kb.source_path.length > 20 ? kb.source_path.substring(0, 20) + '...' : kb.source_path}
+                                    </span>
+                                </div>
+                                <button onclick="event.stopPropagation(); refreshKnowledgeBase(${kb.id})" 
+                                        class="ml-3 px-3 py-1 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white text-xs font-medium hover:from-purple-dark hover:to-neon-purple transition-all duration-300 flex items-center space-x-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    <span>Yenile</span>
+                                </button>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
                     ${kb.processing_status === 'completed' ? `
                         <div class="mt-4 flex space-x-3">
                             <button onclick="event.stopPropagation(); searchKnowledgeBase(${kb.id})" class="px-4 py-2 bg-gradient-to-r from-purple-glow to-neon-purple rounded-lg text-white text-sm font-medium hover:from-purple-dark hover:to-neon-purple transition-all duration-300">
@@ -2106,6 +2126,62 @@ function showErrorMessage(message) {
     setTimeout(() => {
         errorDiv.remove();
     }, 5000);
+}
+
+// Refresh Knowledge Base function
+async function refreshKnowledgeBase(kbId) {
+    if (!confirm('Bu bilgi tabanını yenilemek istediğinizden emin misiniz? Mevcut chunk\'lar silinecek ve URL\'den yeniden işlenecektir.')) {
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const refreshBtn = event.target.closest('button');
+        const originalContent = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = `
+            <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Yenileniyor...</span>
+        `;
+        refreshBtn.disabled = true;
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+        
+        const response = await fetch(`/dashboard/knowledge-base/${kbId}/refresh-chunks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccessMessage(`Bilgi tabanı başarıyla yenilendi! ${data.chunk_count} yeni chunk oluşturuldu.`);
+            // Reload the knowledge bases list
+            loadContent();
+        } else {
+            showErrorMessage(data.message || 'Bilgi tabanı yenilenirken hata oluştu.');
+        }
+        
+    } catch (error) {
+        console.error('Refresh error:', error);
+        showErrorMessage('Bilgi tabanı yenilenirken hata oluştu: ' + error.message);
+    } finally {
+        // Reset button state
+        const refreshBtn = event.target.closest('button');
+        refreshBtn.innerHTML = `
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Yenile</span>
+        `;
+        refreshBtn.disabled = false;
+    }
 }
 </script>
 @endsection
