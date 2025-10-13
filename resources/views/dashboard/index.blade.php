@@ -3,6 +3,59 @@
 @section('title', 'Dashboard')
 
 @section('content')
+<style>
+/* Custom Scrollbar for Project Cards */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #8B5CF6 #1F2937;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1F2937;
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #8B5CF6, #A855F7);
+    border-radius: 4px;
+    border: 1px solid #4C1D95;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #7C3AED, #9333EA);
+}
+
+/* Smooth scrolling */
+.custom-scrollbar {
+    scroll-behavior: smooth;
+}
+
+/* Scroll indicators */
+.custom-scrollbar::before,
+.custom-scrollbar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.custom-scrollbar::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.8), transparent);
+}
+
+.custom-scrollbar::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(15, 23, 42, 0.8), transparent);
+}
+</style>
 <div class="space-y-6">
     <!-- Welcome Section -->
     <div class="glass-effect rounded-2xl p-8 relative overflow-hidden">
@@ -55,7 +108,7 @@
             </div>
             
             <!-- Horizontal Scroll Container -->
-            <div class="overflow-x-auto pb-4">
+            <div class="overflow-x-auto pb-4 custom-scrollbar relative">
                 <div class="flex space-x-4 min-w-max">
                     <!-- Proje Ekle Butonu -->
                     <div class="flex-shrink-0">
