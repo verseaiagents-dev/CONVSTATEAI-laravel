@@ -111,10 +111,10 @@ class OrderDataMappingService
                     'order_date' => $apiResponse['order_date'] ?? date('c'),
                     'items' => $this->mapItems($apiResponse['items'] ?? []),
                     'shipping' => [
-                        'courier' => $apiResponse['courier'] ?? $apiResponse['shipping_company'] ?? 'Bilinmeyen',
+                        'courier' => $apiResponse['courier'] ?? $apiResponse['shipping_company'] ?? ' ',
                         'tracking_number' => $apiResponse['tracking_number'] ?? $trackingNumber,
                         'last_update' => $apiResponse['last_update'] ?? $apiResponse['updated_at'] ?? date('c'),
-                        'location' => $apiResponse['location'] ?? $apiResponse['current_location'] ?? 'Bilinmeyen',
+                        'location' => $apiResponse['location'] ?? $apiResponse['current_location'] ?? ' ',
                         'estimated_delivery' => $apiResponse['estimated_delivery'] ?? $apiResponse['delivery_date'] ?? date('c', strtotime('+3 days'))
                     ],
                     'message' => $apiResponse['message'] ?? 'Kargo takip bilgileri'

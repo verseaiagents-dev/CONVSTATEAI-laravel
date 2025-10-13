@@ -181,7 +181,7 @@ class MailTemplate extends Model
      */
     public function getCategoryNameAttribute()
     {
-        return self::CATEGORIES[$this->category] ?? 'Bilinmeyen';
+        return self::CATEGORIES[$this->category] ?? ' ';
     }
 
     /**

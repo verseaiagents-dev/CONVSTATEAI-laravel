@@ -521,7 +521,7 @@ class ActionAPIsController extends Controller
                 'name' => $metadata['name'] ?? 'Ürün ' . $productId,
                 'category' => $metadata['category'] ?? 'Genel',
                 'price' => $metadata['price'] ?? 0,
-                'brand' => $metadata['brand'] ?? 'Bilinmeyen',
+                'brand' => $metadata['brand'] ?? ' ',
                 'rating' => $metadata['rating'] ?? 4.0,
                 'stock' => $metadata['stock'] ?? 0,
                 'image' => ProductImageHelper::getImageWithFallback($metadata['image'] ?? null),

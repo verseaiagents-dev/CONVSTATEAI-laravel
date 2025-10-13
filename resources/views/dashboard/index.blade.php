@@ -125,18 +125,18 @@
                         <div class="flex-shrink-0 w-64 h-32 p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-200 cursor-pointer" onclick="window.location.href='{{ route('dashboard.knowledge-base', ['project_id' => $project->id]) }}'">
                             <div class="flex flex-col justify-between h-full">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h4 class="text-white font-medium text-sm truncate">{{ $project->name ?? 'İsimsiz Proje' }}</h4>
+                                    <h4 class="text-white font-medium text-sm truncate">{{ $project->name ?? '' }}</h4>
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ ($project->status ?? '') === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400' }}">
                                         {{ ($project->status ?? '') === 'active' ? 'Aktif' : 'Pasif' }}
                                     </span>
                                 </div>
                                 <div class="space-y-1 text-xs">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-400">KB:</span>
+                                        <span class="text-gray-400">Bilgi Tabanları:</span>
                                         <span class="text-white">{{ $project->knowledge_bases_count ?? 0 }}</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-400">Chat:</span>
+                                        <span class="text-gray-400">Sohbet Oturumları:</span>
                                         <span class="text-white">{{ $project->chat_sessions_count ?? 0 }}</span>
                                     </div>
                                 </div>

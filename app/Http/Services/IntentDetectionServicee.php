@@ -1771,7 +1771,7 @@ class IntentDetectionServicee {
                     'name' => $metadata['name'] ?? 'Ürün ' . $chunk->id,
                     'price' => $metadata['price'] ?? 0,
                     'rating' => $metadata['rating'] ?? 4.0,
-                    'brand' => $metadata['brand'] ?? 'Bilinmeyen',
+                    'brand' => $metadata['brand'] ?? ' ',
                     'stock' => $metadata['stock'] ?? 0,
                     'image' => ProductImageHelper::getImageWithFallback($metadata['image'] ?? null),
                     'description' => substr($chunk->content, 0, 200) . '...',
@@ -1833,7 +1833,7 @@ class IntentDetectionServicee {
                     'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
-                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                    'brand' => $productData['brand'] ?? ' ',
                     'rating' => $productData['rating']['rate'] ?? 4.0,
                     'stock' => 10, // Default stock
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
@@ -1883,7 +1883,7 @@ class IntentDetectionServicee {
                     'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
-                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                    'brand' => $productData['brand'] ?? ' ',
                     'rating' => $productData['rating']['rate'] ?? 4.0,
                     'stock' => 10, // Default stock
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),

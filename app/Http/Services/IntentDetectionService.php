@@ -1782,7 +1782,7 @@ class IntentDetectionService {
                     'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
                     'price' => $productData['price'] ?? 0,
                     'rating' => $productData['rating']['rate'] ?? 4.0,
-                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                    'brand' => $productData['brand'] ?? ' ',
                     'stock' => 10, // Default stock
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
                     'description' => $productData['description'] ?? substr($chunk->content, 0, 200) . '...',
@@ -1844,7 +1844,7 @@ class IntentDetectionService {
                     'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
-                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                    'brand' => $productData['brand'] ?? ' ',
                     'rating' => $productData['rating']['rate'] ?? 4.0,
                     'stock' => 10, // Default stock
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
@@ -1894,7 +1894,7 @@ class IntentDetectionService {
                     'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
-                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                    'brand' => $productData['brand'] ?? ' ',
                     'rating' => $productData['rating']['rate'] ?? 4.0,
                     'stock' => 10, // Default stock
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
@@ -2441,7 +2441,7 @@ class IntentDetectionService {
                     'name' => $productData['title'] ?? 'Ürün ' . $chunk->id,
                     'category' => $productData['category'] ?? 'Genel',
                     'price' => $productData['price'] ?? 0,
-                    'brand' => $productData['brand'] ?? 'Bilinmeyen',
+                    'brand' => $productData['brand'] ?? ' ',
                     'rating' => $productData['rating']['rate'] ?? 4.0,
                     'stock' => 10,
                     'image' => ProductImageHelper::getImageWithFallback($productData['image'] ?? null),
