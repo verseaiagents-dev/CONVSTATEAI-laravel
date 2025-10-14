@@ -39,9 +39,7 @@ class CampaignController extends Controller
                 }
                 
                 $campaigns = Campaign::where('project_id', $projectId)
-                    ->active()
-                    ->valid()
-                    ->orderBy('start_date', 'desc')
+                    ->orderBy('created_at', 'desc')
                     ->get();
 
                 return response()->json([
@@ -122,7 +120,12 @@ class CampaignController extends Controller
                 ], 422);
             }
 
-            $campaign = Campaign::create($request->all());
+            // Kampanya verilerini hazırla ve otomatik aktif yap
+            $campaignData = $request->all();
+            $campaignData['is_active'] = true; // Yeni kampanyaları otomatik aktif yap
+            $campaignData['created_by'] = auth()->id(); // Oluşturan kullanıcıyı ekle
+            
+            $campaign = Campaign::create($campaignData);
 
             return response()->json([
                 'success' => true,

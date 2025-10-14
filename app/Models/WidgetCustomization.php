@@ -135,7 +135,7 @@ class WidgetCustomization extends Model
             'primary_color' => $this->primary_color ?? '#3B82F6',
             'secondary_color' => $this->secondary_color ?? '#6B7280',
             'theme_color' => $this->theme_color ?? '#3B82F6',
-            'font_family' => $this->font_family ?? 'Inter',
+            'font_family' => $this->font_family ?? 'Roboto',
             'logo_url' => $this->logo_url
         ];
     }

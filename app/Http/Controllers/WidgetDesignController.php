@@ -147,7 +147,7 @@ class WidgetDesignController extends Controller
                 'error_message_template' => $request->error_message_template ?? $widgetCustomization->error_message_template,
                 'order_not_found_message' => $request->order_not_found_message ?? $widgetCustomization->order_not_found_message,
                 'theme_color' => $request->theme_color ?? $widgetCustomization->theme_color,
-                'font_family' => $request->font_family ?? $widgetCustomization->font_family,
+                'font_family' => $request->font_family ?? $widgetCustomization->font_family ?? 'Roboto',
                 'primary_color' => $request->primary_color ?? $widgetCustomization->primary_color,
                 'secondary_color' => $request->secondary_color ?? $widgetCustomization->secondary_color,
                 'language' => $request->language ?? $widgetCustomization->language ?? 'tr',

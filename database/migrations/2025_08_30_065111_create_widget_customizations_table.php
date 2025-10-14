@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('welcome_message', 500)->default('Merhaba ben Kadir, senin dijital asistanınım. Sana nasıl yardımcı olabilirim?');
             $table->string('primary_color', 7)->default('#007bff'); // Hex color code
             $table->string('secondary_color', 7)->default('#6c757d');
-            $table->string('font_family', 50)->default('Arial, sans-serif');
+            $table->string('font_family', 50)->default('Roboto, sans-serif');
             $table->integer('font_size')->default(14);
             $table->boolean('show_avatar')->default(true);
             $table->string('avatar_url')->nullable();
